@@ -1,0 +1,310 @@
+@import "tailwindcss";
+
+/* ─── @theme: exposes CSS vars to Tailwind so opacity modifiers (bg-accent/10) work ─── */
+@theme {
+  --color-accent: var(--accent);
+  --color-risk-low: var(--risk-low);
+  --color-risk-moderate: var(--risk-moderate);
+  --color-risk-high: var(--risk-high);
+  --color-risk-extreme: var(--risk-extreme);
+}
+
+/* ─── Layer 1: Runtime design tokens (Vercel-style) ─── */
+:root {
+  color-scheme: light;
+  --bg-base: oklch(0.99 0 0);
+  /* near-white */
+  --bg-subtle: oklch(0.97 0 0);
+  --bg-elevated: oklch(1.0 0 0);
+  --border-subtle: oklch(0.92 0 0);
+  --border-default: oklch(0.88 0 0);
+  --text-primary: oklch(0.15 0 0);
+  /* near-black */
+  --text-secondary: oklch(0.45 0 0);
+  --text-tertiary: oklch(0.65 0 0);
+  --accent: oklch(0.15 0 0);
+  /* Vercel uses black as accent in light mode */
+  --accent-muted: oklch(0.95 0 0);
+  --accent-border: oklch(0.85 0 0);
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.10), 0 2px 4px -2px rgb(0 0 0 / 0.10);
+
+  /* Risk colors */
+  --risk-low: oklch(0.62 0.17 145);
+  --risk-moderate: oklch(0.7 0.17 75);
+  --risk-high: oklch(0.6 0.22 25);
+  --risk-extreme: oklch(0.4 0.15 25);
+}
+
+.dark {
+  color-scheme: dark;
+  --bg-base: oklch(0.15 0 0);
+  /* very dark gray */
+  --bg-subtle: oklch(0.18 0 0);
+  --bg-elevated: oklch(0.2 0 0);
+  --border-subtle: oklch(0.25 0 0);
+  --border-default: oklch(0.3 0 0);
+  --text-primary: oklch(0.98 0 0);
+  --text-secondary: oklch(0.7 0 0);
+  --text-tertiary: oklch(0.5 0 0);
+  --accent: oklch(0.98 0 0);
+  /* White accent in dark mode */
+  --accent-muted: oklch(0.25 0 0);
+  --accent-border: oklch(0.35 0 0);
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.50);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.60), 0 2px 4px -2px rgb(0 0 0 / 0.50);
+}
+
+.oled {
+  color-scheme: dark;
+  --bg-base: oklch(0 0 0);
+  --bg-subtle: oklch(0.1 0 0);
+  --bg-elevated: oklch(0.15 0 0);
+  --border-subtle: oklch(0.2 0 0);
+  --border-default: oklch(0.25 0 0);
+  --text-primary: oklch(0.98 0 0);
+  --text-secondary: oklch(0.7 0 0);
+  --text-tertiary: oklch(0.5 0 0);
+  --accent: oklch(0.98 0 0);
+  --accent-muted: oklch(0.2 0 0);
+  --accent-border: oklch(0.3 0 0);
+  --shadow-sm: 0 1px 3px 0 rgb(255 255 255 / 0.05);
+  --shadow-md: 0 4px 8px -1px rgb(255 255 255 / 0.08), 0 2px 4px -2px rgb(255 255 255 / 0.08);
+}
+
+/* ─── Layer 2: Explicit utility classes (reliable in Tailwind v4) ─── */
+@layer utilities {
+
+  /* Backgrounds */
+  .bg-base {
+    background-color: var(--bg-base);
+  }
+
+  .bg-subtle {
+    background-color: var(--bg-subtle);
+  }
+
+  .bg-elevated {
+    background-color: var(--bg-elevated);
+  }
+
+  .bg-accent-muted {
+    background-color: var(--accent-muted);
+  }
+
+  /* Borders */
+  .border-subtle {
+    border-color: var(--border-subtle);
+  }
+
+  .border-default {
+    border-color: var(--border-default);
+  }
+
+  .border-accent {
+    border-color: var(--accent);
+  }
+
+  .border-accent-border {
+    border-color: var(--accent-border);
+  }
+
+  .divide-subtle>*+* {
+    border-color: var(--border-subtle);
+  }
+
+  /* Text */
+  .text-primary {
+    color: var(--text-primary);
+  }
+
+  .text-secondary {
+    color: var(--text-secondary);
+  }
+
+  .text-tertiary {
+    color: var(--text-tertiary);
+  }
+
+  .text-accent {
+    color: var(--accent);
+  }
+
+  /* Risk colors */
+  .text-risk-low {
+    color: var(--risk-low);
+  }
+
+  .text-risk-moderate {
+    color: var(--risk-moderate);
+  }
+
+  .text-risk-high {
+    color: var(--risk-high);
+  }
+
+  .text-risk-extreme {
+    color: var(--risk-extreme);
+  }
+
+  .bg-risk-low {
+    background-color: var(--risk-low);
+  }
+
+  .bg-risk-moderate {
+    background-color: var(--risk-moderate);
+  }
+
+  .bg-risk-high {
+    background-color: var(--risk-high);
+  }
+
+  .bg-risk-extreme {
+    background-color: var(--risk-extreme);
+  }
+
+  /* Shadows */
+  .shadow-token-sm {
+    box-shadow: var(--shadow-sm);
+  }
+
+  .shadow-token-md {
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Accent button helper */
+  .btn-accent {
+    background-color: var(--accent-muted);
+    border: 1px solid var(--accent-border);
+    color: var(--accent);
+  }
+
+  .btn-accent:hover {
+    background-color: rgba(37, 99, 235, 0.18);
+  }
+}
+
+/* ─── Transition scope (scoped to avoid FOUC on initial load) ─── */
+.theme-transitioning * {
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease !important;
+}
+
+/* ─── Base resets ─── */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-geist-sans), sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 2px;
+}
+
+/* Risk badge */
+.risk-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Mono font */
+.mono {
+  font-family: var(--font-geist-mono), monospace;
+}
+
+/* Live indicator */
+@keyframes pulse-dot {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: scale(0.85);
+  }
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--risk-low);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* Shimmer loading */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, var(--bg-elevated) 25%, var(--border-subtle) 50%, var(--bg-elevated) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+/* Agent stream cursor */
+@keyframes blink {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+.cursor::after {
+  content: '▍';
+  animation: blink 1s infinite;
+  color: var(--accent);
+}
+
+@keyframes pulse-dot {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}

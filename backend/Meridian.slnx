@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Meridian.API/Meridian.API.csproj" />
+  <Project Path="Meridian.Application/Meridian.Application.csproj" />
+  <Project Path="Meridian.Core/Meridian.Core.csproj" />
+  <Project Path="Meridian.Infrastructure/Meridian.Infrastructure.csproj" />
+</Solution>

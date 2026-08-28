@@ -1,0 +1,6 @@
+@Meridian.API_HostAddress = http://localhost:5250
+
+GET {{Meridian.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
