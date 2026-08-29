@@ -37,12 +37,18 @@ public class ExportController : ControllerBase
         double sumTemp = 0;
         int highRiskCount = 0;
 
+        // Extract location IDs for O(1) query
+        var locationIds = locations.Select(l => l.Id).ToList();
+        
+        // Fetch all latest readings in a single DB roundtrip
+        var latestReadings = await _heatRepo.GetLatestForLocationsAsync(locationIds, ct);
+        
+        // Map readings by LocationId for O(1) lookup
+        var readingsMap = latestReadings.ToDictionary(r => r.LocationId);
+
         foreach (var loc in locations)
         {
-            var readings = await _heatRepo.GetByLocationIdAsync(loc.Id, 1, ct);
-            var last = readings.FirstOrDefault();
-
-            if (last != null)
+            if (readingsMap.TryGetValue(loc.Id, out var last))
             {
                 var risk = RiskLevelExtensions.FromTemperature(last.TemperatureCelsius);
                 var riskStr = risk.ToString();

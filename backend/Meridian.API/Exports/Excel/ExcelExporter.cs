@@ -42,7 +42,7 @@ public class ZoneExcelExporter : IZoneExcelExporter
             worksheet.Cell(row, 4).Value = zone.HeatIndex;
             worksheet.Cell(row, 5).Value = zone.Humidity;
             worksheet.Cell(row, 6).Value = zone.RiskLevel.ToString();
-            worksheet.Cell(row, 7).Value = zone.Date.ToString("yyyy-MM-dd HH:mm");
+            worksheet.Cell(row, 7).Value = zone.Date;
 
             // Format numbers
             worksheet.Cell(row, 3).Style.NumberFormat.Format = "0.0";
