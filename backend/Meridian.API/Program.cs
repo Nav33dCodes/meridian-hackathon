@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 using Serilog;
 using System.Text.Json.Serialization;
-using Meridian.API.Exports.Csv;
 using Meridian.API.Exports.Pdf;
 using QuestPDF.Infrastructure;
 
@@ -38,7 +37,6 @@ builder.Services.AddSignalR()
         options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 builder.Services.AddScoped<Meridian.Core.Interfaces.Services.IHeatNotificationService, Meridian.API.Services.HeatNotificationService>();
-builder.Services.AddScoped<IZoneCsvExporter, ZoneCsvExporter>();
 builder.Services.AddScoped<Meridian.API.Exports.Excel.IZoneExcelExporter, Meridian.API.Exports.Excel.ZoneExcelExporter>();
 builder.Services.AddScoped<IChartRenderer, ChartRenderer>();
 builder.Services.AddHostedService<Meridian.API.Services.LiveHeatSimulatorService>();
