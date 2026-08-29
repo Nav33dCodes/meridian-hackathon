@@ -87,5 +87,14 @@ app.MapControllers();
 app.MapHealthChecks("/health");
 app.MapHub<HeatHub>("/hubs/heat");
 
+app.MapGet("/", () => new
+{
+    Name = "Meridian API",
+    Version = "1.0.0",
+    Status = "Online",
+    Environment = app.Environment.EnvironmentName,
+    Documentation = "/swagger/index.html"
+});
+
 Log.Information("Meridian API starting on {Env}", app.Environment.EnvironmentName);
 app.Run();
