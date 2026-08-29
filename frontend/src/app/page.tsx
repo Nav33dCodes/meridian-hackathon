@@ -154,16 +154,17 @@ export default function DashboardPage() {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 mr-2">
+          {/* Segmented Control for Live/History */}
+          <div className="flex items-center p-1 bg-subtle border border-subtle rounded-xl mr-1">
             <button
               onClick={() => setIsHistorical(false)}
-              className={`text-xs px-3 py-1.5 rounded-lg font-semibold transition-colors ${!isHistorical ? 'bg-accent text-white shadow-sm' : 'bg-transparent text-secondary hover:bg-subtle'}`}
+              className={`text-xs px-3 py-1 rounded-lg font-semibold transition-colors ${!isHistorical ? 'bg-elevated text-primary shadow-sm border border-default' : 'text-tertiary hover:text-secondary'}`}
             >
               Live
             </button>
             <button
               onClick={() => setIsHistorical(true)}
-              className={`text-xs px-3 py-1.5 rounded-lg font-semibold transition-colors ${isHistorical ? 'bg-accent text-white shadow-sm' : 'bg-transparent text-secondary hover:bg-subtle'}`}
+              className={`text-xs px-3 py-1 rounded-lg font-semibold transition-colors ${isHistorical ? 'bg-elevated text-primary shadow-sm border border-default' : 'text-tertiary hover:text-secondary'}`}
             >
               24h History
             </button>
