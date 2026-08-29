@@ -1,6 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
-using Meridian.API.Exports;
-using Meridian.API.Exports.Csv;
 using Meridian.API.Exports.Excel;
 using Meridian.API.Exports.Pdf;
 using Meridian.Core.Interfaces.Repositories;
@@ -15,20 +12,17 @@ public class ExportController : ControllerBase
 {
     private readonly ILocationRepository _locationRepo;
     private readonly IHeatReadingRepository _heatRepo;
-    private readonly IZoneCsvExporter _csvExporter;
     private readonly IZoneExcelExporter _excelExporter;
     private readonly IChartRenderer _chartRenderer;
 
     public ExportController(
         ILocationRepository locationRepo, 
         IHeatReadingRepository heatRepo,
-        IZoneCsvExporter csvExporter,
         IZoneExcelExporter excelExporter,
         IChartRenderer chartRenderer)
     {
         _locationRepo = locationRepo;
         _heatRepo = heatRepo;
-        _csvExporter = csvExporter;
         _excelExporter = excelExporter;
         _chartRenderer = chartRenderer;
     }
@@ -78,14 +72,6 @@ public class ExportController : ControllerBase
         };
     }
 
-    [HttpGet("csv")]
-    public async Task<IActionResult> ExportCsv(CancellationToken ct)
-    {
-        var model = await BuildExportModelAsync(ct);
-        var bytes = _csvExporter.ExportToCsv(model.Zones);
-        var fileName = $"meridian-zones-{DateTime.UtcNow:yyyy-MM-dd-HHmmss}.csv";
-        return File(bytes, "text/csv", fileName);
-    }
 
     [HttpGet("excel")]
     public async Task<IActionResult> ExportExcel(CancellationToken ct)
