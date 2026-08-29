@@ -2,15 +2,14 @@ import { useEffect } from 'react';
 import * as signalR from '@microsoft/signalr';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { API_BASE } from '@/lib/api/client';
 
 export function useSignalR() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    const url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5250';
-
     const connection = new signalR.HubConnectionBuilder()
-      .withUrl(`${url}/hubs/heat`)
+      .withUrl(`${API_BASE}/hubs/heat`)
       .withAutomaticReconnect()
       .build();
 
