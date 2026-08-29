@@ -90,6 +90,12 @@ public class HeatController : ControllerBase
         reading.Location = location;
         var responseDto = _mapper.Map<HeatReadingResponse>(reading);
 
+        // Notify clients that new data is available (for legacy listeners)
+        await _hubContext.Clients.All.SendAsync("HeatReadingsUpdated", ct);
+
+        // Push full reading via SignalR for live zero-latency dashboard updates
+        await _hubContext.Clients.All.SendAsync("ReceiveHeatReading", responseDto, ct);
+
         // SignalR Real-Time Alert for Extreme Heat
         if (reading.RiskLevel == RiskLevel.Extreme)
         {

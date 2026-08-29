@@ -59,13 +59,37 @@ export default function LocationsPage() {
 
   const createLocation = useMutation({
     mutationFn: (data: Parameters<typeof locationApi.create>[0]) => locationApi.create(data),
-    onSuccess: () => {
-      toast.success('New zone added!');
+    onMutate: async (newData) => {
+      await qc.cancelQueries({ queryKey: ['locations', page, search] });
+      const previous = qc.getQueryData(['locations', page, search]);
+      
+      const optimisticLocation = {
+        id: crypto.randomUUID(), // Fake ID for UI
+        ...newData,
+        isActive: false,
+      };
+
+      qc.setQueryData(['locations', page, search], (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          data: [optimisticLocation, ...old.data].slice(0, limit),
+          totalCount: old.totalCount + 1
+        };
+      });
+      
       setIsModalOpen(false);
       setFormData({ name: '', city: '', country: '', latitude: '', longitude: '' });
+      return { previous };
+    },
+    onError: (e: any, variables, context) => {
+      qc.setQueryData(['locations', page, search], context?.previous);
+      toast.error(e.message || 'Failed to add zone');
+    },
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: ['locations'] });
     },
-    onError: (e: any) => toast.error(e.message || 'Failed to add zone'),
+    onSuccess: () => toast.success('New zone added!'),
   });
 
   const createBulk = useMutation({
@@ -79,25 +103,52 @@ export default function LocationsPage() {
 
   const deleteLocation = useMutation({
     mutationFn: (id: string) => locationApi.delete(id),
-    onSuccess: () => {
-      toast.success('Location deleted');
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: ['locations', page, search] });
+      const previous = qc.getQueryData(['locations', page, search]);
+      
+      qc.setQueryData(['locations', page, search], (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          data: old.data.filter((l: any) => l.id !== id),
+          totalCount: Math.max(0, old.totalCount - 1)
+        };
+      });
       setDeleteConfirm(null);
+      return { previous };
+    },
+    onError: (e: any, id, context) => {
+      qc.setQueryData(['locations', page, search], context?.previous);
+      toast.error(e.message || 'Failed to delete');
+    },
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: ['locations'] });
       qc.invalidateQueries({ queryKey: ['dashboard'] });
     },
-    onError: (e: any) => toast.error(e.message || 'Failed to delete'),
+    onSuccess: () => toast.success('Location deleted'),
   });
 
   const deleteAll = useMutation({
     mutationFn: () => locationApi.deleteAll(),
-    onSuccess: () => {
-      toast.success('All locations cleared');
+    onMutate: async () => {
+      await qc.cancelQueries({ queryKey: ['locations'] });
+      const previous = qc.getQueryData(['locations', page, search]);
+      
+      qc.setQueryData(['locations', page, search], { data: [], totalPages: 1, totalCount: 0 });
       setDeleteAllConfirm(false);
       setPage(1);
+      return { previous };
+    },
+    onError: (e: any, variables, context) => {
+      qc.setQueryData(['locations', page, search], context?.previous);
+      toast.error(e.message || 'Failed to clear');
+    },
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: ['locations'] });
       qc.invalidateQueries({ queryKey: ['dashboard'] });
     },
-    onError: (e: any) => toast.error(e.message || 'Failed to clear'),
+    onSuccess: () => toast.success('All locations cleared'),
   });
 
   const handleSearch = (e: React.FormEvent) => {

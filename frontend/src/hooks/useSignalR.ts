@@ -14,11 +14,43 @@ export function useSignalR() {
       .withAutomaticReconnect()
       .build();
 
-    connection.on('HeatReadingsUpdated', () => {
-      console.log('Real-time update received: Heat readings ingested!');
-      toast.success('Live update: New heat data ingested!');
+    // Listen for full heat reading payload to do manual zero-latency cache updates
+    connection.on('ReceiveHeatReading', (reading: any) => {
+      // Update dashboard cache
+      queryClient.setQueryData(['dashboard'], (oldData: any) => {
+        if (!oldData || !oldData.readings) return oldData;
+        
+        const newReadings = [...oldData.readings];
+        const existingIndex = newReadings.findIndex(r => r.locationId === reading.locationId);
+        if (existingIndex >= 0) newReadings[existingIndex] = reading;
+        else newReadings.unshift(reading);
 
-      // Invalidate relevant queries to trigger an immediate background refetch
+        // Recalculate stats
+        const extremeRiskCount = newReadings.filter(r => r.riskLevel === 'Extreme').length;
+        const highRiskCount = newReadings.filter(r => r.riskLevel === 'High').length;
+        const globalAverageTemp = newReadings.reduce((sum, r) => sum + r.temperatureCelsius, 0) / newReadings.length;
+
+        return {
+          ...oldData,
+          readings: newReadings,
+          extremeRiskCount,
+          highRiskCount,
+          globalAverageTemp,
+          totalLocations: newReadings.length
+        };
+      });
+
+      // Update locations cache if needed (less critical for instant UI, but good for sync)
+      queryClient.invalidateQueries({ queryKey: ['locations'] });
+    });
+
+    connection.on('HeatReadingsUpdated', () => {
+      // Legacy fallback
+    });
+
+    // Fallback: If connection drops and reconnects, we might have missed events, so refetch everything
+    connection.onreconnected(() => {
+      console.log('SignalR Reconnected! Refetching stale data...');
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       queryClient.invalidateQueries({ queryKey: ['locations'] });
     });

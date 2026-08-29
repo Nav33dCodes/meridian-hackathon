@@ -11,9 +11,10 @@ import {
 } from 'recharts';
 import type { HeatReading } from '@/types';
 import dynamic from 'next/dynamic';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useSignalR } from '@/hooks/useSignalR';
 import Link from 'next/link';
+import { useVirtualizer } from '@tanstack/react-virtual';
 
 const DynamicMap = dynamic(() => import('@/components/Map'), { ssr: false });
 
@@ -60,7 +61,7 @@ export default function DashboardPage() {
   const { data, isLoading, refetch, isFetching } = useQuery({
     queryKey: ['dashboard'],
     queryFn: heatApi.getDashboard,
-    refetchInterval: 30000,
+    // Real-time updates are now pushed via SignalR WebSocket in useSignalR!
   });
 
   const [isHistorical, setIsHistorical] = useState(false);
@@ -137,6 +138,15 @@ export default function DashboardPage() {
   const chartData = sortedReadings.slice(0, 20);
   const hasData = !isLoading && readings.length > 0;
   const skeletonRows = [...Array(8)];
+
+  // Virtualizer for the readings list
+  const parentRef = useRef<HTMLDivElement>(null);
+  const rowVirtualizer = useVirtualizer({
+    count: sortedReadings.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 55, // Approx height of each row
+    overscan: 10,
+  });
 
   return (
     <div className="h-screen max-h-screen overflow-hidden flex flex-col relative">
@@ -249,55 +259,59 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto">
-              <table className="w-full text-left border-collapse">
-                <thead className="sticky top-0 z-10 bg-elevated border-b border-subtle">
-                  <tr>
-                    <th className="text-xs font-semibold text-tertiary uppercase tracking-wider py-2 px-4">Location</th>
-                    <th className="text-xs font-semibold text-tertiary uppercase tracking-wider py-2 px-3">Temp</th>
-                    <th className="text-xs font-semibold text-tertiary uppercase tracking-wider py-2 px-3 hidden xl:table-cell">Humidity</th>
-                    <th className="text-xs font-semibold text-tertiary uppercase tracking-wider py-2 px-3 hidden xl:table-cell">Heat Idx</th>
-                    <th className="text-xs font-semibold text-tertiary uppercase tracking-wider py-2 px-3">Risk</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {isLoading ? (
-                    skeletonRows.map((_, i) => (
-                      <tr key={i} className="border-b border-subtle/40">
-                        <td className="py-2.5 px-4"><div className="shimmer h-3.5 w-36 rounded" /></td>
-                        <td className="py-2.5 px-3"><div className="shimmer h-3.5 w-10 rounded" /></td>
-                        <td className="py-2.5 px-3 hidden xl:table-cell"><div className="shimmer h-3.5 w-8 rounded" /></td>
-                        <td className="py-2.5 px-3 hidden xl:table-cell"><div className="shimmer h-3.5 w-10 rounded" /></td>
-                        <td className="py-2.5 px-3"><div className="shimmer h-4 w-14 rounded-md" /></td>
-                      </tr>
-                    ))
-                  ) : (
-                    sortedReadings.map((r) => (
-                      <tr
+            <div className="flex-1 overflow-y-auto" ref={parentRef}>
+              {/* Virtualized List Header */}
+              <div className="sticky top-0 z-10 bg-elevated border-b border-subtle flex items-center shadow-sm">
+                <div className="text-xs font-semibold text-tertiary uppercase tracking-wider py-2 px-4 flex-1 min-w-[120px]">Location</div>
+                <div className="text-xs font-semibold text-tertiary uppercase tracking-wider py-2 px-3 w-16 shrink-0">Temp</div>
+                <div className="text-xs font-semibold text-tertiary uppercase tracking-wider py-2 px-3 w-16 shrink-0 hidden xl:block">Humid</div>
+                <div className="text-xs font-semibold text-tertiary uppercase tracking-wider py-2 px-3 w-16 shrink-0 hidden xl:block">Idx</div>
+                <div className="text-xs font-semibold text-tertiary uppercase tracking-wider py-2 px-3 w-20 shrink-0">Risk</div>
+              </div>
+
+              {isLoading ? (
+                <div className="flex flex-col">
+                  {skeletonRows.map((_, i) => (
+                    <div key={i} className="flex border-b border-subtle/40 py-2.5 px-4 items-center">
+                      <div className="shimmer h-3.5 w-36 rounded flex-1 mr-2" />
+                      <div className="shimmer h-3.5 w-10 rounded w-16 shrink-0 mr-2" />
+                      <div className="shimmer h-3.5 w-8 rounded w-16 shrink-0 hidden xl:block mr-2" />
+                      <div className="shimmer h-3.5 w-10 rounded w-16 shrink-0 hidden xl:block mr-2" />
+                      <div className="shimmer h-4 w-14 rounded-md w-20 shrink-0" />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div style={{ height: `${rowVirtualizer.getTotalSize()}px`, width: '100%', position: 'relative' }}>
+                  {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                    const r = sortedReadings[virtualRow.index];
+                    return (
+                      <div
                         key={r.id}
-                        className="border-b border-subtle hover:bg-subtle/60 transition-colors"
+                        className="flex border-b border-subtle hover:bg-subtle/60 transition-colors absolute top-0 left-0 w-full items-center overflow-hidden"
+                        style={{ height: `${virtualRow.size}px`, transform: `translateY(${virtualRow.start}px)` }}
                       >
-                        <td className="py-2 px-4">
+                        <div className="py-2 px-4 flex-1 min-w-[120px]">
                           <p className="text-sm font-medium text-primary truncate max-w-[160px]">{r.locationName}</p>
-                          <p className="text-xs text-tertiary">{r.resolution}</p>
-                        </td>
-                        <td className="py-2 px-3">
+                          <p className="text-xs text-tertiary truncate max-w-[160px]">{r.resolution}</p>
+                        </div>
+                        <div className="py-2 px-3 w-16 shrink-0">
                           <span className="text-base font-bold font-mono text-[color:var(--dynamic-color)]" style={{ '--dynamic-color': r.riskColor } as React.CSSProperties}>{r.temperatureCelsius.toFixed(1)}°</span>
-                        </td>
-                        <td className="py-2 px-3 hidden xl:table-cell">
+                        </div>
+                        <div className="py-2 px-3 w-16 shrink-0 hidden xl:block">
                           <span className="text-xs text-secondary font-mono">{r.humidityPercent.toFixed(0)}%</span>
-                        </td>
-                        <td className="py-2 px-3 hidden xl:table-cell">
+                        </div>
+                        <div className="py-2 px-3 w-16 shrink-0 hidden xl:block">
                           <span className="text-xs text-secondary font-mono">{r.heatIndexCelsius.toFixed(1)}°</span>
-                        </td>
-                        <td className="py-2 px-3">
+                        </div>
+                        <div className="py-2 px-3 w-20 shrink-0">
                           <RiskBadge level={r.riskLevel as any} />
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             <div className="px-4 py-2 border-t border-subtle bg-subtle shrink-0">
