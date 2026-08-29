@@ -25,5 +25,10 @@ public class AppDbContext : DbContext
             new Location { Id = Guid.Parse("33333333-3333-3333-3333-333333333333"), Name = "Karachi Saddar", City = "Karachi", Country = "Pakistan", Latitude = 24.8607, Longitude = 67.0011, CreatedAt = seedDate },
             new Location { Id = Guid.Parse("44444444-4444-4444-4444-444444444444"), Name = "Riyadh City Center", City = "Riyadh", Country = "Saudi Arabia", Latitude = 24.7136, Longitude = 46.6753, CreatedAt = seedDate }
         );
+
+        // Performance indexes
+        modelBuilder.Entity<HeatReading>()
+            .HasIndex(h => new { h.LocationId, h.MeasuredAt })
+            .IsDescending(false, true);
     }
 }
