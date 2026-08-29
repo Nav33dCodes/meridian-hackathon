@@ -18,9 +18,9 @@ export function useSignalR() {
     connection.on('ReceiveHeatReading', (reading: any) => {
       // Update dashboard cache
       queryClient.setQueryData(['dashboard'], (oldData: any) => {
-        if (!oldData || !oldData.readings) return oldData;
-        
-        const newReadings = [...oldData.readings];
+        if (!oldData || !oldData.latestReadings) return oldData;
+
+        const newReadings = [...oldData.latestReadings];
         const existingIndex = newReadings.findIndex(r => r.locationId === reading.locationId);
         if (existingIndex >= 0) newReadings[existingIndex] = reading;
         else newReadings.unshift(reading);
@@ -32,7 +32,7 @@ export function useSignalR() {
 
         return {
           ...oldData,
-          readings: newReadings,
+          latestReadings: newReadings,
           extremeRiskCount,
           highRiskCount,
           globalAverageTemp,
