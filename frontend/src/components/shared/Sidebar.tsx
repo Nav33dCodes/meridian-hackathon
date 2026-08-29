@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { useState } from 'react';
+import { Button } from './ui/Button';
 
 const nav = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -27,13 +28,13 @@ export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <aside 
-      className={`h-screen sticky top-0 flex flex-col bg-elevated/80 backdrop-blur-xl border-r border-subtle z-50 transition-[width] duration-200 ease-in-out ${collapsed ? 'w-[80px]' : 'w-[260px]'}`}
+    <aside
+      className={`h-screen sticky top-0 flex flex-col bg-elevated/80 backdrop-blur-xl border-r border-subtle z-50 transition-[width] duration-200 ease-in-out ${collapsed ? 'w-[72px]' : 'w-[260px]'}`}
     >
-      <div className="flex items-center p-5 border-b border-subtle shrink-0 h-[81px] overflow-hidden">
-        <div className="flex items-center gap-3 w-full">
+      <div className={`flex items-center border-b border-subtle shrink-0 h-[81px] overflow-hidden ${collapsed ? 'px-0 justify-center' : 'px-5'}`}>
+        <div className={`flex items-center w-full ${collapsed ? 'justify-center' : 'gap-3'}`}>
           <div className="w-10 h-10 shrink-0 rounded-xl flex items-center justify-center bg-accent text-white shadow-token-md">
-             <Thermometer size={22} className="drop-shadow-md" />
+            <Thermometer size={22} className="drop-shadow-md" />
           </div>
           {!collapsed && (
             <div className="overflow-hidden whitespace-nowrap">
@@ -44,7 +45,7 @@ export function Sidebar() {
         </div>
       </div>
 
-      <nav className="flex flex-col gap-2 p-3 flex-1 overflow-x-hidden overflow-y-auto">
+      <nav className={`flex flex-col gap-2 flex-1 overflow-x-hidden overflow-y-auto ${collapsed ? 'p-2' : 'p-3'}`}>
         {nav.map(({ href, label, icon: Icon }) => {
           const active = path === href;
           return (
@@ -52,9 +53,9 @@ export function Sidebar() {
               key={href}
               href={href}
               prefetch={true}
-              className={`relative flex items-center gap-3 p-3 rounded-xl transition-all ${active 
-                ? 'bg-accent/10 text-accent font-semibold shadow-sm' 
-                : 'text-secondary hover:text-primary hover:bg-subtle/50'
+              className={`relative flex items-center rounded-xl transition-all ${collapsed ? 'justify-center h-12 w-12 mx-auto' : 'gap-3 p-3'} ${active
+                ? 'bg-accent/10 text-accent font-semibold shadow-sm'
+                : 'text-secondary hover:text-primary hover:bg-subtle'
                 }`}
               title={collapsed ? label : undefined}
             >
@@ -64,7 +65,7 @@ export function Sidebar() {
                   {label}
                 </span>
               )}
-              {active && (
+              {active && !collapsed && (
                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-accent rounded-r-full" />
               )}
             </Link>
@@ -72,22 +73,24 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="p-4 flex flex-col gap-3 border-t border-subtle bg-base/50 shrink-0 overflow-hidden">
-        <div className="flex items-center justify-between">
+      <div className={`flex flex-col border-t border-subtle bg-base/50 shrink-0 overflow-hidden ${collapsed ? 'p-2 gap-2' : 'p-4 gap-4'}`}>
+        {!collapsed && (
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 shrink-0 rounded-full bg-risk-low" />
-            {!collapsed && <span className="text-xs font-medium text-tertiary whitespace-nowrap">System Live</span>}
+            <span className="text-xs font-medium text-tertiary whitespace-nowrap">System Live</span>
           </div>
-        </div>
-        <div className={`flex items-center ${collapsed ? 'justify-center flex-col gap-3' : 'justify-between'}`}>
+        )}
+        <div className={`flex items-center ${collapsed ? 'flex-col gap-2' : 'justify-between'}`}>
           <ThemeToggle />
-          <button 
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setCollapsed(!collapsed)}
-            className="w-9 h-9 rounded-lg flex items-center justify-center text-tertiary hover:bg-subtle hover:text-primary transition-colors focus:outline-none"
-            aria-label="Toggle Sidebar"
+            className={`flex items-center justify-center p-0 ${collapsed ? 'w-10 h-10' : 'w-9 h-9'}`}
+            title="Toggle Sidebar"
           >
             {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-          </button>
+          </Button>
         </div>
       </div>
     </aside>

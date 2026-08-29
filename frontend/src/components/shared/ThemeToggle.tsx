@@ -3,6 +3,7 @@
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import { Sun, Moon, Contrast } from 'lucide-react';
+import { Button } from './ui/Button';
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
@@ -38,9 +39,11 @@ export function ThemeToggle() {
   };
 
   return (
-    <button
+    <Button
+      variant="ghost"
+      size="sm"
       onClick={cycleTheme}
-      className="flex items-center justify-center w-9 h-9 rounded-lg hover:bg-subtle text-secondary hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-accent/50"
+      className="w-9 h-9 p-0 flex items-center justify-center text-secondary hover:text-primary"
       aria-label={`Current theme is ${resolvedTheme}. Click to cycle.`}
       title="Toggle Theme"
     >
@@ -48,6 +51,6 @@ export function ThemeToggle() {
       {resolvedTheme === 'light' && <Sun size={18} />}
       {resolvedTheme === 'dark' && <Moon size={18} />}
       {resolvedTheme === 'oled' && <Contrast size={18} />}
-    </button>
+    </Button>
   );
 }

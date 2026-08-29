@@ -38,7 +38,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("MeridianCors", policy =>
         policy.WithOrigins(
-            "http://localhost:3000",
+            "http://localhost:3001","http://localhost:3000"
             "https://meridian.vercel.app"
         )
         .AllowAnyHeader()
