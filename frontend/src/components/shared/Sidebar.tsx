@@ -13,7 +13,6 @@ import {
 } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 const nav = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -28,41 +27,24 @@ export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <motion.aside 
-      initial={false}
-      animate={{ width: collapsed ? 80 : 260 }}
-      transition={{ duration: 0.3, ease: "anticipate" }}
-      className="h-screen sticky top-0 flex flex-col bg-elevated/80 backdrop-blur-xl border-r border-subtle z-50 overflow-visible"
+    <aside 
+      className={`h-screen sticky top-0 flex flex-col bg-elevated/80 backdrop-blur-xl border-r border-subtle z-50 transition-[width] duration-200 ease-in-out ${collapsed ? 'w-[80px]' : 'w-[260px]'}`}
     >
-      <div className="flex items-center justify-between p-5 border-b border-subtle">
-        <div className="flex items-center gap-3 overflow-hidden">
-          <div className="w-10 h-10 shrink-0 rounded-xl flex items-center justify-center bg-accent text-white shadow-token-md overflow-hidden">
+      <div className="flex items-center p-5 border-b border-subtle shrink-0 h-[81px] overflow-hidden">
+        <div className="flex items-center gap-3 w-full">
+          <div className="w-10 h-10 shrink-0 rounded-xl flex items-center justify-center bg-accent text-white shadow-token-md">
              <Thermometer size={22} className="drop-shadow-md" />
           </div>
-          <AnimatePresence>
-            {!collapsed && (
-              <motion.div
-                initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: "auto" }}
-                exit={{ opacity: 0, width: 0 }}
-                className="overflow-hidden whitespace-nowrap"
-              >
-                <p className="font-bold text-base tracking-tight text-primary">Meridian</p>
-                <p className="text-xs text-tertiary font-medium">Bento UI</p>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {!collapsed && (
+            <div className="overflow-hidden whitespace-nowrap">
+              <p className="font-bold text-base tracking-tight text-primary">Meridian</p>
+              <p className="text-xs text-tertiary font-medium">Bento UI</p>
+            </div>
+          )}
         </div>
       </div>
 
-      <button
-        onClick={() => setCollapsed(!collapsed)}
-        className="absolute top-6 -right-3.5 w-7 h-7 bg-elevated border border-subtle rounded-full flex items-center justify-center text-secondary hover:text-primary hover:bg-subtle transition-colors shadow-token-sm z-50 cursor-pointer backdrop-blur-md"
-      >
-        {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
-      </button>
-
-      <nav className="flex flex-col gap-2 p-3 flex-1 relative mt-4 overflow-x-hidden">
+      <nav className="flex flex-col gap-2 p-3 flex-1 overflow-x-hidden overflow-y-auto">
         {nav.map(({ href, label, icon: Icon }) => {
           const active = path === href;
           return (
@@ -77,49 +59,37 @@ export function Sidebar() {
               title={collapsed ? label : undefined}
             >
               <Icon size={20} className={`shrink-0 ${active ? 'text-accent' : 'text-tertiary'}`} />
-              <AnimatePresence>
-                {!collapsed && (
-                  <motion.span
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
-                    className="whitespace-nowrap text-sm"
-                  >
-                    {label}
-                  </motion.span>
-                )}
-              </AnimatePresence>
+              {!collapsed && (
+                <span className="whitespace-nowrap text-sm">
+                  {label}
+                </span>
+              )}
               {active && (
-                <motion.div 
-                  layoutId="active-indicator"
-                  className="absolute left-0 top-0 bottom-0 w-1 bg-accent rounded-r-full" 
-                />
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-accent rounded-r-full" />
               )}
             </Link>
           );
         })}
       </nav>
 
-      <div className="p-4 flex items-center justify-between border-t border-subtle bg-base/50 overflow-hidden">
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 shrink-0 rounded-full bg-risk-low animate-pulse" />
-          <AnimatePresence>
-            {!collapsed && (
-              <motion.span
-                initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: "auto" }}
-                exit={{ opacity: 0, width: 0 }}
-                className="text-xs font-medium text-tertiary whitespace-nowrap"
-              >
-                System Live
-              </motion.span>
-            )}
-          </AnimatePresence>
+      <div className="p-4 flex flex-col gap-3 border-t border-subtle bg-base/50 shrink-0 overflow-hidden">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 shrink-0 rounded-full bg-risk-low" />
+            {!collapsed && <span className="text-xs font-medium text-tertiary whitespace-nowrap">System Live</span>}
+          </div>
         </div>
-        <div className="shrink-0">
+        <div className={`flex items-center ${collapsed ? 'justify-center flex-col gap-3' : 'justify-between'}`}>
           <ThemeToggle />
+          <button 
+            onClick={() => setCollapsed(!collapsed)}
+            className="w-9 h-9 rounded-lg flex items-center justify-center text-tertiary hover:bg-subtle hover:text-primary transition-colors focus:outline-none"
+            aria-label="Toggle Sidebar"
+          >
+            {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+          </button>
         </div>
       </div>
-    </motion.aside>
+    </aside>
   );
 }
