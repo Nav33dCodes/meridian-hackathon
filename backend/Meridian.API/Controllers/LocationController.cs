@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Meridian.Application.DTOs.Requests;
 using Meridian.Application.DTOs.Responses;
 using Meridian.Application.Services;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Meridian.API.Controllers;
 
@@ -11,10 +12,12 @@ namespace Meridian.API.Controllers;
 public class LocationController : ControllerBase
 {
     private readonly LocationService _locationService;
+    private readonly IMemoryCache _cache;
 
-    public LocationController(LocationService locationService)
+    public LocationController(LocationService locationService, IMemoryCache cache)
     {
         _locationService = locationService;
+        _cache = cache;
     }
 
     /// <summary>Get all active locations with latest readings</summary>
@@ -25,16 +28,25 @@ public class LocationController : ControllerBase
         [FromQuery] string? search = null, 
         CancellationToken ct = default)
     {
+        var cacheKey = $"locations_{page}_{limit}_{search}";
+        if (_cache.TryGetValue(cacheKey, out object? cachedResult) && cachedResult != null)
+        {
+            return Ok(cachedResult);
+        }
+
         var (items, totalCount) = await _locationService.GetPaginatedWithLatestReadingsAsync(page, limit, search, ct);
         
-        return Ok(new 
+        var responseObj = new 
         {
             Data = items,
             TotalCount = totalCount,
             Page = page,
             PageSize = limit,
             TotalPages = (int)Math.Ceiling(totalCount / (double)limit)
-        });
+        };
+
+        _cache.Set(cacheKey, responseObj, TimeSpan.FromSeconds(15));
+        return Ok(responseObj);
     }
 
     /// <summary>Create a new monitored location</summary>

@@ -36,9 +36,13 @@ public class LocationService
         var (locations, totalCount) = await _locationRepo.GetPaginatedLocationsAsync(page, pageSize, search, ct);
         var result = new List<LocationResponse>();
 
+        var locationIds = locations.Select(l => l.Id).ToList();
+        var latestReadings = await _heatRepo.GetLatestForLocationsAsync(locationIds, ct);
+        var readingsDict = latestReadings.ToDictionary(r => r.LocationId);
+
         foreach (var location in locations)
         {
-            var latest = await _heatRepo.GetLatestByLocationAsync(location.Id, ct);
+            readingsDict.TryGetValue(location.Id, out var latest);
             var latestDto = latest is not null ? _mapper.Map<HeatReadingResponse>(latest) : null;
             var dto = _mapper.Map<LocationResponse>(location) with { LatestReading = latestDto };
             result.Add(dto);
@@ -52,9 +56,13 @@ public class LocationService
         var locations = await _locationRepo.GetActiveLocationsAsync(ct);
         var result = new List<LocationResponse>();
 
+        var locationIds = locations.Select(l => l.Id).ToList();
+        var latestReadings = await _heatRepo.GetLatestForLocationsAsync(locationIds, ct);
+        var readingsDict = latestReadings.ToDictionary(r => r.LocationId);
+
         foreach (var location in locations)
         {
-            var latest = await _heatRepo.GetLatestByLocationAsync(location.Id, ct);
+            readingsDict.TryGetValue(location.Id, out var latest);
             var latestDto = latest is not null ? _mapper.Map<HeatReadingResponse>(latest) : null;
             var dto = _mapper.Map<LocationResponse>(location) with { LatestReading = latestDto };
             result.Add(dto);

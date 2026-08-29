@@ -3,6 +3,7 @@ using Meridian.Application.DTOs.Requests;
 using Meridian.Application.DTOs.Responses;
 using Meridian.Core.Common;
 using Meridian.Core.Interfaces.Services;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Meridian.API.Controllers;
 
@@ -12,10 +13,12 @@ namespace Meridian.API.Controllers;
 public class AnalysisController : ControllerBase
 {
     private readonly IHeatAnalysisService _analysisService;
+    private readonly IMemoryCache _cache;
 
-    public AnalysisController(IHeatAnalysisService analysisService)
+    public AnalysisController(IHeatAnalysisService analysisService, IMemoryCache cache)
     {
         _analysisService = analysisService;
+        _cache = cache;
     }
 
     /// <summary>Full AI-powered heat analysis for a location</summary>
@@ -46,8 +49,18 @@ public class AnalysisController : ControllerBase
     {
         var f = from ?? DateTime.UtcNow.AddDays(-7);
         var t = to ?? DateTime.UtcNow;
+        var cacheKey = $"correlations_{f:yyyyMMdd}_{t:yyyyMMdd}";
+
+        if (_cache.TryGetValue(cacheKey, out IEnumerable<CorrelationResponse>? cachedResult) && cachedResult != null)
+        {
+            return Ok(cachedResult);
+        }
+
         var correlations = await _analysisService.GetCorrelationsAsync(f, t, ct);
-        return Ok(correlations.Select(c => new CorrelationResponse(c.LocationA, c.LocationB, c.CorrelationCoefficient, c.Interpretation)));
+        var responseObj = correlations.Select(c => new CorrelationResponse(c.LocationA, c.LocationB, c.CorrelationCoefficient, c.Interpretation)).ToList();
+        
+        _cache.Set(cacheKey, responseObj, TimeSpan.FromSeconds(30));
+        return Ok(responseObj);
     }
 
     /// <summary>Get heat trend for a location</summary>
