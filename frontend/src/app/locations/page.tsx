@@ -191,22 +191,22 @@ export default function LocationsPage() {
       </div>
 
       {/* ── Search Bar ────────────────────────────────────────── */}
-      <div className="px-8 py-3 border-b border-subtle shrink-0 bg-subtle">
-        <form onSubmit={handleSearch} className="flex gap-2 max-w-lg">
+      <div className="px-8 py-4 border-b border-subtle shrink-0 bg-base">
+        <form onSubmit={handleSearch} className="flex gap-3 max-w-2xl">
           <div className="relative flex-1">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-tertiary" />
+            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-tertiary" />
             <input
               value={searchInput}
               onChange={e => setSearchInput(e.target.value)}
               placeholder="Search by name, city, or country…"
-              className="w-full h-9 pl-9 pr-3 rounded-lg bg-base border border-subtle text-sm text-primary placeholder:text-tertiary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all shadow-token-sm"
+              className="w-full h-11 pl-11 pr-4 rounded-xl bg-elevated border border-subtle text-sm font-medium text-primary placeholder:text-tertiary focus:outline-none focus:border-accent/50 focus:ring-4 focus:ring-accent/10 transition-all shadow-sm"
             />
           </div>
-          <Button type="submit" size="sm" className="h-9">
+          <Button type="submit" size="md">
             Search
           </Button>
           {search && (
-            <Button type="button" variant="ghost" size="sm" onClick={() => { setSearch(''); setSearchInput(''); setPage(1); }} className="h-9">
+            <Button type="button" variant="ghost" size="md" onClick={() => { setSearch(''); setSearchInput(''); setPage(1); }}>
               Clear
             </Button>
           )}
