@@ -6,6 +6,7 @@ import { reportApi } from '@/lib/api/analysis';
 import { FileText, Sparkles, Calendar, Loader2, Trash2, Download, AlertTriangle, Filter } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
+import { API_BASE } from '@/lib/api/client';
 import type { Report } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -221,7 +222,7 @@ export default function ReportsPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <Button variant="secondary" size="sm" onClick={() => window.open('http://localhost:5250/api/export/pdf', '_blank')}>
+                    <Button variant="secondary" size="sm" onClick={() => window.open(`${API_BASE}/api/export/pdf`, '_blank')}>
                       <Download size={14} className="mr-2" />
                       Export Global PDF
                     </Button>

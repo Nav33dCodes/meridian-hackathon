@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 import { toast } from 'sonner';
+import { API_BASE } from '@/lib/api/client';
 
 export function GlobalAlerts() {
   const [connection, setConnection] = useState<any>(null);
@@ -12,7 +13,7 @@ export function GlobalAlerts() {
     const connect = async () => {
       try {
         newConnection = new HubConnectionBuilder()
-          .withUrl(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5250'}/hubs/heat`)
+          .withUrl(`${API_BASE}/hubs/heat`)
           .configureLogging(LogLevel.Warning)
           .withAutomaticReconnect()
           .build();

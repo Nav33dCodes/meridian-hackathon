@@ -4,6 +4,7 @@ import { useAppStore } from '@/lib/store/useAppStore';
 import { agentApi } from '@/lib/api/analysis';
 import { Bot, Send, Trash2, Loader2, User } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { API_BASE } from '@/lib/api/client';
 
 const SUGGESTED = [
   'What is the current heat risk in Phoenix?',
@@ -74,7 +75,7 @@ export default function AgentPage() {
     } catch (err) {
       addAgentMessage({
         id: crypto.randomUUID(), role: 'assistant',
-        content: 'Connection error. Make sure the API is running on http://localhost:5250',
+        content: `Connection error. Make sure the API is running on ${API_BASE}`,
         timestamp: new Date()
       });
     } finally {

@@ -15,6 +15,8 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { useSignalR } from '@/hooks/useSignalR';
 import Link from 'next/link';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import { toast } from 'sonner';
+import { API_BASE } from '@/lib/api/client';
 
 const DynamicMap = dynamic(() => import('@/components/Map'), { ssr: false });
 
@@ -185,13 +187,17 @@ export default function DashboardPage() {
                 <div className="absolute top-full right-0 mt-2 bg-elevated border border-default rounded-xl shadow-xl p-1.5 w-36 z-50">
                   <button
                     className="w-full text-left px-3 py-2 text-sm font-semibold hover:bg-subtle rounded-lg text-primary transition-colors flex items-center"
-                    onClick={() => { window.open('http://localhost:5250/api/export/excel', '_blank'); setIsExportOpen(false); }}
+                    onClick={async () => {
+                      setIsExportOpen(false);
+                      toast.success("Excel Export Started! You'll be notified when it's ready.", { icon: '📊' });
+                      await fetch(`${API_BASE}/api/export/excel`, { method: 'POST' });
+                    }}
                   >
                     <FileText size={14} className="mr-2 text-secondary" /> Excel Spreadsheet
                   </button>
                   <button
                     className="w-full text-left px-3 py-2 text-sm font-semibold hover:bg-subtle rounded-lg text-primary transition-colors flex items-center mt-0.5"
-                    onClick={() => { window.open('http://localhost:5250/api/export/pdf', '_blank'); setIsExportOpen(false); }}
+                    onClick={() => { window.open(`${API_BASE}/api/export/pdf`, '_blank'); setIsExportOpen(false); }}
                   >
                     <Download size={14} className="mr-2 text-secondary" /> PDF Report
                   </button>
