@@ -186,11 +186,20 @@ export default function DashboardPage() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => hasData && exportToCSV(readings)}
+            onClick={() => window.open('http://localhost:5250/api/export/csv', '_blank')}
             disabled={!hasData}
           >
             <Download size={14} className="mr-2" />
             Export CSV
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => window.open('http://localhost:5250/api/export/pdf', '_blank')}
+            disabled={!hasData}
+          >
+            <Download size={14} className="mr-2" />
+            Export PDF
           </Button>
           <Button
             variant="ghost"
