@@ -263,10 +263,10 @@ export default function DashboardPage() {
               {/* Virtualized List Header */}
               <div className="sticky top-0 z-10 bg-elevated border-b border-subtle flex items-center shadow-sm">
                 <div className="text-xs font-semibold text-tertiary uppercase tracking-wider py-2 px-4 flex-1 min-w-[120px]">Location</div>
-                <div className="text-xs font-semibold text-tertiary uppercase tracking-wider py-2 px-3 w-16 shrink-0">Temp</div>
-                <div className="text-xs font-semibold text-tertiary uppercase tracking-wider py-2 px-3 w-16 shrink-0 hidden xl:block">Humid</div>
-                <div className="text-xs font-semibold text-tertiary uppercase tracking-wider py-2 px-3 w-16 shrink-0 hidden xl:block">Idx</div>
-                <div className="text-xs font-semibold text-tertiary uppercase tracking-wider py-2 px-3 w-20 shrink-0">Risk</div>
+                <div className="text-xs font-semibold text-tertiary uppercase tracking-wider py-2 px-3 w-24 shrink-0">Temp</div>
+                <div className="text-xs font-semibold text-tertiary uppercase tracking-wider py-2 px-3 w-20 shrink-0 hidden xl:block">Humid</div>
+                <div className="text-xs font-semibold text-tertiary uppercase tracking-wider py-2 px-3 w-20 shrink-0 hidden xl:block">Idx</div>
+                <div className="text-xs font-semibold text-tertiary uppercase tracking-wider py-2 px-3 w-28 shrink-0">Risk</div>
               </div>
 
               {isLoading ? (
@@ -274,10 +274,10 @@ export default function DashboardPage() {
                   {skeletonRows.map((_, i) => (
                     <div key={i} className="flex border-b border-subtle/40 py-2.5 px-4 items-center">
                       <div className="shimmer h-3.5 w-36 rounded flex-1 mr-2" />
-                      <div className="shimmer h-3.5 w-10 rounded w-16 shrink-0 mr-2" />
-                      <div className="shimmer h-3.5 w-8 rounded w-16 shrink-0 hidden xl:block mr-2" />
-                      <div className="shimmer h-3.5 w-10 rounded w-16 shrink-0 hidden xl:block mr-2" />
-                      <div className="shimmer h-4 w-14 rounded-md w-20 shrink-0" />
+                      <div className="shimmer h-3.5 w-10 rounded w-24 shrink-0 mr-2" />
+                      <div className="shimmer h-3.5 w-8 rounded w-20 shrink-0 hidden xl:block mr-2" />
+                      <div className="shimmer h-3.5 w-10 rounded w-20 shrink-0 hidden xl:block mr-2" />
+                      <div className="shimmer h-4 w-14 rounded-md w-28 shrink-0" />
                     </div>
                   ))}
                 </div>
@@ -295,16 +295,16 @@ export default function DashboardPage() {
                           <p className="text-sm font-medium text-primary truncate max-w-[160px]">{r.locationName}</p>
                           <p className="text-xs text-tertiary truncate max-w-[160px]">{r.resolution}</p>
                         </div>
-                        <div className="py-2 px-3 w-16 shrink-0">
+                        <div className="py-2 px-3 w-24 shrink-0">
                           <span className="text-base font-bold font-mono text-[color:var(--dynamic-color)]" style={{ '--dynamic-color': r.riskColor } as React.CSSProperties}>{r.temperatureCelsius.toFixed(1)}°</span>
                         </div>
-                        <div className="py-2 px-3 w-16 shrink-0 hidden xl:block">
+                        <div className="py-2 px-3 w-20 shrink-0 hidden xl:block">
                           <span className="text-xs text-secondary font-mono">{r.humidityPercent.toFixed(0)}%</span>
                         </div>
-                        <div className="py-2 px-3 w-16 shrink-0 hidden xl:block">
+                        <div className="py-2 px-3 w-20 shrink-0 hidden xl:block">
                           <span className="text-xs text-secondary font-mono">{r.heatIndexCelsius.toFixed(1)}°</span>
                         </div>
-                        <div className="py-2 px-3 w-20 shrink-0">
+                        <div className="py-2 px-3 w-28 shrink-0">
                           <RiskBadge level={r.riskLevel as any} />
                         </div>
                       </div>
