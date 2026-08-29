@@ -6,6 +6,7 @@ import { Providers } from './providers';
 import { Sidebar } from '@/components/shared/Sidebar';
 import { Toaster } from 'sonner';
 import { GlobalAlerts } from '@/components/shared/GlobalAlerts';
+import { CommandPalette } from '@/components/ui/CommandPalette';
 
 export const metadata: Metadata = {
   title: 'Meridian — Urban Heat Intelligence',
@@ -36,6 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
           <Toaster position="bottom-right" theme="system" />
           <GlobalAlerts />
+          <CommandPalette />
         </Providers>
       </body>
     </html>
