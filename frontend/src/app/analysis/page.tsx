@@ -178,7 +178,7 @@ export default function AnalysisPage() {
           ))}
         </div>
 
-        <div className="flex flex-col">
+        <div className="flex flex-col max-h-[400px] overflow-y-auto">
           {corrLoading ? (
             <div className="p-6"><div className="shimmer h-[60px] rounded-lg" /></div>
           ) : !correlations || correlations.length === 0 ? (
