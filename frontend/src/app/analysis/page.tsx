@@ -1,7 +1,6 @@
 'use client';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { analysisApi } from '@/lib/api/analysis';
 import { locationApi } from '@/lib/api/heat';
@@ -59,6 +58,10 @@ export default function AnalysisPage() {
     ? 'var(--risk-low)'
     : 'var(--text-secondary)';
 
+  const forecast = trend && trendChartData.length > 0 
+    ? (trendChartData[trendChartData.length - 1].temp + trend.changeRate).toFixed(1)
+    : null;
+
   return (
     <div style={{ padding: '32px', maxWidth: '1400px', margin: '0 auto' }}>
       <div style={{ marginBottom: '32px' }}>
@@ -71,10 +74,12 @@ export default function AnalysisPage() {
       </div>
 
       {/* Location selector */}
-      <div style={{ 
-        backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', 
-        borderRadius: '12px', padding: '20px', marginBottom: '24px', boxShadow: 'var(--shadow-sm)' 
-      }}>
+      <div 
+        style={{ 
+          backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', 
+          borderRadius: '12px', padding: '20px', marginBottom: '24px', boxShadow: 'var(--shadow-sm)' 
+        }}
+      >
         <label style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-secondary)', display: 'block', marginBottom: '8px' }}>
           Select Location for Analysis
         </label>
@@ -88,7 +93,7 @@ export default function AnalysisPage() {
           }}
         >
           <option value="">-- Select location --</option>
-          {locations?.map(l => (
+          {locations?.map((l: any) => (
             <option key={l.id} value={l.id}>{l.name} — {l.city}</option>
           ))}
         </select>
@@ -96,12 +101,21 @@ export default function AnalysisPage() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '20px', marginBottom: '24px' }}>
         {/* Trend Chart */}
-        <div style={{ 
-          backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', 
-          borderRadius: '12px', padding: '24px', boxShadow: 'var(--shadow-sm)' 
-        }}>
+        <div 
+          style={{ 
+            backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', 
+            borderRadius: '12px', padding: '24px', boxShadow: 'var(--shadow-sm)' 
+          }}
+        >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-            <h2 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>Temperature Trend</h2>
+            <div className="flex items-center gap-3">
+              <h2 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>Temperature Trend</h2>
+              {forecast && (
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-accent/20 text-accent border border-accent/30 animate-pulse">
+                  T+1 Forecast: {forecast}°C
+                </span>
+              )}
+            </div>
             {trend && (
               <div style={{ 
                 display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 8px', 
@@ -120,9 +134,9 @@ export default function AnalysisPage() {
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={trendChartData}>
                 <XAxis dataKey="time" stroke="var(--text-tertiary)" tick={{ fill: 'var(--text-secondary)', fontSize: 11 }} tickLine={false} axisLine={false} dy={10} />
-                <YAxis stroke="var(--text-tertiary)" tick={{ fill: 'var(--text-secondary)', fontSize: 11 }} tickLine={false} axisLine={false} dx={-10} unit="°" />
-                <Tooltip content={<CustomTooltip />} />
-                <Line type="monotone" dataKey="temp" stroke="var(--risk-moderate)" strokeWidth={2.5} dot={false} activeDot={{ r: 4, strokeWidth: 0 }} />
+                <YAxis stroke="var(--text-tertiary)" domain={['dataMin - 1', 'dataMax + 1']} tick={{ fill: 'var(--text-secondary)', fontSize: 11 }} tickLine={false} axisLine={false} dx={-10} unit="°" />
+                <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'var(--border-subtle)', strokeWidth: 1, strokeDasharray: '4 4' }} />
+                <Line type="monotone" dataKey="temp" stroke={trendColor} strokeWidth={2.5} dot={false} activeDot={{ r: 4, strokeWidth: 0 }} />
               </LineChart>
             </ResponsiveContainer>
           ) : (
@@ -136,23 +150,28 @@ export default function AnalysisPage() {
         </div>
 
         {/* AI Insight */}
-        <div style={{ 
-          backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', 
-          borderRadius: '12px', padding: '24px', boxShadow: 'var(--shadow-sm)' 
-        }}>
+        <div 
+          style={{ 
+            backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', 
+            borderRadius: '12px', padding: '24px', boxShadow: 'var(--shadow-sm)' 
+          }}
+        >
           <h2 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '20px' }}>AI Insight</h2>
           {analysis ? (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <div>
               <div style={{ display: 'flex', gap: '16px', marginBottom: '20px' }}>
                 {[
                   { label: 'Current', val: `${analysis.currentTemp.toFixed(1)}°C` },
                   { label: 'Average', val: `${analysis.averageTemp.toFixed(1)}°C` },
                   { label: 'Peak', val: `${analysis.peakTemp.toFixed(1)}°C` },
                 ].map(({ label, val }) => (
-                  <div key={label} style={{ 
-                    flex: 1, backgroundColor: 'var(--bg-subtle)', borderRadius: '8px', 
-                    padding: '12px 14px', border: '1px solid var(--border-default)' 
-                  }}>
+                  <div 
+                    key={label} 
+                    style={{ 
+                      flex: 1, backgroundColor: 'var(--bg-subtle)', borderRadius: '8px', 
+                      padding: '12px 14px', border: '1px solid var(--border-default)' 
+                    }}
+                  >
                     <p style={{ fontSize: '10px', color: 'var(--text-tertiary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>{label}</p>
                     <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '18px', fontWeight: 700, color: 'var(--risk-moderate)' }}>{val}</p>
                   </div>
@@ -164,7 +183,7 @@ export default function AnalysisPage() {
               }}>
                 {analysis.aiInsight}
               </p>
-            </motion.div>
+            </div>
           ) : (
             <div style={{ 
               height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', 
@@ -177,10 +196,12 @@ export default function AnalysisPage() {
       </div>
 
       {/* Correlations */}
-      <div style={{ 
-        backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', 
-        borderRadius: '12px', overflow: 'hidden', boxShadow: 'var(--shadow-sm)' 
-      }}>
+      <div 
+        style={{ 
+          backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', 
+          borderRadius: '12px', overflow: 'hidden', boxShadow: 'var(--shadow-sm)' 
+        }}
+      >
         <div style={{ padding: '20px 20px 12px' }}>
           <h2 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>Location Correlations (Pearson)</h2>
           <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>Statistical heat pattern relationships between monitored zones</p>
@@ -204,7 +225,8 @@ export default function AnalysisPage() {
             </div>
           ) : (
             correlations.map((c: any, i: number) => (
-              <div key={i} style={{ 
+              <div 
+                key={i} style={{ 
                 display: 'grid', gridTemplateColumns: '1fr 1fr 120px 1fr', padding: '14px 20px', gap: '12px', alignItems: 'center',
                 borderBottom: '1px solid var(--border-subtle)'
               }}>

@@ -65,18 +65,25 @@ public class HeatAnalysisService : IHeatAnalysisService
         var locationList = locations.ToList();
         var correlations = new List<HeatCorrelation>();
 
+        var readingsDict = new Dictionary<Guid, List<double>>();
+        foreach (var loc in locationList)
+        {
+            readingsDict[loc.Id] = (await _heatRepo.GetByLocationIdAsync(loc.Id, 50, ct))
+                .Select(r => r.TemperatureCelsius).ToList();
+        }
+
         for (int i = 0; i < locationList.Count; i++)
         {
             for (int j = i + 1; j < locationList.Count; j++)
             {
-                var readingsA = (await _heatRepo.GetByLocationIdAsync(locationList[i].Id, 50, ct)).ToList();
-                var readingsB = (await _heatRepo.GetByLocationIdAsync(locationList[j].Id, 50, ct)).ToList();
+                var readingsA = readingsDict[locationList[i].Id];
+                var readingsB = readingsDict[locationList[j].Id];
 
                 if (readingsA.Count < 2 || readingsB.Count < 2) continue;
 
                 var coefficient = CalculatePearsonCorrelation(
-                    readingsA.Select(r => r.TemperatureCelsius).ToList(),
-                    readingsB.Select(r => r.TemperatureCelsius).ToList()
+                    readingsA,
+                    readingsB
                 );
 
                 var interpretation = coefficient switch
