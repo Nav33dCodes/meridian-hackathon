@@ -34,8 +34,8 @@ export function Sidebar() {
     >
       <div className={`flex items-center border-b border-subtle shrink-0 h-[81px] overflow-hidden ${collapsed ? 'px-0 justify-center' : 'px-5'}`}>
         <div className={`flex items-center w-full ${collapsed ? 'justify-center' : 'gap-3'}`}>
-          <div className="w-10 h-10 shrink-0 relative flex items-center justify-center rounded-xl bg-white shadow-token-md border border-subtle/50 overflow-hidden dark:bg-black/20 dark:shadow-[0_0_15px_rgba(255,255,255,0.05)]">
-             <Image src="/logo.png" alt="Meridian Logo" fill className="object-contain p-1.5 drop-shadow-sm" />
+          <div className="w-9 h-9 shrink-0 relative flex items-center justify-center">
+             <Image src="/logo.png" alt="Meridian Logo" fill className="object-contain" priority />
           </div>
           {!collapsed && (
             <div className="overflow-hidden whitespace-nowrap">
