@@ -167,11 +167,9 @@ export default function DashboardPage() {
                 24h History
               </button>
             </div>
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-subtle border border-subtle overflow-hidden">
-              <span className={`w-1.5 h-1.5 shrink-0 rounded-full ${!isHistorical ? 'bg-risk-low animate-pulse' : 'bg-secondary'}`} />
-              <span className="text-[11px] font-mono text-tertiary truncate">
-                {isHistorical ? 'Playback' : 'FortyGuard API · 20m² · 2m AGL · Groq llama-3.3-70b'}
-              </span>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-subtle border border-subtle">
+              <span className={`w-1.5 h-1.5 rounded-full ${!isHistorical ? 'bg-risk-low animate-pulse' : 'bg-secondary'}`} />
+              <span className="text-xs font-semibold text-secondary">{isHistorical ? 'Playback' : 'Live Sync'}</span>
             </div>
             <div className="relative">
               <Button
