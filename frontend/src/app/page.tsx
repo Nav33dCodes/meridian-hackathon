@@ -11,7 +11,7 @@ import {
 } from 'recharts';
 import type { HeatReading } from '@/types';
 import dynamic from 'next/dynamic';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useSignalR } from '@/hooks/useSignalR';
 import Link from 'next/link';
 
@@ -20,6 +20,7 @@ const DynamicMap = dynamic(() => import('@/components/Map'), { ssr: false });
 import { RiskBadge } from '@/components/ui/RiskBadge';
 import { StatCard } from '@/components/ui/StatCard';
 import { Button } from '@/components/ui/Button';
+import { TimeLapseSlider } from '@/components/features/TimeLapseSlider';
 
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
@@ -62,6 +63,65 @@ export default function DashboardPage() {
     refetchInterval: 30000,
   });
 
+  const [isHistorical, setIsHistorical] = useState(false);
+  const [playbackTime, setPlaybackTime] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const { data: historyData, isLoading: historyLoading } = useQuery({
+    queryKey: ['history'],
+    queryFn: () => heatApi.getHistory(24),
+    enabled: isHistorical,
+  });
+
+  // Calculate playback bounds
+  const minTime = historyData && historyData.length > 0 ? Math.min(...historyData.map((d: any) => new Date(d.measuredAt).getTime())) : 0;
+  const maxTime = historyData && historyData.length > 0 ? Math.max(...historyData.map((d: any) => new Date(d.measuredAt).getTime())) : 0;
+
+  // Setup default playback time
+  useEffect(() => {
+    if (isHistorical && maxTime > 0 && playbackTime === 0) {
+      setPlaybackTime(minTime); // start from beginning
+    }
+  }, [isHistorical, maxTime, minTime, playbackTime]);
+
+  // Playback loop
+  useEffect(() => {
+    let interval: any;
+    if (isPlaying && isHistorical && minTime > 0) {
+      interval = setInterval(() => {
+        setPlaybackTime(prev => {
+          const next = prev + 1000 * 60 * 30; // Advance 30 mins per tick
+          if (next >= maxTime) {
+            setIsPlaying(false);
+            return maxTime;
+          }
+          return next;
+        });
+      }, 500); // Tick every 500ms
+    }
+    return () => clearInterval(interval);
+  }, [isPlaying, isHistorical, minTime, maxTime]);
+
+  // Get active readings for map
+  const activeReadings = useMemo(() => {
+    if (isHistorical && historyData) {
+      // Find the closest reading for each location that is BEFORE or AT playbackTime
+      const locationMap = new Map();
+      
+      // Sort history descending by time so we can easily find the latest reading before playbackTime
+      const sortedHistory = [...historyData].sort((a: any, b: any) => new Date(b.measuredAt).getTime() - new Date(a.measuredAt).getTime());
+      
+      for (const reading of sortedHistory) {
+        const time = new Date(reading.measuredAt).getTime();
+        if (time <= playbackTime && !locationMap.has(reading.locationId)) {
+          locationMap.set(reading.locationId, reading);
+        }
+      }
+      return Array.from(locationMap.values());
+    }
+    return data?.latestReadings ?? [];
+  }, [isHistorical, historyData, playbackTime, data]);
+
   const readings = data?.latestReadings ?? [];
 
   const sortedReadings = useMemo(() => {
@@ -94,9 +154,23 @@ export default function DashboardPage() {
           </div>
         </div>
         <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 mr-2">
+            <button
+              onClick={() => setIsHistorical(false)}
+              className={`text-xs px-3 py-1.5 rounded-lg font-semibold transition-colors ${!isHistorical ? 'bg-accent text-white shadow-sm' : 'bg-transparent text-secondary hover:bg-subtle'}`}
+            >
+              Live
+            </button>
+            <button
+              onClick={() => setIsHistorical(true)}
+              className={`text-xs px-3 py-1.5 rounded-lg font-semibold transition-colors ${isHistorical ? 'bg-accent text-white shadow-sm' : 'bg-transparent text-secondary hover:bg-subtle'}`}
+            >
+              24h History
+            </button>
+          </div>
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-subtle border border-subtle">
-            <span className="w-1.5 h-1.5 rounded-full bg-risk-low animate-pulse" />
-            <span className="text-xs font-semibold text-secondary">Live · 30s</span>
+            <span className={`w-1.5 h-1.5 rounded-full ${!isHistorical ? 'bg-risk-low animate-pulse' : 'bg-secondary'}`} />
+            <span className="text-xs font-semibold text-secondary">{isHistorical ? 'Playback' : 'Live · 30s'}</span>
           </div>
           <Button
             variant="ghost"
@@ -111,8 +185,9 @@ export default function DashboardPage() {
             variant="ghost"
             size="sm"
             onClick={() => refetch()}
+            disabled={isHistorical}
           >
-            <RefreshCw size={14} className={`mr-2 ${isFetching ? 'animate-spin' : ''}`} />
+            <RefreshCw size={14} className={`mr-2 ${isFetching && !isHistorical ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
         </div>
@@ -249,7 +324,23 @@ export default function DashboardPage() {
             <div className="flex-1 min-h-0 relative">
               {activeTab === 'map' ? (
                 <div className="absolute inset-0">
-                  {isLoading ? <div className="w-full h-full shimmer" /> : <DynamicMap data={readings} />}
+                  {isLoading || (isHistorical && historyLoading) ? (
+                    <div className="w-full h-full shimmer" />
+                  ) : (
+                    <>
+                      <DynamicMap data={activeReadings} />
+                      {isHistorical && (
+                        <TimeLapseSlider
+                          minTime={minTime}
+                          maxTime={maxTime}
+                          currentTime={playbackTime}
+                          onChange={setPlaybackTime}
+                          isPlaying={isPlaying}
+                          onTogglePlay={() => setIsPlaying(!isPlaying)}
+                        />
+                      )}
+                    </>
+                  )}
                 </div>
               ) : (
                 <div className="absolute inset-0 p-4">

@@ -13,6 +13,9 @@ export const heatApi = {
 
   ingest: (location: string) =>
     apiClient.post<HeatReading>('/heat/ingest', { location, saveToDatabase: true }).then((r) => r.data),
+
+  getHistory: (hours = 24) =>
+    apiClient.get<HeatReading[]>(`/heat/history?hours=${hours}`).then((r) => r.data),
 };
 
 export const locationApi = {

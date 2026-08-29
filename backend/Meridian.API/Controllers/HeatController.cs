@@ -7,6 +7,8 @@ using Meridian.Core.Entities;
 using Meridian.Core.Interfaces.Repositories;
 using Meridian.Core.Interfaces.Services;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.AspNetCore.SignalR;
+using Meridian.API.Hubs;
 
 namespace Meridian.API.Controllers;
 
@@ -21,6 +23,7 @@ public class HeatController : ControllerBase
     private readonly IMapper _mapper;
     private readonly ILogger<HeatController> _logger;
     private readonly IMemoryCache _cache;
+    private readonly IHubContext<HeatHub> _hubContext;
 
     public HeatController(
         IHeatReadingRepository repo,
@@ -28,7 +31,8 @@ public class HeatController : ControllerBase
         ILocationRepository locationRepo,
         IMapper mapper,
         ILogger<HeatController> logger,
-        IMemoryCache cache)
+        IMemoryCache cache,
+        IHubContext<HeatHub> hubContext)
     {
         _repo = repo;
         _tempService = tempService;
@@ -36,6 +40,7 @@ public class HeatController : ControllerBase
         _mapper = mapper;
         _logger = logger;
         _cache = cache;
+        _hubContext = hubContext;
     }
 
     /// <summary>Get all heat readings (latest 100)</summary>
@@ -83,7 +88,21 @@ public class HeatController : ControllerBase
         }
 
         reading.Location = location;
-        return Ok(_mapper.Map<HeatReadingResponse>(reading));
+        var responseDto = _mapper.Map<HeatReadingResponse>(reading);
+
+        // SignalR Real-Time Alert for Extreme Heat
+        if (reading.RiskLevel == RiskLevel.Extreme)
+        {
+            await _hubContext.Clients.All.SendAsync("ReceiveHeatAlert", new
+            {
+                LocationName = location.Name,
+                Temperature = reading.TemperatureCelsius,
+                RiskLevel = reading.RiskLevel.ToString(),
+                Timestamp = reading.MeasuredAt
+            }, ct);
+        }
+
+        return Ok(responseDto);
     }
 
     /// <summary>Get dashboard summary</summary>
@@ -131,5 +150,14 @@ public class HeatController : ControllerBase
 
         _cache.Set("dashboard", responseObj, TimeSpan.FromSeconds(10));
         return Ok(responseObj);
+    }
+
+    /// <summary>Get historical readings for time-lapse slider</summary>
+    [HttpGet("history")]
+    public async Task<ActionResult<IEnumerable<HeatReadingResponse>>> GetHistory([FromQuery] int hours = 24, CancellationToken ct = default)
+    {
+        var fromDate = DateTime.UtcNow.AddHours(-hours);
+        var readings = await _repo.GetByDateRangeAsync(fromDate, DateTime.UtcNow, ct);
+        return Ok(_mapper.Map<IEnumerable<HeatReadingResponse>>(readings));
     }
 }

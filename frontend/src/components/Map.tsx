@@ -6,6 +6,8 @@ import { useTheme } from 'next-themes';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import type { HeatReading } from '@/types';
+import HeatmapLayer from './HeatmapLayer';
+import { Layers } from 'lucide-react';
 
 // Fix Leaflet's default icon issue with Next.js SSR
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -21,6 +23,7 @@ interface MapProps {
 
 export default function Map({ data }: MapProps) {
   const [mounted, setMounted] = useState(false);
+  const [viewMode, setViewMode] = useState<'heatmap' | 'markers'>('heatmap');
   const { resolvedTheme } = useTheme();
 
   // Create a beautiful glowing marker using DivIcon
@@ -49,37 +52,62 @@ export default function Map({ data }: MapProps) {
   const cartoApiKey = process.env.NEXT_PUBLIC_CARTO_API_KEY || 'cb1_2h2f_1_4173fd78da0b8728b9022689';
   const mapStyle = resolvedTheme === 'dark' ? 'dark_all' : 'light_all';
 
+  // Prepare heatmap data: mapping temperature to an intensity value (0.0 to 1.0)
+  // Clamp minimum to 0.4 so even very cold temperatures are highly visible on the map.
+  const heatmapData: Array<[number, number, number]> = data
+    .filter(r => r.latitude && r.longitude)
+    .map(r => {
+      // Scale: 0°C -> 0.4, 45°C -> 1.0
+      const intensity = Math.max(0.4, Math.min(1.0, 0.4 + (r.temperatureCelsius / 75)));
+      return [r.latitude!, r.longitude!, intensity];
+    });
+
   return (
-    <MapContainer
-      center={center}
-      zoom={3}
-      style={{ height: '100%', width: '100%' }}
-      className="bg-subtle"
-      zoomControl={false}
-      attributionControl={true}
-    >
-      <TileLayer
-        url={`https://{s}.basemaps.cartocdn.com/${mapStyle}/{z}/{x}/{y}{r}.png?key=${cartoApiKey}`}
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-      />
-      {data.map((reading) => {
-        if (!reading.latitude || !reading.longitude) return null;
-        return (
-          <Marker
-            key={reading.id}
-            position={[reading.latitude, reading.longitude]}
-            icon={createCustomIcon(reading.riskColor || 'var(--accent)')}
-          >
-            <Popup className="heat-popup">
-              <div className="p-1">
-                <p className="font-bold text-sm mb-1">{reading.locationName}</p>
-                <p className="text-xs">{reading.temperatureCelsius.toFixed(1)}°C / {reading.humidityPercent.toFixed(0)}% RH</p>
-                <p className="text-xs uppercase font-bold mt-1 text-[color:var(--dynamic-color)]" style={{ '--dynamic-color': reading.riskColor } as React.CSSProperties}>{reading.riskLevel}</p>
-              </div>
-            </Popup>
-          </Marker>
-        );
-      })}
+    <div className="w-full h-full relative">
+      <MapContainer
+        center={center}
+        zoom={3}
+        style={{ height: '100%', width: '100%' }}
+        className="bg-subtle"
+        zoomControl={false}
+        attributionControl={true}
+      >
+        <TileLayer
+          url={`https://{s}.basemaps.cartocdn.com/${mapStyle}/{z}/{x}/{y}{r}.png?key=${cartoApiKey}`}
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        />
+      {viewMode === 'heatmap' ? (
+        <HeatmapLayer data={heatmapData} theme={resolvedTheme} />
+      ) : (
+        data.map((reading) => {
+          if (!reading.latitude || !reading.longitude) return null;
+          return (
+            <Marker
+              key={reading.id}
+              position={[reading.latitude, reading.longitude]}
+              icon={createCustomIcon(reading.riskColor || 'var(--accent)')}
+            >
+              <Popup className="heat-popup">
+                <div className="p-1">
+                  <p className="font-bold text-sm mb-1">{reading.locationName}</p>
+                  <p className="text-xs">{reading.temperatureCelsius.toFixed(1)}°C / {reading.humidityPercent.toFixed(0)}% RH</p>
+                  <p className="text-xs uppercase font-bold mt-1 text-[color:var(--dynamic-color)]" style={{ '--dynamic-color': reading.riskColor } as React.CSSProperties}>{reading.riskLevel}</p>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })
+      )}
     </MapContainer>
+      <div className="absolute top-4 right-4 z-[9999] pointer-events-auto">
+        <button
+          onClick={() => setViewMode(prev => prev === 'heatmap' ? 'markers' : 'heatmap')}
+          className="flex items-center gap-2 px-3 py-2 bg-elevated/90 backdrop-blur-md border border-subtle shadow-md rounded-lg text-xs font-semibold text-primary hover:bg-subtle transition-colors"
+        >
+          <Layers size={16} />
+          {viewMode === 'heatmap' ? 'Show Markers' : 'Show Heatmap'}
+        </button>
+      </div>
+    </div>
   );
 }

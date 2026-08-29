@@ -5,6 +5,7 @@ import './globals.css';
 import { Providers } from './providers';
 import { Sidebar } from '@/components/shared/Sidebar';
 import { Toaster } from 'sonner';
+import { GlobalAlerts } from '@/components/shared/GlobalAlerts';
 
 export const metadata: Metadata = {
   title: 'Meridian — Urban Heat Intelligence',
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </main>
           </div>
           <Toaster position="bottom-right" theme="system" />
+          <GlobalAlerts />
         </Providers>
       </body>
     </html>
