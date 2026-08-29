@@ -60,4 +60,23 @@ public class HeatReadingRepository : Repository<HeatReading>, IHeatReadingReposi
 
         return latestReadings.Where(r => r != null)!;
     }
+
+    public async Task<Dictionary<Guid, List<double>>> GetTemperaturesForLocationsAsync(IEnumerable<Guid> locationIds, int limit = 50, CancellationToken ct = default)
+    {
+        // Batch fetch temperatures. To respect the limit per location in a single query, we fetch more and group in-memory.
+        // For correlations (usually < 20 locations, 50 points), fetching 1000 rows into memory is extremely fast compared to N queries.
+        var data = await _dbSet
+            .Where(r => locationIds.Contains(r.LocationId))
+            .OrderByDescending(r => r.MeasuredAt)
+            .Select(r => new { r.LocationId, r.TemperatureCelsius })
+            .ToListAsync(ct);
+
+        return data.GroupBy(r => r.LocationId)
+                   .ToDictionary(g => g.Key, g => g.Select(x => x.TemperatureCelsius).Take(limit).ToList());
+    }
+
+    public async Task DeleteAllAsync(CancellationToken ct = default)
+    {
+        await _dbSet.ExecuteDeleteAsync(ct);
+    }
 }

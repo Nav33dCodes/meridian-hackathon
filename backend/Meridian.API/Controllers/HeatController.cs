@@ -6,6 +6,7 @@ using Meridian.Core.Common;
 using Meridian.Core.Entities;
 using Meridian.Core.Interfaces.Repositories;
 using Meridian.Core.Interfaces.Services;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Meridian.API.Controllers;
 
@@ -19,19 +20,22 @@ public class HeatController : ControllerBase
     private readonly ILocationRepository _locationRepo;
     private readonly IMapper _mapper;
     private readonly ILogger<HeatController> _logger;
+    private readonly IMemoryCache _cache;
 
     public HeatController(
         IHeatReadingRepository repo,
         ITemperatureService tempService,
         ILocationRepository locationRepo,
         IMapper mapper,
-        ILogger<HeatController> logger)
+        ILogger<HeatController> logger,
+        IMemoryCache cache)
     {
         _repo = repo;
         _tempService = tempService;
         _locationRepo = locationRepo;
         _mapper = mapper;
         _logger = logger;
+        _cache = cache;
     }
 
     /// <summary>Get all heat readings (latest 100)</summary>
@@ -86,6 +90,11 @@ public class HeatController : ControllerBase
     [HttpGet("dashboard")]
     public async Task<ActionResult<DashboardSummaryResponse>> GetDashboard(CancellationToken ct)
     {
+        if (_cache.TryGetValue("dashboard", out DashboardSummaryResponse? cachedResult) && cachedResult != null)
+        {
+            return Ok(cachedResult);
+        }
+
         var locations = await _locationRepo.GetActiveLocationsAsync(ct);
         var locationIds = locations.Select(l => l.Id).ToList();
 
@@ -111,13 +120,16 @@ public class HeatController : ControllerBase
             }
         }
 
-        return Ok(new DashboardSummaryResponse(
+        var responseObj = new DashboardSummaryResponse(
             locations.Count(),
             extremeCount,
             highCount,
             temps.Any() ? Math.Round(temps.Average(), 1) : 0,
             allReadings.OrderByDescending(r => r.TemperatureCelsius),
             DateTime.UtcNow
-        ));
+        );
+
+        _cache.Set("dashboard", responseObj, TimeSpan.FromSeconds(10));
+        return Ok(responseObj);
     }
 }

@@ -25,8 +25,14 @@ public class AnalysisController : ControllerBase
     [HttpGet("location/{locationId}")]
     public async Task<ActionResult<HeatAnalysisResponse>> AnalyzeLocation(Guid locationId, CancellationToken ct)
     {
+        var cacheKey = $"analysis_{locationId}";
+        if (_cache.TryGetValue(cacheKey, out HeatAnalysisResponse? cachedResult) && cachedResult != null)
+        {
+            return Ok(cachedResult);
+        }
+
         var result = await _analysisService.AnalyzeLocationAsync(locationId, ct);
-        return Ok(new HeatAnalysisResponse(
+        var responseObj = new HeatAnalysisResponse(
             result.LocationId,
             result.LocationName,
             result.CurrentTemp,
@@ -37,7 +43,10 @@ public class AnalysisController : ControllerBase
             result.AiInsight,
             [],
             result.AnalyzedAt
-        ));
+        );
+
+        _cache.Set(cacheKey, responseObj, TimeSpan.FromMinutes(5));
+        return Ok(responseObj);
     }
 
     /// <summary>Get Pearson correlation between all monitored locations</summary>

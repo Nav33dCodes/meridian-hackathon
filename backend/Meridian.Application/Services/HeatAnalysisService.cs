@@ -65,10 +65,16 @@ public class HeatAnalysisService : IHeatAnalysisService
         var locationList = locations.ToList();
         var correlations = new List<HeatCorrelation>();
 
-        var readingsDict = new Dictionary<Guid, List<double>>();
+        var locationIds = locationList.Select(l => l.Id).ToList();
+        var readingsDict = await _heatRepo.GetTemperaturesForLocationsAsync(locationIds, 50, ct);
+
+        // Ensure all locations have a list to avoid KeyNotFoundException
         foreach (var loc in locationList)
         {
-            readingsDict[loc.Id] = (await _heatRepo.GetTemperaturesByLocationAsync(loc.Id, 50, ct)).ToList();
+            if (!readingsDict.ContainsKey(loc.Id))
+            {
+                readingsDict[loc.Id] = new List<double>();
+            }
         }
 
         for (int i = 0; i < locationList.Count; i++)

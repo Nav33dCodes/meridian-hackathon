@@ -35,4 +35,9 @@ public class LocationRepository : Repository<Location>, ILocationRepository
 
         return (items, totalCount);
     }
+
+    public async Task DeleteAllAsync(CancellationToken ct = default)
+    {
+        await _dbSet.ExecuteDeleteAsync(ct);
+    }
 }

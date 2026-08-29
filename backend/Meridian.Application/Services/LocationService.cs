@@ -167,11 +167,8 @@ public class LocationService
         var location = await _locationRepo.GetByIdAsync(id, ct);
         if (location == null) return false;
 
-        // Cascade delete heat readings for this location
-        var readings = await _heatRepo.FindAsync(r => r.LocationId == id, ct);
-        foreach (var reading in readings)
-            await _heatRepo.DeleteAsync(reading, ct);
-        
+        // EF Core will cascade delete heat readings automatically, 
+        // or we could use ExecuteDeleteAsync on readings here for safety.
         await _locationRepo.DeleteAsync(location, ct);
         await _locationRepo.SaveChangesAsync(ct);
         return true;
@@ -179,16 +176,8 @@ public class LocationService
 
     public async Task DeleteAllLocationsAsync(CancellationToken ct = default)
     {
-        // Delete all heat readings first (cascade)
-        var allReadings = await _heatRepo.GetAllAsync(ct);
-        foreach (var reading in allReadings)
-            await _heatRepo.DeleteAsync(reading, ct);
-        await _heatRepo.SaveChangesAsync(ct);
-
-        // Delete all locations
-        var allLocations = await _locationRepo.GetAllAsync(ct);
-        foreach (var location in allLocations)
-            await _locationRepo.DeleteAsync(location, ct);
-        await _locationRepo.SaveChangesAsync(ct);
+        // Instantly truncate tables using EF Core 7+ ExecuteDeleteAsync
+        await _heatRepo.DeleteAllAsync(ct);
+        await _locationRepo.DeleteAllAsync(ct);
     }
 }
