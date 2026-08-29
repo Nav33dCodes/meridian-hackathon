@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { useState } from 'react';
-import { Button } from './ui/Button';
+import { Button } from '../ui/Button';
 
 const nav = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
