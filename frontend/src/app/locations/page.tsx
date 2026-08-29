@@ -152,10 +152,15 @@ export default function LocationsPage() {
     <div className="h-screen max-h-screen overflow-hidden flex flex-col bg-base">
 
       {/* â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-      <div className="px-5 py-3 border-b border-subtle flex items-center justify-between shrink-0 bg-elevated">
+      <div className="px-5 py-4 border-b border-subtle flex items-center justify-between shrink-0 bg-elevated">
         <div>
-          <h1 className="text-[13px] font-bold text-primary leading-none">Monitoring Zones</h1>
-          <p className="text-[10px] text-tertiary mt-0.5">{totalCount} total locations</p>
+          <div className="flex items-center gap-2 text-xs text-tertiary mb-1 font-medium">
+            <span>Dashboard</span>
+            <span className="text-secondary">/</span>
+            <span className="text-primary">Locations</span>
+          </div>
+          <h1 className="text-xl font-bold tracking-tight text-primary">Monitoring Zones</h1>
+          <p className="text-xs text-tertiary mt-1">{totalCount} total locations</p>
         </div>
         <div className="flex items-center gap-2">
           {/* CSV Upload */}

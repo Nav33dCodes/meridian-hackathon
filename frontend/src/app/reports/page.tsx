@@ -124,7 +124,12 @@ export default function ReportsPage() {
       {/* ─── Header ───────────────────────────────────────── */}
       <div className="px-6 py-4 border-b border-subtle flex items-center justify-between shrink-0 bg-elevated">
         <div>
-          <h1 className="text-sm font-bold text-primary leading-none">AI Risk Reports</h1>
+          <div className="flex items-center gap-2 text-xs text-tertiary mb-1 font-medium">
+            <span>Dashboard</span>
+            <span className="text-secondary">/</span>
+            <span className="text-primary">Reports</span>
+          </div>
+          <h1 className="text-xl font-bold tracking-tight text-primary">AI Risk Reports</h1>
           <p className="text-xs text-tertiary mt-1">Government-grade advisories · Meridian AI</p>
         </div>
         <Button

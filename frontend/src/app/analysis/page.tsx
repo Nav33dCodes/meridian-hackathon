@@ -64,7 +64,12 @@ export default function AnalysisPage() {
   return (
     <div className="p-8 max-w-[1400px] mx-auto">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight text-primary">
+        <div className="flex items-center gap-2 text-xs text-tertiary mb-2 font-medium">
+          <span>Dashboard</span>
+          <span className="text-secondary">/</span>
+          <span className="text-primary">Analysis</span>
+        </div>
+        <h1 className="text-3xl font-bold tracking-tight text-primary">
           Data Analysis & Correlation
         </h1>
         <p className="text-sm text-secondary mt-1">

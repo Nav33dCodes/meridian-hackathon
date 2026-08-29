@@ -9,38 +9,69 @@
   --color-risk-extreme: var(--risk-extreme);
 }
 
-/* ─── Layer 1: Runtime design tokens (Linear Midnight & Violet) ─── */
-:root, .dark {
-  color-scheme: dark;
+/* ─── Layer 1: Runtime design tokens (Glassmorphism Bento Box) ─── */
+:root {
+  color-scheme: light;
   
-  /* Midnight Backgrounds */
-  --bg-base: #08090A;
-  --bg-subtle: #121316;
-  --bg-elevated: #0E0F12;
+  /* Soft Light Background */
+  --bg-base: #F3F5F8;
+  --bg-subtle: #E2E8F0;
   
-  /* Ultra-subtle borders */
-  --border-subtle: rgba(255, 255, 255, 0.04);
-  --border-default: rgba(255, 255, 255, 0.08);
+  /* Translucent Elevated for Glassmorphism */
+  --bg-elevated: rgba(255, 255, 255, 0.85);
+  
+  /* Borders */
+  --border-subtle: rgba(0, 0, 0, 0.05);
+  --border-default: rgba(0, 0, 0, 0.1);
   
   /* Typography */
-  --text-primary: #F2F2F2;
-  --text-secondary: #8A8F98;
-  --text-tertiary: #60646C;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-tertiary: #94A3B8;
   
-  /* Linear Violet Accent */
-  --accent: #5E6AD2;
-  --accent-muted: rgba(94, 106, 210, 0.15);
-  --accent-border: rgba(94, 106, 210, 0.3);
+  /* Bright Blue Accent */
+  --accent: #3B82F6;
+  --accent-muted: rgba(59, 130, 246, 0.15);
+  --accent-border: rgba(59, 130, 246, 0.3);
   
-  /* Glowing / Machined inner shadows */
-  --shadow-sm: 0 2px 8px 0 rgba(0,0,0,0.4), inset 0 1px 0 0 rgba(255,255,255,0.05);
-  --shadow-md: 0 4px 16px 0 rgba(0,0,0,0.5), inset 0 1px 0 0 rgba(255,255,255,0.05);
+  /* Soft Bento Shadows */
+  --shadow-sm: 0 4px 12px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
 
   /* Risk colors */
-  --risk-low: #5E6AD2; 
-  --risk-moderate: #F5A623;
-  --risk-high: #F05050;
-  --risk-extreme: #D0021B;
+  --risk-low: #10B981; 
+  --risk-moderate: #F59E0B;
+  --risk-high: #EF4444;
+  --risk-extreme: #991B1B;
+}
+
+.dark {
+  color-scheme: dark;
+  
+  /* Deep Dark Background */
+  --bg-base: #0B0F19;
+  --bg-subtle: #131B2C;
+  
+  /* Translucent Elevated */
+  --bg-elevated: rgba(30, 41, 59, 0.75);
+  
+  /* Borders */
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-default: rgba(255, 255, 255, 0.15);
+  
+  /* Typography */
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-tertiary: #64748B;
+  
+  /* Bright Blue Accent */
+  --accent: #60A5FA;
+  --accent-muted: rgba(96, 165, 250, 0.15);
+  --accent-border: rgba(96, 165, 250, 0.3);
+  
+  /* Soft Bento Shadows */
+  --shadow-sm: 0 4px 12px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
 }
 
 /* ─── Layer 2: Explicit utility classes (reliable in Tailwind v4) ─── */

@@ -18,8 +18,8 @@ import Link from 'next/link';
 
 const DynamicMap = dynamic(() => import('@/components/Map'), { ssr: false });
 
-import { RiskBadge } from '@/components/features/dashboard/RiskBadge';
-import { StatCard } from '@/components/features/dashboard/StatCard';
+import { RiskBadge } from '@/components/ui/RiskBadge';
+import { StatCard } from '@/components/ui/StatCard';
 
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
@@ -123,10 +123,10 @@ export default function DashboardPage() {
           skeletonRows.slice(0, 4).map((_, i) => <div key={i} className="shimmer h-[88px] rounded-xl" />)
         ) : (
           <>
-            <StatCard label="Monitored Zones" value={data?.totalLocations ?? 0} sub={`${readings.length} with live data`} icon={MapPin} color="var(--accent)" />
-            <StatCard label="Global Avg Temp" value={`${(data?.globalAverageTemp ?? 0).toFixed(1)}°C`} sub="All active zones" icon={Thermometer} color="var(--risk-moderate)" />
-            <StatCard label="Extreme Risk" value={data?.extremeRiskCount ?? 0} sub="Immediate action" icon={AlertTriangle} color="var(--risk-extreme)" />
-            <StatCard label="High Risk" value={data?.highRiskCount ?? 0} sub="Monitor closely" icon={Activity} color="var(--risk-high)" />
+            <StatCard title="Monitored Zones" value={data?.totalLocations ?? 0} trend={{ direction: 'neutral', value: readings.length, label: 'live' }} icon={<MapPin size={20} />} delay={0.1} />
+            <StatCard title="Global Avg Temp" value={`${(data?.globalAverageTemp ?? 0).toFixed(1)}°C`} trend={{ direction: 'up', value: '+1.2°', label: 'vs avg' }} icon={<Thermometer size={20} />} delay={0.2} />
+            <StatCard title="Extreme Risk" value={data?.extremeRiskCount ?? 0} trend={{ direction: (data?.extremeRiskCount ?? 0) > 0 ? 'up' : 'neutral', value: (data?.extremeRiskCount ?? 0) > 0 ? '+Action req' : 'Stable' }} icon={<AlertTriangle size={20} />} delay={0.3} />
+            <StatCard title="High Risk" value={data?.highRiskCount ?? 0} trend={{ direction: 'neutral', value: 'Monitor' }} icon={<Activity size={20} />} delay={0.4} />
           </>
         )}
       </div>
@@ -218,7 +218,7 @@ export default function DashboardPage() {
                           <span className="text-[11px] text-secondary font-mono">{r.heatIndexCelsius.toFixed(1)}°</span>
                         </td>
                         <td className="py-2 px-3">
-                          <RiskBadge level={r.riskLevel} color={r.riskColor} />
+                          <RiskBadge level={r.riskLevel as any} />
                         </td>
                       </motion.tr>
                     ))
