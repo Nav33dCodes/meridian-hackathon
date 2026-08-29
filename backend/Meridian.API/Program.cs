@@ -27,8 +27,13 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 builder.Services.AddMemoryCache();
-builder.Services.AddSignalR();
+builder.Services.AddSignalR()
+    .AddJsonProtocol(options => 
+    {
+        options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 builder.Services.AddScoped<Meridian.Core.Interfaces.Services.IHeatNotificationService, Meridian.API.Services.HeatNotificationService>();
+builder.Services.AddHostedService<Meridian.API.Services.LiveHeatSimulatorService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
