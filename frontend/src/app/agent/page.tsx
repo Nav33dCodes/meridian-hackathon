@@ -1,9 +1,9 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore } from '@/lib/store/useAppStore';
 import { agentApi } from '@/lib/api/analysis';
 import { Bot, Send, Trash2, Loader2, User } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 const SUGGESTED = [
   'What is the current heat risk in Phoenix?',
@@ -37,7 +37,7 @@ export default function AgentPage() {
   const send = async (query: string) => {
     if (!query.trim() || streaming) return;
     setInput('');
-    setIsAtBottom(true); // Force scroll to bottom on send
+    setIsAtBottom(true);
 
     addAgentMessage({ id: crypto.randomUUID(), role: 'user', content: query, timestamp: new Date() });
     setStreaming(true);
@@ -86,7 +86,7 @@ export default function AgentPage() {
   return (
     <div className="flex flex-col h-screen max-w-[900px] mx-auto p-8">
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-6 shrink-0">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-primary">Meridian AI Agent</h1>
           <p className="text-sm text-secondary mt-1">
@@ -94,12 +94,14 @@ export default function AgentPage() {
           </p>
         </div>
         {agentMessages.length > 0 && (
-          <button 
+          <Button 
+            variant="ghost"
+            size="sm"
             onClick={clearAgentMessages} 
-            className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-risk-high/10 border border-risk-high/20 text-risk-high text-sm hover:bg-risk-high/20 transition-colors"
+            className="text-risk-extreme hover:bg-risk-extreme/10"
           >
-            <Trash2 size={14} /> Clear
-          </button>
+            <Trash2 size={14} className="mr-1.5" /> Clear
+          </Button>
         )}
       </div>
 
@@ -110,7 +112,7 @@ export default function AgentPage() {
         className="flex-1 overflow-y-auto flex flex-col gap-4 pb-4 pr-2"
       >
         {agentMessages.length === 0 && !streaming && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-full flex flex-col items-center justify-center -mt-10">
+          <div className="h-full flex flex-col items-center justify-center -mt-10">
             <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-accent flex items-center justify-center shadow-token-sm">
               <Bot size={28} color="var(--bg-base)" />
             </div>
@@ -129,32 +131,28 @@ export default function AgentPage() {
                 </button>
               ))}
             </div>
-          </motion.div>
+          </div>
         )}
 
-        <AnimatePresence>
-          {agentMessages.map(msg => (
-            <motion.div
-              key={msg.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className={`flex gap-3 items-start ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
-            >
-              <div className={`w-8 h-8 rounded-md shrink-0 flex items-center justify-center ${msg.role === 'user' ? 'bg-accent-muted' : 'bg-accent'}`}>
-                {msg.role === 'user' ? <User size={14} className="text-accent" /> : <Bot size={14} color="var(--bg-base)" />}
-              </div>
-              <div className={`max-w-[80%] px-4 py-3 rounded-xl text-sm leading-relaxed whitespace-pre-wrap shadow-token-sm ${
-                msg.role === 'user' ? 'bg-accent-muted border border-accent-border text-primary' : 'bg-elevated border border-subtle text-primary'
-              }`}>
-                {msg.content}
-              </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
+        {agentMessages.map(msg => (
+          <div
+            key={msg.id}
+            className={`flex gap-3 items-start ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
+          >
+            <div className={`w-8 h-8 rounded-md shrink-0 flex items-center justify-center ${msg.role === 'user' ? 'bg-accent-muted' : 'bg-accent'}`}>
+              {msg.role === 'user' ? <User size={14} className="text-accent" /> : <Bot size={14} color="var(--bg-base)" />}
+            </div>
+            <div className={`max-w-[80%] px-4 py-3 rounded-xl text-sm leading-relaxed whitespace-pre-wrap shadow-token-sm ${
+              msg.role === 'user' ? 'bg-accent-muted border border-accent-border text-primary' : 'bg-elevated border border-subtle text-primary'
+            }`}>
+              {msg.content}
+            </div>
+          </div>
+        ))}
 
         {/* Streaming message */}
         {streaming && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-3 items-start">
+          <div className="flex gap-3 items-start">
             <div className="w-8 h-8 rounded-md shrink-0 bg-accent flex items-center justify-center">
               <Bot size={14} color="var(--bg-base)" />
             </div>
@@ -172,13 +170,13 @@ export default function AgentPage() {
                 </div>
               )}
             </div>
-          </motion.div>
+          </div>
         )}
         <div ref={bottomRef} />
       </div>
 
       {/* Input */}
-      <div className="bg-elevated border border-subtle rounded-xl flex gap-3 p-3 mt-2 shadow-token-sm">
+      <div className="bg-elevated border border-subtle rounded-xl flex gap-3 p-3 mt-2 shadow-token-sm shrink-0">
         <input
           value={input}
           onChange={e => setInput(e.target.value)}
@@ -186,17 +184,13 @@ export default function AgentPage() {
           placeholder="Ask Meridian about heat risk, zones, correlations..."
           className="flex-1 bg-transparent border-none outline-none text-primary text-sm px-2"
         />
-        <button
+        <Button
           onClick={() => send(input)}
           disabled={streaming || !input.trim()}
-          className={`px-4 py-2 rounded-md flex items-center justify-center transition-colors ${
-            streaming || !input.trim() 
-              ? 'bg-accent-muted text-tertiary cursor-not-allowed' 
-              : 'bg-accent text-white hover:opacity-90'
-          }`}
+          className="px-4"
         >
-          {streaming ? <Loader2 size={16} className="animate-spin text-accent" /> : <Send size={16} />}
-        </button>
+          {streaming ? <Loader2 size={16} className="animate-spin text-white" /> : <Send size={16} />}
+        </Button>
       </div>
     </div>
   );

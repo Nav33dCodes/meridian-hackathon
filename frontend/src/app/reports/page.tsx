@@ -147,17 +147,15 @@ export default function ReportsPage() {
         <Filter size={14} className="text-tertiary mr-1" />
         <span className="text-xs text-tertiary font-semibold uppercase tracking-wider mr-2">Filter:</span>
         {RISK_LEVELS.map(level => (
-          <button
+          <Button
             key={level}
+            variant={riskFilter === level ? 'primary' : 'ghost'}
+            size="sm"
             onClick={() => setRiskFilter(level)}
-            className={`text-xs px-3 py-1 rounded-lg font-semibold transition-colors ${
-              riskFilter === level
-                ? 'bg-primary text-base'
-                : 'bg-transparent text-secondary hover:text-primary hover:bg-elevated'
-            }`}
+            className="text-xs px-3 h-7 rounded-lg font-semibold transition-colors"
           >
             {level}
-          </button>
+          </Button>
         ))}
         <span className="ml-auto text-xs font-semibold text-tertiary bg-elevated px-2 py-1 rounded-md border border-subtle">{filtered.length} reports</span>
       </div>
@@ -209,12 +207,14 @@ export default function ReportsPage() {
                           </div>
                         </div>
                         {/* Delete button — appears on hover */}
-                        <button
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={e => { e.stopPropagation(); setDeleteConfirm(r.id); }}
-                          className={`absolute top-2.5 right-2.5 w-7 h-7 flex items-center justify-center rounded-lg transition-all ${isSelected ? 'opacity-100 text-tertiary hover:text-risk-extreme hover:bg-risk-extreme/10' : 'opacity-0 group-hover:opacity-100 text-tertiary hover:text-risk-extreme hover:bg-risk-extreme/10'}`}
+                          className={`absolute top-2.5 right-2.5 w-7 h-7 p-0 transition-all ${isSelected ? 'opacity-100 text-tertiary hover:text-risk-extreme hover:bg-risk-extreme/10' : 'opacity-0 group-hover:opacity-100 text-tertiary hover:text-risk-extreme hover:bg-risk-extreme/10'}`}
                         >
                           <Trash2 size={14} />
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   );
@@ -263,7 +263,7 @@ export default function ReportsPage() {
                 {/* Viewer body */}
                 <div className="flex-1 overflow-y-auto px-8 py-6">
                   <div className="prose prose-sm max-w-[800px]">
-                    <pre className="text-[14px] leading-relaxed text-secondary whitespace-pre-wrap font-sans">{selectedReport.content}</pre>
+                    <pre className="text-sm leading-relaxed text-secondary whitespace-pre-wrap font-sans">{selectedReport.content}</pre>
                   </div>
                 </div>
               </div>

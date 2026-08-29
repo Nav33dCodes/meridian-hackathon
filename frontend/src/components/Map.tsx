@@ -53,7 +53,8 @@ export default function Map({ data }: MapProps) {
     <MapContainer
       center={center}
       zoom={3}
-      style={{ height: '100%', width: '100%', background: 'var(--bg-subtle)' }}
+      style={{ height: '100%', width: '100%' }}
+      className="bg-subtle"
       zoomControl={false}
       attributionControl={true}
     >
@@ -73,7 +74,7 @@ export default function Map({ data }: MapProps) {
               <div className="p-1">
                 <p className="font-bold text-sm mb-1">{reading.locationName}</p>
                 <p className="text-xs">{reading.temperatureCelsius.toFixed(1)}°C / {reading.humidityPercent.toFixed(0)}% RH</p>
-                <p className="text-[10px] uppercase font-bold mt-1" style={{ color: reading.riskColor }}>{reading.riskLevel}</p>
+                <p className="text-xs uppercase font-bold mt-1 text-[color:var(--dynamic-color)]" style={{ '--dynamic-color': reading.riskColor } as React.CSSProperties}>{reading.riskLevel}</p>
               </div>
             </Popup>
           </Marker>

@@ -1,6 +1,4 @@
-'use client';
 import { ReactNode } from 'react';
-import { motion } from 'framer-motion';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 interface StatCardProps {
@@ -18,12 +16,8 @@ interface StatCardProps {
 
 export function StatCard({ title, value, icon, trend, delay = 0, className = '' }: StatCardProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay, ease: "easeOut" }}
-      whileHover={{ y: -4, transition: { duration: 0.2 } }}
-      className={`bg-elevated/80 backdrop-blur-xl border border-subtle rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow ${className}`}
+    <div
+      className={`bg-elevated border border-subtle rounded-xl p-6 shadow-sm hover:border-accent hover:shadow-token-sm transition-all duration-200 ${className}`}
     >
       <div className="flex items-start justify-between mb-4">
         <h3 className="text-sm font-medium text-secondary">{title}</h3>
@@ -48,6 +42,6 @@ export function StatCard({ title, value, icon, trend, delay = 0, className = '' 
           </div>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }

@@ -5,7 +5,7 @@ export default function Loading() {
     <div className="w-full h-screen flex flex-col items-center justify-center bg-base relative overflow-hidden">
       {/* Subtle background glow */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full bg-[var(--accent)]/10 blur-[100px] animate-pulse" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full bg-[var(--accent)]/5 blur-[100px]" />
       </div>
       
       <div className="relative z-10 flex flex-col items-center gap-4">

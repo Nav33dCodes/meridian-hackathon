@@ -7,6 +7,12 @@
   --color-risk-moderate: var(--risk-moderate);
   --color-risk-high: var(--risk-high);
   --color-risk-extreme: var(--risk-extreme);
+
+  /* Typography Scale */
+  --text-xs: 11px;
+  --text-sm: 13px;
+  --text-base: 15px;
+  --text-lg: 20px;
 }
 
 /* ─── Layer 1: Runtime design tokens (Glassmorphism Bento Box) ─── */

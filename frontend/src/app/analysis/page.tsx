@@ -12,9 +12,9 @@ import { Badge } from '@/components/ui/Badge';
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-elevated border border-default rounded-lg px-3.5 py-2.5 shadow-md text-[13px]">
+    <div className="bg-elevated border border-default rounded-lg px-3.5 py-2.5 shadow-md text-sm">
       <p className="text-secondary mb-1">{label}</p>
-      <p className="font-mono font-semibold text-[15px] text-risk-moderate">
+      <p className="font-mono font-semibold text-base text-risk-moderate">
         {payload[0]?.value?.toFixed(1)}°C
       </p>
     </div>
@@ -48,16 +48,16 @@ export default function AnalysisPage() {
   const TrendIcon = trend?.direction === 'rising' || trend?.direction === 'spike'
     ? TrendingUp
     : trend?.direction === 'falling'
-    ? TrendingDown
-    : Minus;
+      ? TrendingDown
+      : Minus;
 
   const trendColor = trend?.direction === 'rising' || trend?.direction === 'spike'
     ? 'var(--risk-high)'
     : trend?.direction === 'falling'
-    ? 'var(--risk-low)'
-    : 'var(--text-secondary)';
+      ? 'var(--risk-low)'
+      : 'var(--text-secondary)';
 
-  const forecast = trend && trendChartData.length > 0 
+  const forecast = trend && trendChartData.length > 0
     ? (trendChartData[trendChartData.length - 1].temp + trend.changeRate).toFixed(1)
     : null;
 
@@ -79,7 +79,7 @@ export default function AnalysisPage() {
 
       {/* Location selector */}
       <Card className="mb-6" padding="md">
-        <label className="text-[13px] font-medium text-secondary block mb-2">
+        <label className="text-sm font-medium text-secondary block mb-2">
           Select Location for Analysis
         </label>
         <select
@@ -99,9 +99,9 @@ export default function AnalysisPage() {
         <Card padding="md">
           <div className="flex justify-between items-center mb-5">
             <div className="flex items-center gap-3">
-              <h2 className="text-[15px] font-semibold text-primary">Temperature Trend</h2>
+              <h2 className="text-base font-semibold text-primary">Temperature Trend</h2>
               {forecast && (
-                <Badge variant="outline" className="border-accent/30 text-accent bg-accent/10 animate-pulse">
+                <Badge variant="outline" className="border-accent/30 text-accent bg-accent/10">
                   T+1 Forecast: {forecast}°C
                 </Badge>
               )}
@@ -127,7 +127,7 @@ export default function AnalysisPage() {
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-[200px] flex items-center justify-center text-[13px] text-tertiary border border-dashed border-subtle rounded-lg">
+            <div className="h-[200px] flex items-center justify-center text-sm text-tertiary border border-dashed border-subtle rounded-lg">
               Select a location with data to view trend
             </div>
           )}
@@ -135,7 +135,7 @@ export default function AnalysisPage() {
 
         {/* AI Insight */}
         <Card padding="md">
-          <h2 className="text-[15px] font-semibold text-primary mb-5">AI Insight</h2>
+          <h2 className="text-base font-semibold text-primary mb-5">AI Insight</h2>
           {analysis ? (
             <div>
               <div className="flex gap-4 mb-5">
@@ -144,21 +144,21 @@ export default function AnalysisPage() {
                   { label: 'Average', val: `${analysis.averageTemp.toFixed(1)}°C` },
                   { label: 'Peak', val: `${analysis.peakTemp.toFixed(1)}°C` },
                 ].map(({ label, val }) => (
-                  <div 
-                    key={label} 
+                  <div
+                    key={label}
                     className="flex-1 bg-subtle rounded-lg px-3.5 py-3 border border-default"
                   >
-                    <p className="text-[10px] text-tertiary font-semibold uppercase tracking-widest mb-1">{label}</p>
+                    <p className="text-xs text-tertiary font-semibold uppercase tracking-widest mb-1">{label}</p>
                     <p className="font-mono text-lg font-bold text-risk-moderate">{val}</p>
                   </div>
                 ))}
               </div>
-              <p className="text-[13px] text-secondary leading-relaxed bg-black/5 dark:bg-white/5 p-4 rounded-lg border border-black/5 dark:border-white/5">
+              <p className="text-sm text-secondary leading-relaxed bg-subtle/50 p-4 rounded-lg border border-default">
                 {analysis.aiInsight}
               </p>
             </div>
           ) : (
-            <div className="h-[180px] flex items-center justify-center text-[13px] text-tertiary border border-dashed border-subtle rounded-lg">
+            <div className="h-[180px] flex items-center justify-center text-sm text-tertiary border border-dashed border-subtle rounded-lg">
               Select a location to get AI insights
             </div>
           )}
@@ -168,31 +168,31 @@ export default function AnalysisPage() {
       {/* Correlations */}
       <Card padding="none">
         <div className="px-5 pt-5 pb-3">
-          <h2 className="text-[15px] font-semibold text-primary">Location Correlations (Pearson)</h2>
+          <h2 className="text-base font-semibold text-primary">Location Correlations (Pearson)</h2>
           <p className="text-xs text-secondary mt-1">Statistical heat pattern relationships between monitored zones</p>
         </div>
-        
+
         <div className="grid grid-cols-[1fr_1fr_120px_1fr] px-5 py-2.5 gap-3 border-y border-default bg-subtle">
           {['Zone A', 'Zone B', 'Coefficient', 'Interpretation'].map(h => (
-            <p key={h} className="text-[11px] font-semibold text-tertiary uppercase tracking-widest">{h}</p>
+            <p key={h} className="text-xs font-semibold text-tertiary uppercase tracking-widest">{h}</p>
           ))}
         </div>
-        
+
         <div className="flex flex-col">
           {corrLoading ? (
             <div className="p-6"><div className="shimmer h-[60px] rounded-lg" /></div>
           ) : !correlations || correlations.length === 0 ? (
-            <div className="p-10 text-center text-tertiary text-[13px]">
+            <div className="p-10 text-center text-tertiary text-sm">
               Waiting for sufficient data. The AI requires historical temperature readings from at least two different monitored zones to calculate Pearson correlation coefficients.
             </div>
           ) : (
             correlations.map((c: any, i: number) => (
-              <div 
-                key={i} 
+              <div
+                key={i}
                 className="grid grid-cols-[1fr_1fr_120px_1fr] px-5 py-3.5 gap-3 items-center border-b border-subtle last:border-b-0"
               >
-                <p className="text-[13px] text-primary font-medium">{c.locationA}</p>
-                <p className="text-[13px] text-primary font-medium">{c.locationB}</p>
+                <p className="text-sm text-primary font-medium">{c.locationA}</p>
+                <p className="text-sm text-primary font-medium">{c.locationB}</p>
                 <p className={`font-mono text-sm font-bold ${Math.abs(c.coefficient) > 0.7 ? 'text-risk-low' : Math.abs(c.coefficient) > 0.4 ? 'text-risk-moderate' : 'text-secondary'}`}>
                   {c.coefficient.toFixed(3)}
                 </p>

@@ -1,7 +1,6 @@
 'use client';
 import { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { motion, AnimatePresence } from 'framer-motion';
 import { locationApi, heatApi } from '@/lib/api/heat';
 import {
   MapPin, Thermometer, Plus, X, Loader2, ChevronLeft,
@@ -17,11 +16,7 @@ function ConfirmModal({ title, message, onConfirm, onCancel, loading }: {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onCancel} />
-      <motion.div
-        initial={{ opacity: 0, scale: 0.96 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="relative bg-elevated border border-subtle rounded-2xl p-6 w-full max-w-sm mx-4 shadow-2xl"
-      >
+      <div className="relative bg-elevated border border-subtle rounded-xl p-6 w-full max-w-sm mx-4 shadow-2xl">
         <div className="w-10 h-10 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-4">
           <AlertTriangle size={18} className="text-red-500" />
         </div>
@@ -36,7 +31,7 @@ function ConfirmModal({ title, message, onConfirm, onCancel, loading }: {
             Delete
           </Button>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
@@ -152,7 +147,7 @@ export default function LocationsPage() {
   return (
     <div className="h-screen max-h-screen overflow-hidden flex flex-col bg-base">
 
-      {/* â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* ─── Header ───────────────────────────────────────── */}
       <div className="px-8 py-4 border-b border-subtle flex items-center justify-between shrink-0 bg-elevated">
         <div>
           <div className="flex items-center gap-2 text-xs text-tertiary mb-1 font-medium">
@@ -174,7 +169,7 @@ export default function LocationsPage() {
           {/* Clear All */}
           {totalCount > 0 && (
             <Button
-              variant="outline"
+              variant="secondary"
               size="sm"
               onClick={() => setDeleteAllConfirm(true)}
               className="text-risk-extreme border-risk-extreme/20 hover:bg-risk-extreme/10"
@@ -218,7 +213,7 @@ export default function LocationsPage() {
         </form>
       </div>
 
-      {/* â”€â”€ Grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* ─── Grid ─────────────────────────────────────────── */}
       <div className="flex-1 overflow-y-auto px-5 py-4">
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
@@ -236,214 +231,196 @@ export default function LocationsPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-            <AnimatePresence>
-              {locations.map((loc, i) => (
-                <motion.div
-                  key={loc.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ delay: i * 0.02 }}
-                  className="bg-elevated border border-subtle rounded-xl p-4 flex flex-col gap-3 hover:border-default transition-colors group"
-                >
-                  {/* Card header */}
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5 mb-0.5">
-                        <MapPin size={11} className="text-accent shrink-0" />
-                        <p className="text-[13px] font-semibold text-primary truncate">{loc.name}</p>
-                      </div>
-                      <p className="text-[11px] text-secondary">{loc.city}, {loc.country}</p>
+            {locations.map((loc) => (
+              <div
+                key={loc.id}
+                className="bg-elevated border border-subtle rounded-xl p-4 flex flex-col gap-3 hover:border-accent hover:shadow-token-sm transition-all group"
+              >
+                {/* Card header */}
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <MapPin size={11} className="text-accent shrink-0" />
+                      <p className="text-sm font-semibold text-primary truncate">{loc.name}</p>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${loc.isActive ? 'bg-green-500' : 'bg-gray-400'}`} />
-                      <button
-                        onClick={() => setDeleteConfirm(loc.id)}
-                        className="opacity-0 group-hover:opacity-100 w-6 h-6 flex items-center justify-center rounded-md text-tertiary hover:text-red-500 hover:bg-red-500/10 transition-all"
-                        title="Delete location"
-                      >
-                        <Trash2 size={12} />
-                      </button>
-                    </div>
+                    <p className="text-xs text-secondary">{loc.city}, {loc.country}</p>
                   </div>
+                  <div className="flex items-center gap-1">
+                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${loc.isActive ? 'bg-green-500' : 'bg-gray-400'}`} />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setDeleteConfirm(loc.id)}
+                      className="opacity-0 group-hover:opacity-100 w-6 h-6 p-0 text-tertiary hover:text-red-500 hover:bg-red-500/10 transition-all"
+                      title="Delete location"
+                    >
+                      <Trash2 size={12} />
+                    </Button>
+                  </div>
+                </div>
 
-                  {/* Temperature */}
-                  {loc.latestReading ? (
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5">
-                          <Thermometer size={14} color={loc.latestReading.riskColor} />
-                          <span className="text-xl font-bold font-mono tracking-tight" style={{ color: loc.latestReading.riskColor }}>
-                            {loc.latestReading.temperatureCelsius.toFixed(1)}°C
-                          </span>
-                        </div>
-                        <span
-                          className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md border"
-                          style={{
-                            color: loc.latestReading.riskColor,
-                            borderColor: `${loc.latestReading.riskColor}30`,
-                            backgroundColor: `${loc.latestReading.riskColor}12`
-                          }}
-                        >
-                          {loc.latestReading.riskLevel}
+                {/* Temperature */}
+                {loc.latestReading ? (
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <Thermometer size={14} color={loc.latestReading.riskColor} />
+                        <span className="text-xl font-bold font-mono tracking-tight text-[color:var(--dynamic-color)]" style={{ '--dynamic-color': loc.latestReading.riskColor } as React.CSSProperties}>
+                          {loc.latestReading.temperatureCelsius.toFixed(1)}°C
                         </span>
                       </div>
-                      <span className="text-[10px] text-secondary font-mono">
-                        {loc.latestReading.humidityPercent.toFixed(0)}% RH · HI {loc.latestReading.heatIndexCelsius.toFixed(1)}°C
+                      <span
+                        className="text-xs font-bold uppercase px-2 py-0.5 rounded-md border text-[color:var(--dynamic-color)] border-[color:var(--dynamic-border)] bg-[color:var(--dynamic-bg)]"
+                        style={{
+                          '--dynamic-color': loc.latestReading.riskColor,
+                          '--dynamic-border': `${loc.latestReading.riskColor}30`,
+                          '--dynamic-bg': `${loc.latestReading.riskColor}12`
+                        } as React.CSSProperties}
+                      >
+                        {loc.latestReading.riskLevel}
                       </span>
                     </div>
-                  ) : (
-                    <div className="flex-1 flex items-center">
-                      <p className="text-[11px] text-tertiary italic">Awaiting first reading...</p>
-                    </div>
-                  )}
-
-                  {/* Footer */}
-                  <div className="flex items-center justify-between pt-1 border-t border-subtle">
-                    <p className="text-[10px] text-tertiary font-mono">{loc.latitude.toFixed(3)}, {loc.longitude.toFixed(3)}</p>
-                    <button
-                      onClick={() => ingest(loc.name)}
-                      disabled={ingesting === loc.name}
-                      className="flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-md transition-colors disabled:opacity-50"
-                      style={{
-                        color: 'var(--accent)',
-                        backgroundColor: 'var(--accent-muted)',
-                        border: '1px solid var(--accent-border)'
-                      }}
-                    >
-                      {ingesting === loc.name ? <Loader2 size={10} className="animate-spin" /> : <Zap size={10} />}
-                      {ingesting === loc.name ? 'Fetching' : 'Ingest'}
-                    </button>
+                    <span className="text-xs text-secondary font-mono">
+                      {loc.latestReading.humidityPercent.toFixed(0)}% RH · HI {loc.latestReading.heatIndexCelsius.toFixed(1)}°C
+                    </span>
                   </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
+                ) : (
+                  <div className="flex-1 flex items-center">
+                    <p className="text-xs text-tertiary italic">Awaiting first reading...</p>
+                  </div>
+                )}
+
+                {/* Footer */}
+                <div className="flex items-center justify-between pt-1 border-t border-subtle">
+                  <p className="text-xs text-tertiary font-mono">{loc.latitude.toFixed(3)}, {loc.longitude.toFixed(3)}</p>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => ingest(loc.name)}
+                    disabled={ingesting === loc.name}
+                    className="h-6 px-2 text-xs"
+                  >
+                    {ingesting === loc.name ? <Loader2 size={10} className="animate-spin mr-1" /> : <Zap size={10} className="mr-1" />}
+                    {ingesting === loc.name ? 'Fetching' : 'Ingest'}
+                  </Button>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
 
-      {/* â”€â”€ Pagination â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* ─── Pagination ─────────────────────────────────────── */}
       {totalPages > 1 && (
         <div className="px-5 py-2.5 border-t border-subtle shrink-0 flex items-center justify-between bg-subtle">
-          <span className="text-[11px] text-tertiary">Page {page} of {totalPages} Â· {totalCount} zones</span>
+          <span className="text-xs text-tertiary">Page {page} of {totalPages} · {totalCount} zones</span>
           <div className="flex gap-1">
-            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="w-7 h-7 rounded-md border border-subtle flex items-center justify-center text-secondary hover:text-primary disabled:opacity-40 transition-colors">
+            <Button variant="ghost" size="sm" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="w-7 h-7 p-0 rounded-md border border-subtle">
               <ChevronLeft size={13} />
-            </button>
+            </Button>
             {[...Array(Math.min(5, totalPages))].map((_, i) => {
               const p = i + Math.max(1, page - 2);
               if (p > totalPages) return null;
               return (
-                <button
+                <Button
                   key={p}
+                  variant={p === page ? "primary" : "ghost"}
+                  size="sm"
                   onClick={() => setPage(p)}
-                  className={`w-7 h-7 rounded-md text-[11px] font-medium transition-colors border ${p === page ? 'bg-accent border-transparent' : 'border-subtle text-secondary hover:text-primary'}`}
-                  style={p === page ? { color: 'var(--bg-base)' } : {}}
+                  className={`w-7 h-7 p-0 rounded-md text-xs font-medium border ${p === page ? 'border-transparent' : 'border-subtle'}`}
                 >
                   {p}
-                </button>
+                </Button>
               );
             })}
-            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="w-7 h-7 rounded-md border border-subtle flex items-center justify-center text-secondary hover:text-primary disabled:opacity-40 transition-colors">
+            <Button variant="ghost" size="sm" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="w-7 h-7 p-0 rounded-md border border-subtle">
               <ChevronRight size={13} />
-            </button>
+            </Button>
           </div>
         </div>
       )}
 
-      {/* â”€â”€ Add Zone Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-      <AnimatePresence>
-        {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.96 }}
-              className="relative bg-elevated border border-subtle rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl"
+      {/* ─── Add Zone Modal ─────────────────────────────────── */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
+          <div className="relative bg-elevated border border-subtle rounded-xl p-6 w-full max-w-md mx-4 shadow-2xl">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-base font-bold text-primary">Add Monitoring Zone</h3>
+              <Button variant="ghost" size="sm" onClick={() => setIsModalOpen(false)} className="w-7 h-7 p-0">
+                <X size={15} />
+              </Button>
+            </div>
+            <form
+              onSubmit={e => {
+                e.preventDefault();
+                createLocation.mutate({
+                  name: formData.name, city: formData.city, country: formData.country,
+                  latitude: parseFloat(formData.latitude), longitude: parseFloat(formData.longitude)
+                });
+              }}
+              className="flex flex-col gap-3"
             >
-              <div className="flex items-center justify-between mb-5">
-                <h3 className="text-base font-bold text-primary">Add Monitoring Zone</h3>
-                <button onClick={() => setIsModalOpen(false)} className="w-7 h-7 rounded-lg flex items-center justify-center text-tertiary hover:text-primary hover:bg-subtle transition-colors">
-                  <X size={15} />
-                </button>
-              </div>
-              <form
-                onSubmit={e => {
-                  e.preventDefault();
-                  createLocation.mutate({
-                    name: formData.name, city: formData.city, country: formData.country,
-                    latitude: parseFloat(formData.latitude), longitude: parseFloat(formData.longitude)
-                  });
-                }}
-                className="flex flex-col gap-3"
-              >
-                {['name', 'city', 'country'].map(field => (
+              {['name', 'city', 'country'].map(field => (
+                <div key={field}>
+                  <label className="text-xs font-semibold text-tertiary uppercase tracking-wider block mb-1">{field}</label>
+                  <input
+                    required
+                    value={(formData as any)[field]}
+                    onChange={e => setFormData(f => ({ ...f, [field]: e.target.value }))}
+                    className="w-full px-3 py-2 rounded-lg bg-base border border-subtle text-sm text-primary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all"
+                    placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                  />
+                </div>
+              ))}
+              <div className="grid grid-cols-2 gap-3">
+                {['latitude', 'longitude'].map(field => (
                   <div key={field}>
-                    <label className="text-[11px] font-semibold text-tertiary uppercase tracking-wider block mb-1">{field}</label>
+                    <label className="text-xs font-semibold text-tertiary uppercase tracking-wider block mb-1">{field}</label>
                     <input
-                      required
+                      required type="number" step="any"
                       value={(formData as any)[field]}
                       onChange={e => setFormData(f => ({ ...f, [field]: e.target.value }))}
-                      className="w-full px-3 py-2 rounded-lg bg-base border border-subtle text-[13px] text-primary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all"
-                      placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                      className="w-full px-3 py-2 rounded-lg bg-base border border-subtle text-sm text-primary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all"
+                      placeholder="0.0000"
                     />
                   </div>
                 ))}
-                <div className="grid grid-cols-2 gap-3">
-                  {['latitude', 'longitude'].map(field => (
-                    <div key={field}>
-                      <label className="text-[11px] font-semibold text-tertiary uppercase tracking-wider block mb-1">{field}</label>
-                      <input
-                        required type="number" step="any"
-                        value={(formData as any)[field]}
-                        onChange={e => setFormData(f => ({ ...f, [field]: e.target.value }))}
-                        className="w-full px-3 py-2 rounded-lg bg-base border border-subtle text-[13px] text-primary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all"
-                        placeholder="0.0000"
-                      />
-                    </div>
-                  ))}
-                </div>
-                <button
-                  type="submit"
-                  disabled={createLocation.isPending}
-                  className="mt-1 w-full py-2 rounded-lg bg-accent text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
-                  style={{ color: 'var(--bg-base)' }}
-                >
-                  {createLocation.isPending && <Loader2 size={14} className="animate-spin" />}
-                  Add Zone
-                </button>
-              </form>
-            </motion.div>
+              </div>
+              <Button
+                type="submit"
+                disabled={createLocation.isPending}
+                className="mt-1 w-full flex items-center justify-center gap-2"
+              >
+                {createLocation.isPending && <Loader2 size={14} className="animate-spin" />}
+                Add Zone
+              </Button>
+            </form>
           </div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
 
-      {/* â”€â”€ Delete Single Confirm â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-      <AnimatePresence>
-        {deleteConfirm && (
-          <ConfirmModal
-            title="Delete Location"
-            message="This will permanently delete this location and all its heat readings. This action cannot be undone."
-            onConfirm={() => deleteLocation.mutate(deleteConfirm)}
-            onCancel={() => setDeleteConfirm(null)}
-            loading={deleteLocation.isPending}
-          />
-        )}
-      </AnimatePresence>
+      {/* ─── Delete Single Confirm ──────────────────────────── */}
+      {deleteConfirm && (
+        <ConfirmModal
+          title="Delete Location"
+          message="This will permanently delete this location and all its heat readings. This action cannot be undone."
+          onConfirm={() => deleteLocation.mutate(deleteConfirm)}
+          onCancel={() => setDeleteConfirm(null)}
+          loading={deleteLocation.isPending}
+        />
+      )}
 
-      {/* â”€â”€ Delete All Confirm â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-      <AnimatePresence>
-        {deleteAllConfirm && (
-          <ConfirmModal
-            title="Clear All Locations"
-            message={`This will permanently delete all ${totalCount} locations and ALL heat readings. This cannot be undone.`}
-            onConfirm={() => deleteAll.mutate()}
-            onCancel={() => setDeleteAllConfirm(false)}
-            loading={deleteAll.isPending}
-          />
-        )}
-      </AnimatePresence>
+      {/* ─── Delete All Confirm ─────────────────────────────── */}
+      {deleteAllConfirm && (
+        <ConfirmModal
+          title="Clear All Locations"
+          message={`This will permanently delete all ${totalCount} locations and ALL heat readings. This cannot be undone.`}
+          onConfirm={() => deleteAll.mutate()}
+          onCancel={() => setDeleteAllConfirm(false)}
+          loading={deleteAll.isPending}
+        />
+      )}
     </div>
   );
 }

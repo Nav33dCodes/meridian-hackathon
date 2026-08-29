@@ -50,7 +50,7 @@ export function RiskBadge({ level, className = '' }: RiskBadgeProps) {
   const { color, bg, border, icon: Icon, pulse } = config[level] || config.Unknown;
 
   return (
-    <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border ${bg} ${border} ${className} shadow-sm backdrop-blur-md`}>
+    <div className={`inline-flex items-center gap-2 px-2.5 py-1 rounded-md border ${bg} ${border} ${className}`}>
       <div className="relative flex items-center justify-center">
         {pulse && <div className={`absolute inset-0 rounded-full ${bg.replace('/10', '/40')} animate-ping`} />}
         <Icon size={14} className={`relative z-10 ${color}`} />

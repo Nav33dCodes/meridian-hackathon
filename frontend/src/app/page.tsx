@@ -1,10 +1,9 @@
 'use client';
 import { useQuery } from '@tanstack/react-query';
-import { motion, AnimatePresence } from 'framer-motion';
 import { heatApi } from '@/lib/api/heat';
 import {
   Thermometer, AlertTriangle, MapPin, Activity, RefreshCw,
-  Download, Plus, TrendingUp, Globe
+  Download, Plus, TrendingUp, Globe, BarChart3
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -26,11 +25,11 @@ const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     const d = payload[0].payload;
     return (
-      <div className="bg-elevated/80 backdrop-blur-xl border border-subtle/60 px-3 py-2.5 rounded-xl shadow-2xl">
-        <p className="font-semibold text-[12px] text-primary">{d.locationName}</p>
+      <div className="bg-elevated border border-default px-3 py-2.5 rounded-xl shadow-lg">
+        <p className="font-semibold text-sm text-primary">{d.locationName}</p>
         <div className="mt-1 flex gap-3">
-          <span className="text-[11px] text-secondary">{d.temperatureCelsius.toFixed(1)}°C</span>
-          <span className="text-[11px] text-secondary">{d.humidityPercent?.toFixed(0)}% RH</span>
+          <span className="text-xs text-secondary">{d.temperatureCelsius.toFixed(1)}°C</span>
+          <span className="text-xs text-secondary">{d.humidityPercent?.toFixed(0)}% RH</span>
         </div>
       </div>
     );
@@ -85,7 +84,7 @@ export default function DashboardPage() {
       
       <div className="relative z-10 flex flex-col h-full w-full bg-transparent">
 
-      {/* â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* ─── Header ───────────────────────────────────────── */}
       <div className="px-8 py-4 border-b border-subtle flex items-center justify-between shrink-0 bg-elevated">
         <div className="flex items-center gap-2.5">
           <Globe size={18} className="text-accent" />
@@ -97,10 +96,10 @@ export default function DashboardPage() {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-subtle border border-subtle">
             <span className="w-1.5 h-1.5 rounded-full bg-risk-low animate-pulse" />
-            <span className="text-[11px] font-semibold text-secondary">Live · 30s</span>
+            <span className="text-xs font-semibold text-secondary">Live · 30s</span>
           </div>
           <Button
-            variant="secondary"
+            variant="ghost"
             size="sm"
             onClick={() => hasData && exportToCSV(readings)}
             disabled={!hasData}
@@ -109,6 +108,7 @@ export default function DashboardPage() {
             Export CSV
           </Button>
           <Button
+            variant="ghost"
             size="sm"
             onClick={() => refetch()}
           >
@@ -118,23 +118,22 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* â”€â”€ Stat Cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* ─── Stat Cards ───────────────────────────────────── */}
       <div className="px-5 py-3 grid grid-cols-2 lg:grid-cols-4 gap-3 shrink-0 border-b border-subtle">
         {isLoading ? (
           skeletonRows.slice(0, 4).map((_, i) => <div key={i} className="shimmer h-[88px] rounded-xl" />)
         ) : (
           <>
-            <StatCard title="Monitored Zones" value={data?.totalLocations ?? 0} trend={{ direction: 'neutral', value: readings.length, label: 'live' }} icon={<MapPin size={20} />} delay={0.1} />
-            <StatCard title="Global Avg Temp" value={`${(data?.globalAverageTemp ?? 0).toFixed(1)}°C`} trend={{ direction: 'up', value: '+1.2°', label: 'vs avg' }} icon={<Thermometer size={20} />} delay={0.2} />
-            <StatCard title="Extreme Risk" value={data?.extremeRiskCount ?? 0} trend={{ direction: (data?.extremeRiskCount ?? 0) > 0 ? 'up' : 'neutral', value: (data?.extremeRiskCount ?? 0) > 0 ? '+Action req' : 'Stable' }} icon={<AlertTriangle size={20} />} delay={0.3} />
-            <StatCard title="High Risk" value={data?.highRiskCount ?? 0} trend={{ direction: 'neutral', value: 'Monitor' }} icon={<Activity size={20} />} delay={0.4} />
+            <StatCard title="Monitored Zones" value={data?.totalLocations ?? 0} trend={{ direction: 'neutral', value: readings.length, label: 'live' }} icon={<MapPin size={20} />} />
+            <StatCard title="Global Avg Temp" value={`${(data?.globalAverageTemp ?? 0).toFixed(1)}°C`} trend={{ direction: 'up', value: '+1.2°', label: 'vs avg' }} icon={<Thermometer size={20} />} />
+            <StatCard title="Extreme Risk" value={data?.extremeRiskCount ?? 0} trend={{ direction: (data?.extremeRiskCount ?? 0) > 0 ? 'up' : 'neutral', value: (data?.extremeRiskCount ?? 0) > 0 ? '+Action req' : 'Stable' }} icon={<AlertTriangle size={20} />} />
+            <StatCard title="High Risk" value={data?.highRiskCount ?? 0} trend={{ direction: 'neutral', value: 'Monitor' }} icon={<Activity size={20} />} />
           </>
         )}
       </div>
 
-      {/* â”€â”€ Main Content â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* ─── Main Content ─────────────────────────────────── */}
       {!isLoading && readings.length === 0 ? (
-        // ... empty state ...
         <div className="flex-1 flex flex-col items-center justify-center gap-4">
           <div className="w-14 h-14 rounded-2xl bg-subtle border border-subtle flex items-center justify-center">
             <MapPin size={24} className="text-tertiary" />
@@ -154,21 +153,19 @@ export default function DashboardPage() {
         <div className="flex-1 min-h-0 flex overflow-hidden w-full relative">
 
           {/* Left: Data Table (55%) */}
-          <div className="flex flex-col border-r border-subtle bg-base relative z-10 shrink-0" style={{ width: '55%' }}>
+          <div className="flex flex-col border-r border-subtle bg-base relative z-10 shrink-0 w-[55%]">
             <div className="px-4 py-2 border-b border-subtle flex items-center justify-between shrink-0 bg-subtle">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-semibold text-tertiary uppercase tracking-wider">Live Readings</span>
-                <span className="text-[10px] bg-base border border-subtle text-secondary px-2 py-0.5 rounded-full">{readings.length} zones</span>
+                <span className="text-xs font-semibold text-tertiary uppercase tracking-wider">Live Readings</span>
+                <span className="text-xs bg-base border border-subtle text-secondary px-2 py-0.5 rounded-md">{readings.length} zones</span>
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[9px] text-tertiary mr-1">Sort:</span>
+                <span className="text-xs text-tertiary mr-1">Sort:</span>
                 {(['temp', 'risk', 'name'] as const).map(k => (
                   <button
                     key={k}
                     onClick={() => setSortKey(k)}
-                    className={`text-[10px] px-2 py-0.5 rounded font-medium transition-colors ${sortKey === k ? 'bg-accent' : 'text-tertiary hover:text-secondary'
-                      }`}
-                    style={sortKey === k ? { color: 'var(--bg-base)' } : {}}
+                    className={`text-xs px-2 py-0.5 rounded-md font-medium transition-colors ${sortKey === k ? 'bg-accent text-white' : 'text-tertiary hover:text-secondary'}`}
                   >
                     {k === 'temp' ? '°C' : k === 'risk' ? 'Risk' : 'A-Z'}
                   </button>
@@ -180,11 +177,11 @@ export default function DashboardPage() {
               <table className="w-full text-left border-collapse">
                 <thead className="sticky top-0 z-10 bg-elevated border-b border-subtle">
                   <tr>
-                    <th className="text-[10px] font-semibold text-tertiary uppercase tracking-wider py-2 px-4">Location</th>
-                    <th className="text-[10px] font-semibold text-tertiary uppercase tracking-wider py-2 px-3">Temp</th>
-                    <th className="text-[10px] font-semibold text-tertiary uppercase tracking-wider py-2 px-3 hidden xl:table-cell">Humidity</th>
-                    <th className="text-[10px] font-semibold text-tertiary uppercase tracking-wider py-2 px-3 hidden xl:table-cell">Heat Idx</th>
-                    <th className="text-[10px] font-semibold text-tertiary uppercase tracking-wider py-2 px-3">Risk</th>
+                    <th className="text-xs font-semibold text-tertiary uppercase tracking-wider py-2 px-4">Location</th>
+                    <th className="text-xs font-semibold text-tertiary uppercase tracking-wider py-2 px-3">Temp</th>
+                    <th className="text-xs font-semibold text-tertiary uppercase tracking-wider py-2 px-3 hidden xl:table-cell">Humidity</th>
+                    <th className="text-xs font-semibold text-tertiary uppercase tracking-wider py-2 px-3 hidden xl:table-cell">Heat Idx</th>
+                    <th className="text-xs font-semibold text-tertiary uppercase tracking-wider py-2 px-3">Risk</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -199,31 +196,28 @@ export default function DashboardPage() {
                       </tr>
                     ))
                   ) : (
-                    sortedReadings.map((r, i) => (
-                      <motion.tr
+                    sortedReadings.map((r) => (
+                      <tr
                         key={r.id}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: Math.min(i * 0.01, 0.25) }}
-                        className="border-b border-subtle/40 hover:bg-subtle/60 transition-colors"
+                        className="border-b border-subtle hover:bg-subtle/60 transition-colors"
                       >
                         <td className="py-2 px-4">
-                          <p className="text-[12px] font-medium text-primary truncate max-w-[160px]">{r.locationName}</p>
-                          <p className="text-[10px] text-tertiary">{r.resolution}</p>
+                          <p className="text-sm font-medium text-primary truncate max-w-[160px]">{r.locationName}</p>
+                          <p className="text-xs text-tertiary">{r.resolution}</p>
                         </td>
                         <td className="py-2 px-3">
-                          <span className="text-[13px] font-bold font-mono" style={{ color: r.riskColor }}>{r.temperatureCelsius.toFixed(1)}°</span>
+                          <span className="text-base font-bold font-mono text-[color:var(--dynamic-color)]" style={{ '--dynamic-color': r.riskColor } as React.CSSProperties}>{r.temperatureCelsius.toFixed(1)}°</span>
                         </td>
                         <td className="py-2 px-3 hidden xl:table-cell">
-                          <span className="text-[11px] text-secondary font-mono">{r.humidityPercent.toFixed(0)}%</span>
+                          <span className="text-xs text-secondary font-mono">{r.humidityPercent.toFixed(0)}%</span>
                         </td>
                         <td className="py-2 px-3 hidden xl:table-cell">
-                          <span className="text-[11px] text-secondary font-mono">{r.heatIndexCelsius.toFixed(1)}°</span>
+                          <span className="text-xs text-secondary font-mono">{r.heatIndexCelsius.toFixed(1)}°</span>
                         </td>
                         <td className="py-2 px-3">
                           <RiskBadge level={r.riskLevel as any} />
                         </td>
-                      </motion.tr>
+                      </tr>
                     ))
                   )}
                 </tbody>
@@ -231,7 +225,7 @@ export default function DashboardPage() {
             </div>
 
             <div className="px-4 py-2 border-t border-subtle bg-subtle shrink-0">
-              <p className="text-[10px] text-tertiary">📡 FortyGuard API · 20m² · 2m AGL &nbsp;·&nbsp; 🤖 Groq llama-3.3-70b</p>
+              <p className="text-xs text-tertiary">FortyGuard API · 20m² · 2m AGL · Groq llama-3.3-70b</p>
             </div>
           </div>
 
@@ -242,40 +236,38 @@ export default function DashboardPage() {
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`px-3 py-1 rounded-md text-[11px] font-semibold transition-all ${activeTab === tab
+                  className={`px-3 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all ${activeTab === tab
                     ? 'bg-elevated border border-subtle text-primary shadow-sm'
                     : 'text-tertiary hover:text-secondary'
                     }`}
                 >
-                  {tab === 'map' ? '🌍 Global Map' : '📊 Top 20 Chart'}
+                  {tab === 'map' ? <><Globe size={14} /> Global Map</> : <><BarChart3 size={14} /> Top 20 Chart</>}
                 </button>
               ))}
             </div>
 
             <div className="flex-1 min-h-0 relative">
-              <AnimatePresence mode="wait">
-                {activeTab === 'map' ? (
-                  <motion.div key="map" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.12 }} className="absolute inset-0">
-                    {isLoading ? <div className="w-full h-full shimmer" /> : <DynamicMap data={readings} />}
-                  </motion.div>
-                ) : (
-                  <motion.div key="chart" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.12 }} className="absolute inset-0 p-4">
-                    {isLoading ? <div className="w-full h-full shimmer rounded-lg" /> : (
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={chartData} margin={{ top: 8, right: 8, left: -18, bottom: 45 }}>
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-subtle)" />
-                          <XAxis dataKey="locationName" tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} tickLine={false} axisLine={false} angle={-35} textAnchor="end" interval={0} tickFormatter={v => v.length > 12 ? v.substring(0, 12) + '…' : v} />
-                          <YAxis domain={['dataMin - 2', 'dataMax + 2']} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} tickLine={false} axisLine={false} tickFormatter={v => `${v}°`} />
-                          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--bg-subtle)' }} />
-                          <Bar dataKey="temperatureCelsius" radius={[3, 3, 0, 0]} maxBarSize={28}>
-                            {chartData.map((e, i) => <Cell key={i} fill={e.riskColor || 'var(--accent)'} />)}
-                          </Bar>
-                        </BarChart>
-                      </ResponsiveContainer>
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              {activeTab === 'map' ? (
+                <div className="absolute inset-0">
+                  {isLoading ? <div className="w-full h-full shimmer" /> : <DynamicMap data={readings} />}
+                </div>
+              ) : (
+                <div className="absolute inset-0 p-4">
+                  {isLoading ? <div className="w-full h-full shimmer rounded-lg" /> : (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={chartData} margin={{ top: 8, right: 8, left: -18, bottom: 45 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-subtle)" />
+                        <XAxis dataKey="locationName" tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} tickLine={false} axisLine={false} angle={-35} textAnchor="end" interval={0} tickFormatter={v => v.length > 12 ? v.substring(0, 12) + '…' : v} />
+                        <YAxis domain={['dataMin - 2', 'dataMax + 2']} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} tickLine={false} axisLine={false} tickFormatter={v => `${v}°`} />
+                        <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--bg-subtle)' }} />
+                        <Bar dataKey="temperatureCelsius" radius={[3, 3, 0, 0]} maxBarSize={28}>
+                          {chartData.map((e, i) => <Cell key={i} fill={e.riskColor || 'var(--accent)'} />)}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
