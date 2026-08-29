@@ -17,6 +17,14 @@ public class HeatReadingRepository : Repository<HeatReading>, IHeatReadingReposi
             .Take(limit)
             .ToListAsync(ct);
 
+    public async Task<IEnumerable<double>> GetTemperaturesByLocationAsync(Guid locationId, int limit = 50, CancellationToken ct = default) =>
+        await _dbSet
+            .Where(r => r.LocationId == locationId)
+            .OrderByDescending(r => r.MeasuredAt)
+            .Select(r => r.TemperatureCelsius)
+            .Take(limit)
+            .ToListAsync(ct);
+
     public async Task<IEnumerable<HeatReading>> GetByDateRangeAsync(DateTime from, DateTime to, CancellationToken ct = default) =>
         await _dbSet.Include(r => r.Location)
             .Where(r => r.MeasuredAt >= from && r.MeasuredAt <= to)

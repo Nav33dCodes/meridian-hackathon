@@ -68,8 +68,7 @@ public class HeatAnalysisService : IHeatAnalysisService
         var readingsDict = new Dictionary<Guid, List<double>>();
         foreach (var loc in locationList)
         {
-            readingsDict[loc.Id] = (await _heatRepo.GetByLocationIdAsync(loc.Id, 50, ct))
-                .Select(r => r.TemperatureCelsius).ToList();
+            readingsDict[loc.Id] = (await _heatRepo.GetTemperaturesByLocationAsync(loc.Id, 50, ct)).ToList();
         }
 
         for (int i = 0; i < locationList.Count; i++)
