@@ -18,38 +18,8 @@ import Link from 'next/link';
 
 const DynamicMap = dynamic(() => import('@/components/Map'), { ssr: false });
 
-function RiskBadge({ level, color }: { level: string; color: string }) {
-  return (
-    <span
-      className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border"
-      style={{ backgroundColor: `${color}18`, color, borderColor: `${color}35` }}
-    >
-      {level}
-    </span>
-  );
-}
-
-function StatCard({ label, value, sub, icon: Icon, color }: {
-  label: string; value: string | number; sub?: string;
-  icon: React.ElementType; color: string;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-elevated border border-subtle rounded-xl p-4 flex flex-col gap-3 hover:border-default transition-colors"
-    >
-      <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: `${color}18` }}>
-        <Icon size={15} color={color} />
-      </div>
-      <div>
-        <p className="text-[11px] font-semibold text-tertiary uppercase tracking-wider mb-0.5">{label}</p>
-        <p className="text-2xl font-bold tracking-tight text-primary leading-none">{value}</p>
-        {sub && <p className="text-[11px] text-secondary mt-1">{sub}</p>}
-      </div>
-    </motion.div>
-  );
-}
+import { RiskBadge } from '@/components/features/dashboard/RiskBadge';
+import { StatCard } from '@/components/features/dashboard/StatCard';
 
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
@@ -109,7 +79,14 @@ export default function DashboardPage() {
   const skeletonRows = [...Array(8)];
 
   return (
-    <div className="h-screen max-h-screen overflow-hidden flex flex-col bg-base">
+    <div className="h-screen max-h-screen overflow-hidden flex flex-col relative">
+      {/* Background decoration */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-base">
+        <div className="absolute -top-[30%] -right-[10%] w-[70%] h-[70%] rounded-full bg-[var(--accent)]/5 blur-[120px]" />
+        <div className="absolute -bottom-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-[var(--risk-high)]/5 blur-[100px]" />
+      </div>
+      
+      <div className="relative z-10 flex flex-col h-full w-full bg-transparent">
 
       {/* â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="px-5 py-3 border-b border-subtle flex items-center justify-between shrink-0 bg-elevated">
@@ -304,6 +281,7 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

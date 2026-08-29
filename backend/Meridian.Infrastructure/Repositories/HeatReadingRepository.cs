@@ -40,4 +40,16 @@ public class HeatReadingRepository : Repository<HeatReading>, IHeatReadingReposi
             .OrderByDescending(r => r.MeasuredAt)
             .Take(50)
             .ToListAsync(ct);
+
+    public async Task<IEnumerable<HeatReading>> GetLatestForLocationsAsync(IEnumerable<Guid> locationIds, CancellationToken ct = default)
+    {
+        // Fetch the max MeasuredAt for each location, then join back to get the full record
+        var latestReadings = await _dbSet
+            .Where(r => locationIds.Contains(r.LocationId))
+            .GroupBy(r => r.LocationId)
+            .Select(g => g.OrderByDescending(x => x.MeasuredAt).FirstOrDefault())
+            .ToListAsync(ct);
+
+        return latestReadings.Where(r => r != null)!;
+    }
 }

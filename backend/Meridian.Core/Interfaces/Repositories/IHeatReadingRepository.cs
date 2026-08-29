@@ -10,4 +10,5 @@ public interface IHeatReadingRepository : IRepository<HeatReading>
     Task<HeatReading?> GetLatestByLocationAsync(Guid locationId, CancellationToken ct = default);
     Task<double> GetAverageTemperatureAsync(Guid locationId, DateTime from, DateTime to, CancellationToken ct = default);
     Task<IEnumerable<HeatReading>> GetExtremeReadingsAsync(RiskLevel minRisk, CancellationToken ct = default);
+    Task<IEnumerable<HeatReading>> GetLatestForLocationsAsync(IEnumerable<Guid> locationIds, CancellationToken ct = default);
 }

@@ -87,19 +87,25 @@ public class HeatController : ControllerBase
     public async Task<ActionResult<DashboardSummaryResponse>> GetDashboard(CancellationToken ct)
     {
         var locations = await _locationRepo.GetActiveLocationsAsync(ct);
+        var locationIds = locations.Select(l => l.Id).ToList();
+
+        var latestReadings = await _repo.GetLatestForLocationsAsync(locationIds, ct);
+        
         var allReadings = new List<HeatReadingResponse>();
         int extremeCount = 0, highCount = 0;
         var temps = new List<double>();
 
-        foreach (var loc in locations)
+        var locationDict = locations.ToDictionary(l => l.Id);
+
+        foreach (var latest in latestReadings)
         {
-            var latest = await _repo.GetLatestByLocationAsync(loc.Id, ct);
-            if (latest is not null)
+            if (locationDict.TryGetValue(latest.LocationId, out var loc))
             {
                 latest.Location = loc;
                 var dto = _mapper.Map<HeatReadingResponse>(latest);
                 allReadings.Add(dto);
                 temps.Add(latest.TemperatureCelsius);
+                
                 if (latest.RiskLevel == RiskLevel.Extreme) extremeCount++;
                 else if (latest.RiskLevel == RiskLevel.High) highCount++;
             }
@@ -110,7 +116,7 @@ public class HeatController : ControllerBase
             extremeCount,
             highCount,
             temps.Any() ? Math.Round(temps.Average(), 1) : 0,
-            allReadings,
+            allReadings.OrderByDescending(r => r.TemperatureCelsius),
             DateTime.UtcNow
         ));
     }

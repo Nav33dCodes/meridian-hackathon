@@ -24,7 +24,7 @@ export function Sidebar() {
   const path = usePathname();
 
   return (
-    <aside className="w-[220px] h-screen sticky top-0 flex flex-col px-3 py-6 bg-base border-r border-subtle">
+    <aside className="w-[220px] h-screen sticky top-0 flex flex-col px-3 py-6 bg-base/60 backdrop-blur-2xl border-r border-subtle z-50 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
       {/* Logo */}
       <div className="px-2 pb-6 mb-6 border-b border-subtle">
         <div className="flex items-center gap-2.5">
@@ -33,7 +33,7 @@ export function Sidebar() {
           </div>
           <div>
             <p className="font-bold text-[15px] tracking-tight text-primary">Meridian</p>
-            <p className="text-[11px] text-tertiary mono font-medium">v1.0 · Heat AI</p>
+            <p className="text-[11px] text-tertiary font-mono font-medium opacity-80">v1.0 · Heat AI</p>
           </div>
         </div>
       </div>
@@ -46,10 +46,9 @@ export function Sidebar() {
             <Link
               key={href}
               href={href}
-              prefetch={href === '/'}
-              className={`relative flex items-center gap-3 px-3 py-2 rounded-md text-[13px] font-medium transition-colors duration-150 ease-out z-10 ${
-                active ? 'text-accent' : 'text-secondary hover:text-primary hover:bg-subtle'
-              }`}
+              prefetch={true}
+              className={`relative flex items-center gap-3 px-3 py-2 rounded-md text-[13px] font-medium transition-colors duration-150 ease-out z-10 ${active ? 'text-accent' : 'text-secondary hover:text-primary hover:bg-subtle'
+                }`}
             >
               {active && (
                 <motion.div
