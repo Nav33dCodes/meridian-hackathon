@@ -89,35 +89,7 @@ export default function ReportsPage() {
     estimateSize: () => 72,
   });
 
-  const exportReport = (report: Report) => {
-    const content = [
-      `MERIDIAN HEAT RISK ADVISORY`,
-      `===========================================================`,
-      ``,
-      `Title: ${report.title}`,
-      `Generated: ${format(new Date(report.createdAt), 'MMMM dd, yyyy HH:mm')} UTC`,
-      `Overall Risk: ${report.overallRisk}`,
-      `Average Temp: ${report.averageTemperatureCelsius.toFixed(1)}°C`,
-      `Peak Temp: ${report.peakTemperatureCelsius.toFixed(1)}°C`,
-      `Model: ${report.modelUsed ?? 'N/A'}`,
-      ``,
-      `-----------------------------------------------------------`,
-      ``,
-      report.content,
-      ``,
-      `-----------------------------------------------------------`,
-      `Meridian Urban Heat Intelligence Platform`,
-    ].join('\n');
-
-    const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `meridian_report_${report.id.substring(0, 8)}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
+  // TXT export logic removed
   return (
     <div className="h-screen max-h-screen overflow-hidden flex flex-col bg-base">
 
@@ -249,11 +221,11 @@ export default function ReportsPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <Button variant="secondary" size="sm" onClick={() => exportReport(selectedReport)}>
+                    <Button variant="secondary" size="sm" onClick={() => window.open('http://localhost:5250/api/export/pdf', '_blank')}>
                       <Download size={14} className="mr-2" />
-                      Export TXT
+                      Export Global PDF
                     </Button>
-                    <Button variant="outline" size="sm" onClick={() => setDeleteConfirm(selectedReport.id)} className="border-risk-extreme/20 text-risk-extreme hover:bg-risk-extreme/5">
+                    <Button variant="ghost" size="sm" onClick={() => setDeleteConfirm(selectedReport.id)} className="border-risk-extreme/20 text-risk-extreme hover:bg-risk-extreme/5">
                       <Trash2 size={14} className="mr-2" />
                       Delete
                     </Button>
