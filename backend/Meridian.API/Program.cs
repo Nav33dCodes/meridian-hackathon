@@ -21,6 +21,7 @@ builder.Host.UseSerilog();
 
 // Services
 builder.Services.AddControllers();
+builder.Services.AddMemoryCache();
 builder.Services.AddSignalR();
 builder.Services.AddScoped<Meridian.Core.Interfaces.Services.IHeatNotificationService, Meridian.API.Services.HeatNotificationService>();
 builder.Services.AddEndpointsApiExplorer();
