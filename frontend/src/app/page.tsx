@@ -167,9 +167,11 @@ export default function DashboardPage() {
                 24h History
               </button>
             </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-subtle border border-subtle">
-              <span className={`w-1.5 h-1.5 rounded-full ${!isHistorical ? 'bg-risk-low animate-pulse' : 'bg-secondary'}`} />
-              <span className="text-xs font-semibold text-secondary">{isHistorical ? 'Playback' : 'Live · 30s'}</span>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-subtle border border-subtle overflow-hidden">
+              <span className={`w-1.5 h-1.5 shrink-0 rounded-full ${!isHistorical ? 'bg-risk-low animate-pulse' : 'bg-secondary'}`} />
+              <span className="text-[11px] font-mono text-tertiary truncate">
+                {isHistorical ? 'Playback' : 'FortyGuard API · 20m² · 2m AGL · Groq llama-3.3-70b'}
+              </span>
             </div>
             <div className="relative">
               <Button
@@ -185,9 +187,9 @@ export default function DashboardPage() {
                 <div className="absolute top-full right-0 mt-2 bg-elevated border border-default rounded-xl shadow-xl p-1.5 w-36 z-50">
                   <button
                     className="w-full text-left px-3 py-2 text-sm font-semibold hover:bg-subtle rounded-lg text-primary transition-colors flex items-center"
-                    onClick={() => { window.open('http://localhost:5250/api/export/csv', '_blank'); setIsExportOpen(false); }}
+                    onClick={() => { window.open('http://localhost:5250/api/export/excel', '_blank'); setIsExportOpen(false); }}
                   >
-                    <FileText size={14} className="mr-2 text-secondary" /> CSV Data
+                    <FileText size={14} className="mr-2 text-secondary" /> Excel Spreadsheet
                   </button>
                   <button
                     className="w-full text-left px-3 py-2 text-sm font-semibold hover:bg-subtle rounded-lg text-primary transition-colors flex items-center mt-0.5"
