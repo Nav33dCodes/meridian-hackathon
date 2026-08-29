@@ -1,7 +1,6 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion } from 'framer-motion';
 import {
   LayoutDashboard,
   BarChart3,
@@ -10,7 +9,6 @@ import {
   MapPin,
   Thermometer,
 } from 'lucide-react';
-import { ThemeToggle } from './ThemeToggle';
 
 const nav = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -24,7 +22,7 @@ export function Sidebar() {
   const path = usePathname();
 
   return (
-    <aside className="w-[220px] h-screen sticky top-0 flex flex-col px-3 py-6 bg-base/60 backdrop-blur-2xl border-r border-subtle z-50 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+    <aside className="w-[240px] h-screen sticky top-0 flex flex-col px-4 py-6 bg-base border-r border-subtle z-50">
       {/* Logo */}
       <div className="px-2 pb-6 mb-6 border-b border-subtle">
         <div className="flex items-center gap-2.5">
@@ -47,19 +45,12 @@ export function Sidebar() {
               key={href}
               href={href}
               prefetch={true}
-              className={`relative flex items-center gap-3 px-3 py-2 rounded-md text-[13px] font-medium transition-colors duration-150 ease-out z-10 ${active ? 'text-accent' : 'text-secondary hover:text-primary hover:bg-subtle'
+              className={`relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${active 
+                ? 'bg-subtle text-primary shadow-[0_1px_2px_rgba(0,0,0,0.5)] border border-white/5' 
+                : 'text-secondary hover:text-primary hover:bg-subtle/50 border border-transparent'
                 }`}
             >
-              {active && (
-                <motion.div
-                  layoutId="sidebar-active"
-                  className="absolute inset-0 rounded-md bg-accent-muted border-l-2 border-accent"
-                  initial={false}
-                  transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-                  style={{ zIndex: -1 }}
-                />
-              )}
-              <Icon size={16} />
+              <Icon size={18} className={active ? 'text-accent' : 'text-tertiary'} />
               {label}
             </Link>
           );
@@ -72,7 +63,6 @@ export function Sidebar() {
           <div className="live-dot" />
           <span className="text-[11px] font-medium text-tertiary">Live</span>
         </div>
-        <ThemeToggle />
       </div>
     </aside>
   );

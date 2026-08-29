@@ -6,16 +6,15 @@ import { analysisApi } from '@/lib/api/analysis';
 import { locationApi } from '@/lib/api/heat';
 import { format } from 'date-fns';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div style={{
-      backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border-default)',
-      borderRadius: '8px', padding: '10px 14px', boxShadow: 'var(--shadow-md)', fontSize: '13px'
-    }}>
-      <p style={{ color: 'var(--text-secondary)', marginBottom: '4px' }}>{label}</p>
-      <p style={{ fontFamily: 'JetBrains Mono, monospace', fontWeight: 600, fontSize: '15px', color: 'var(--risk-moderate)' }}>
+    <div className="bg-elevated border border-default rounded-lg px-3.5 py-2.5 shadow-md text-[13px]">
+      <p className="text-secondary mb-1">{label}</p>
+      <p className="font-mono font-semibold text-[15px] text-risk-moderate">
         {payload[0]?.value?.toFixed(1)}°C
       </p>
     </div>
@@ -63,73 +62,56 @@ export default function AnalysisPage() {
     : null;
 
   return (
-    <div style={{ padding: '32px', maxWidth: '1400px', margin: '0 auto' }}>
-      <div style={{ marginBottom: '32px' }}>
-        <h1 style={{ fontSize: '24px', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
+    <div className="p-8 max-w-[1400px] mx-auto">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold tracking-tight text-primary">
           Data Analysis & Correlation
         </h1>
-        <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginTop: '4px' }}>
+        <p className="text-sm text-secondary mt-1">
           Pearson correlation analysis · Heat trend detection · AI-powered insights
         </p>
       </div>
 
       {/* Location selector */}
-      <div 
-        style={{ 
-          backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', 
-          borderRadius: '12px', padding: '20px', marginBottom: '24px', boxShadow: 'var(--shadow-sm)' 
-        }}
-      >
-        <label style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-secondary)', display: 'block', marginBottom: '8px' }}>
+      <Card className="mb-6" padding="md">
+        <label className="text-[13px] font-medium text-secondary block mb-2">
           Select Location for Analysis
         </label>
         <select
           value={selectedLocationId}
           onChange={e => setSelectedLocationId(e.target.value)}
-          style={{
-            width: '100%', maxWidth: '360px', backgroundColor: 'var(--bg-base)', border: '1px solid var(--border-default)',
-            color: 'var(--text-primary)', fontSize: '14px', borderRadius: '8px', padding: '10px 14px',
-            outline: 'none', cursor: 'pointer'
-          }}
+          className="w-full max-w-[360px] bg-base border border-default text-primary text-sm rounded-lg px-3.5 py-2.5 outline-none cursor-pointer focus:ring-2 focus:ring-accent/50 transition-shadow"
         >
           <option value="">-- Select location --</option>
           {locations?.map((l: any) => (
             <option key={l.id} value={l.id}>{l.name} — {l.city}</option>
           ))}
         </select>
-      </div>
+      </Card>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '20px', marginBottom: '24px' }}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
         {/* Trend Chart */}
-        <div 
-          style={{ 
-            backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', 
-            borderRadius: '12px', padding: '24px', boxShadow: 'var(--shadow-sm)' 
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <Card padding="md">
+          <div className="flex justify-between items-center mb-5">
             <div className="flex items-center gap-3">
-              <h2 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>Temperature Trend</h2>
+              <h2 className="text-[15px] font-semibold text-primary">Temperature Trend</h2>
               {forecast && (
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-accent/20 text-accent border border-accent/30 animate-pulse">
+                <Badge variant="outline" className="border-accent/30 text-accent bg-accent/10 animate-pulse">
                   T+1 Forecast: {forecast}°C
-                </span>
+                </Badge>
               )}
             </div>
             {trend && (
-              <div style={{ 
-                display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 8px', 
-                borderRadius: '999px', border: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-subtle)' 
-              }}>
-                <TrendIcon size={14} color={trendColor} />
-                <span style={{ fontSize: '12px', fontWeight: 600, textTransform: 'capitalize', color: trendColor }}>
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded-full border border-subtle bg-subtle">
+                <TrendIcon size={14} style={{ color: trendColor }} />
+                <span className="text-xs font-semibold capitalize" style={{ color: trendColor }}>
                   {trend.direction} ({trend.changeRate > 0 ? '+' : ''}{trend.changeRate}°C)
                 </span>
               </div>
             )}
           </div>
           {trendLoading ? (
-            <div className="shimmer" style={{ height: '200px', borderRadius: '8px' }} />
+            <div className="shimmer h-[200px] rounded-lg" />
           ) : trendChartData.length > 0 ? (
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={trendChartData}>
@@ -140,26 +122,18 @@ export default function AnalysisPage() {
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <div style={{ 
-              height: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center', 
-              fontSize: '13px', color: 'var(--text-tertiary)', border: '1px dashed var(--border-subtle)', borderRadius: '8px' 
-            }}>
+            <div className="h-[200px] flex items-center justify-center text-[13px] text-tertiary border border-dashed border-subtle rounded-lg">
               Select a location with data to view trend
             </div>
           )}
-        </div>
+        </Card>
 
         {/* AI Insight */}
-        <div 
-          style={{ 
-            backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', 
-            borderRadius: '12px', padding: '24px', boxShadow: 'var(--shadow-sm)' 
-          }}
-        >
-          <h2 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '20px' }}>AI Insight</h2>
+        <Card padding="md">
+          <h2 className="text-[15px] font-semibold text-primary mb-5">AI Insight</h2>
           {analysis ? (
             <div>
-              <div style={{ display: 'flex', gap: '16px', marginBottom: '20px' }}>
+              <div className="flex gap-4 mb-5">
                 {[
                   { label: 'Current', val: `${analysis.currentTemp.toFixed(1)}°C` },
                   { label: 'Average', val: `${analysis.averageTemp.toFixed(1)}°C` },
@@ -167,83 +141,62 @@ export default function AnalysisPage() {
                 ].map(({ label, val }) => (
                   <div 
                     key={label} 
-                    style={{ 
-                      flex: 1, backgroundColor: 'var(--bg-subtle)', borderRadius: '8px', 
-                      padding: '12px 14px', border: '1px solid var(--border-default)' 
-                    }}
+                    className="flex-1 bg-subtle rounded-lg px-3.5 py-3 border border-default"
                   >
-                    <p style={{ fontSize: '10px', color: 'var(--text-tertiary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>{label}</p>
-                    <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '18px', fontWeight: 700, color: 'var(--risk-moderate)' }}>{val}</p>
+                    <p className="text-[10px] text-tertiary font-semibold uppercase tracking-widest mb-1">{label}</p>
+                    <p className="font-mono text-lg font-bold text-risk-moderate">{val}</p>
                   </div>
                 ))}
               </div>
-              <p style={{ 
-                fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6, 
-                backgroundColor: 'rgba(0,0,0,0.02)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.05)' 
-              }}>
+              <p className="text-[13px] text-secondary leading-relaxed bg-black/5 dark:bg-white/5 p-4 rounded-lg border border-black/5 dark:border-white/5">
                 {analysis.aiInsight}
               </p>
             </div>
           ) : (
-            <div style={{ 
-              height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', 
-              fontSize: '13px', color: 'var(--text-tertiary)', border: '1px dashed var(--border-subtle)', borderRadius: '8px' 
-            }}>
+            <div className="h-[180px] flex items-center justify-center text-[13px] text-tertiary border border-dashed border-subtle rounded-lg">
               Select a location to get AI insights
             </div>
           )}
-        </div>
+        </Card>
       </div>
 
       {/* Correlations */}
-      <div 
-        style={{ 
-          backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', 
-          borderRadius: '12px', overflow: 'hidden', boxShadow: 'var(--shadow-sm)' 
-        }}
-      >
-        <div style={{ padding: '20px 20px 12px' }}>
-          <h2 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>Location Correlations (Pearson)</h2>
-          <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>Statistical heat pattern relationships between monitored zones</p>
+      <Card padding="none">
+        <div className="px-5 pt-5 pb-3">
+          <h2 className="text-[15px] font-semibold text-primary">Location Correlations (Pearson)</h2>
+          <p className="text-xs text-secondary mt-1">Statistical heat pattern relationships between monitored zones</p>
         </div>
         
-        <div style={{ 
-          display: 'grid', gridTemplateColumns: '1fr 1fr 120px 1fr', padding: '10px 20px', gap: '12px', 
-          borderTop: '1px solid var(--border-default)', borderBottom: '1px solid var(--border-default)', backgroundColor: 'var(--bg-subtle)' 
-        }}>
+        <div className="grid grid-cols-[1fr_1fr_120px_1fr] px-5 py-2.5 gap-3 border-y border-default bg-subtle">
           {['Zone A', 'Zone B', 'Coefficient', 'Interpretation'].map(h => (
-            <p key={h} style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{h}</p>
+            <p key={h} className="text-[11px] font-semibold text-tertiary uppercase tracking-widest">{h}</p>
           ))}
         </div>
         
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div className="flex flex-col">
           {corrLoading ? (
-            <div style={{ padding: '24px' }}><div className="shimmer" style={{ height: '60px', borderRadius: '8px' }} /></div>
+            <div className="p-6"><div className="shimmer h-[60px] rounded-lg" /></div>
           ) : !correlations || correlations.length === 0 ? (
-            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: '13px' }}>
+            <div className="p-10 text-center text-tertiary text-[13px]">
               Waiting for sufficient data. The AI requires historical temperature readings from at least two different monitored zones to calculate Pearson correlation coefficients.
             </div>
           ) : (
             correlations.map((c: any, i: number) => (
               <div 
-                key={i} style={{ 
-                display: 'grid', gridTemplateColumns: '1fr 1fr 120px 1fr', padding: '14px 20px', gap: '12px', alignItems: 'center',
-                borderBottom: '1px solid var(--border-subtle)'
-              }}>
-                <p style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 500 }}>{c.locationA}</p>
-                <p style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 500 }}>{c.locationB}</p>
-                <p style={{ 
-                  fontFamily: 'JetBrains Mono, monospace', fontSize: '14px', fontWeight: 700,
-                  color: Math.abs(c.coefficient) > 0.7 ? 'var(--risk-low)' : Math.abs(c.coefficient) > 0.4 ? 'var(--risk-moderate)' : 'var(--text-secondary)'
-                }}>
+                key={i} 
+                className="grid grid-cols-[1fr_1fr_120px_1fr] px-5 py-3.5 gap-3 items-center border-b border-subtle last:border-b-0"
+              >
+                <p className="text-[13px] text-primary font-medium">{c.locationA}</p>
+                <p className="text-[13px] text-primary font-medium">{c.locationB}</p>
+                <p className={`font-mono text-sm font-bold ${Math.abs(c.coefficient) > 0.7 ? 'text-risk-low' : Math.abs(c.coefficient) > 0.4 ? 'text-risk-moderate' : 'text-secondary'}`}>
                   {c.coefficient.toFixed(3)}
                 </p>
-                <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{c.interpretation}</p>
+                <p className="text-xs text-secondary">{c.interpretation}</p>
               </div>
             ))
           )}
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

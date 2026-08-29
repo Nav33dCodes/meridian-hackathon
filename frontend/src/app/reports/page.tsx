@@ -1,42 +1,49 @@
 'use client';
 import { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { reportApi } from '@/lib/api/analysis';
 import { FileText, Sparkles, Calendar, Loader2, Trash2, Download, AlertTriangle, Filter } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import type { Report } from '@/types';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
+import { Card } from '@/components/ui/Card';
 
 const RISK_LEVELS = ['All', 'Extreme', 'High', 'Moderate', 'Low'] as const;
 type RiskFilter = typeof RISK_LEVELS[number];
 
-function getRiskColor(risk: string) {
-  if (risk === 'Extreme') return 'var(--risk-extreme)';
-  if (risk === 'High') return 'var(--risk-high)';
-  if (risk === 'Moderate') return 'var(--risk-moderate)';
-  return 'var(--risk-low)';
+function getRiskVariant(risk: string): any {
+  if (risk === 'Extreme') return 'error';
+  if (risk === 'High') return 'warning';
+  if (risk === 'Low') return 'success';
+  return 'default';
 }
 
 function ConfirmModal({ onConfirm, onCancel, loading }: { onConfirm: () => void; onCancel: () => void; loading?: boolean; }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onCancel} />
-      <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }}
-        className="relative bg-elevated border border-subtle rounded-2xl p-6 w-full max-w-sm mx-4 shadow-2xl">
-        <div className="w-10 h-10 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-4">
-          <AlertTriangle size={18} className="text-red-500" />
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onCancel} />
+      <Card padding="md" className="relative w-full max-w-sm mx-4 z-10 shadow-2xl">
+        <div className="w-10 h-10 rounded-full bg-risk-extreme/10 border border-risk-extreme/20 flex items-center justify-center mb-4">
+          <AlertTriangle size={18} className="text-risk-extreme" />
         </div>
         <h3 className="text-base font-bold text-primary mb-1">Delete Report</h3>
-        <p className="text-sm text-secondary mb-5">This report will be permanently removed. This action cannot be undone.</p>
-        <div className="flex gap-2 justify-end">
-          <button onClick={onCancel} className="px-4 py-2 rounded-lg bg-subtle border border-subtle text-secondary text-sm font-medium hover:text-primary transition-colors">Cancel</button>
-          <button onClick={onConfirm} disabled={loading} className="px-4 py-2 rounded-lg bg-red-500 text-white text-sm font-semibold hover:bg-red-600 disabled:opacity-50 flex items-center gap-2 transition-colors">
-            {loading && <Loader2 size={14} className="animate-spin" />}Delete
-          </button>
+        <p className="text-sm text-secondary mb-6">This report will be permanently removed. This action cannot be undone.</p>
+        <div className="flex gap-3 justify-end">
+          <Button variant="ghost" size="sm" onClick={onCancel}>Cancel</Button>
+          <Button 
+            className="bg-risk-extreme text-white hover:opacity-90 border border-transparent" 
+            size="sm" 
+            onClick={onConfirm} 
+            disabled={loading}
+          >
+            {loading && <Loader2 size={14} className="animate-spin mr-2" />}
+            Delete
+          </Button>
         </div>
-      </motion.div>
+      </Card>
     </div>
   );
 }
@@ -85,7 +92,7 @@ export default function ReportsPage() {
   const exportReport = (report: Report) => {
     const content = [
       `MERIDIAN HEAT RISK ADVISORY`,
-      `â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•`,
+      `===========================================================`,
       ``,
       `Title: ${report.title}`,
       `Generated: ${format(new Date(report.createdAt), 'MMMM dd, yyyy HH:mm')} UTC`,
@@ -94,11 +101,11 @@ export default function ReportsPage() {
       `Peak Temp: ${report.peakTemperatureCelsius.toFixed(1)}°C`,
       `Model: ${report.modelUsed ?? 'N/A'}`,
       ``,
-      `â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€`,
+      `-----------------------------------------------------------`,
       ``,
       report.content,
       ``,
-      `â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€`,
+      `-----------------------------------------------------------`,
       `Meridian Urban Heat Intelligence Platform`,
     ].join('\n');
 
@@ -114,66 +121,60 @@ export default function ReportsPage() {
   return (
     <div className="h-screen max-h-screen overflow-hidden flex flex-col bg-base">
 
-      {/* â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-      <div className="px-5 py-3 border-b border-subtle flex items-center justify-between shrink-0 bg-elevated">
+      {/* ─── Header ───────────────────────────────────────── */}
+      <div className="px-6 py-4 border-b border-subtle flex items-center justify-between shrink-0 bg-elevated">
         <div>
-          <h1 className="text-[13px] font-bold text-primary leading-none">AI Risk Reports</h1>
-          <p className="text-[10px] text-tertiary mt-0.5">Government-grade advisories Â· Meridian AI</p>
+          <h1 className="text-sm font-bold text-primary leading-none">AI Risk Reports</h1>
+          <p className="text-xs text-tertiary mt-1">Government-grade advisories · Meridian AI</p>
         </div>
-        <button
+        <Button
           onClick={() => generate.mutate()}
           disabled={generate.isPending}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-accent text-[11px] font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
-          style={{ color: 'var(--bg-base)' }}
+          size="sm"
         >
-          {generate.isPending ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+          {generate.isPending ? <Loader2 size={14} className="animate-spin mr-2" /> : <Sparkles size={14} className="mr-2" />}
           Generate Report
-        </button>
+        </Button>
       </div>
 
-      {/* â”€â”€ Risk Filter Bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-      <div className="px-5 py-2 border-b border-subtle shrink-0 bg-subtle flex items-center gap-2">
-        <Filter size={11} className="text-tertiary" />
-        <span className="text-[10px] text-tertiary font-medium mr-1">Filter:</span>
+      {/* ─── Risk Filter Bar ────────────────────────────── */}
+      <div className="px-6 py-3 border-b border-subtle shrink-0 bg-subtle flex items-center gap-2">
+        <Filter size={14} className="text-tertiary mr-1" />
+        <span className="text-xs text-tertiary font-semibold uppercase tracking-wider mr-2">Filter:</span>
         {RISK_LEVELS.map(level => (
           <button
             key={level}
             onClick={() => setRiskFilter(level)}
-            className={`text-[10px] px-2.5 py-0.5 rounded-full font-semibold border transition-all ${
+            className={`text-xs px-3 py-1 rounded-lg font-semibold transition-colors ${
               riskFilter === level
-                ? 'border-transparent text-white'
-                : 'border-subtle text-tertiary hover:text-primary'
+                ? 'bg-primary text-base'
+                : 'bg-transparent text-secondary hover:text-primary hover:bg-elevated'
             }`}
-            style={riskFilter === level && level !== 'All'
-              ? { backgroundColor: getRiskColor(level), borderColor: getRiskColor(level) }
-              : riskFilter === level
-              ? { backgroundColor: 'var(--accent)', color: 'var(--bg-base)' }
-              : {}}
           >
             {level}
           </button>
         ))}
-        <span className="ml-auto text-[10px] text-tertiary">{filtered.length} reports</span>
+        <span className="ml-auto text-xs font-semibold text-tertiary bg-elevated px-2 py-1 rounded-md border border-subtle">{filtered.length} reports</span>
       </div>
 
-      {/* â”€â”€ Main 2-col layout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* ─── Main 2-col layout ──────────────────────────── */}
       <div className="flex-1 min-h-0 flex overflow-hidden">
 
         {/* Report List */}
-        <div className="flex flex-col border-r border-subtle" style={{ width: '340px', minWidth: '340px' }}>
+        <div className="flex flex-col border-r border-subtle bg-base" style={{ width: '380px', minWidth: '380px' }}>
           <div ref={parentRef} className="flex-1 overflow-y-auto">
             {isLoading ? (
-              <div className="p-3 flex flex-col gap-2">
-                {[...Array(6)].map((_, i) => <div key={i} className="shimmer h-[68px] rounded-lg" />)}
+              <div className="p-4 flex flex-col gap-3">
+                {[...Array(6)].map((_, i) => <div key={i} className="shimmer h-[72px] rounded-xl" />)}
               </div>
             ) : filtered.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full py-16 gap-3">
-                <FileText size={24} className="text-tertiary" />
+                <FileText size={32} className="text-tertiary" />
                 <p className="text-sm text-secondary">
                   {riskFilter !== 'All' ? `No ${riskFilter} risk reports` : 'No reports yet'}
                 </p>
                 {riskFilter !== 'All' && (
-                  <button onClick={() => setRiskFilter('All')} className="text-[11px] text-accent">Show all</button>
+                  <Button variant="ghost" size="sm" onClick={() => setRiskFilter('All')}>Show all</Button>
                 )}
               </div>
             ) : (
@@ -188,31 +189,26 @@ export default function ReportsPage() {
                     >
                       <div
                         onClick={() => setSelected(r.id)}
-                        className={`mx-2 my-1 p-3 rounded-lg cursor-pointer border transition-all group relative ${
-                          isSelected ? 'border-accent/30 bg-accent-muted' : 'border-transparent hover:bg-subtle hover:border-subtle'
+                        className={`mx-3 my-1.5 p-3.5 rounded-xl cursor-pointer border transition-all group relative flex items-start gap-3 ${
+                          isSelected ? 'border-accent/30 bg-accent/10 shadow-sm' : 'border-transparent hover:bg-subtle hover:border-subtle'
                         }`}
                       >
-                        <div className="flex items-start gap-2.5">
-                          <FileText size={13} className={`shrink-0 mt-0.5 ${isSelected ? 'text-accent' : 'text-tertiary'}`} />
-                          <div className="flex-1 min-w-0">
-                            <p className={`text-[12px] font-medium truncate mb-1 ${isSelected ? 'text-accent' : 'text-primary'}`}>{r.title}</p>
-                            <div className="flex items-center gap-2">
-                              <span className="text-[10px] text-tertiary">{format(new Date(r.createdAt), 'MMM dd, HH:mm')}</span>
-                              <span
-                                className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded"
-                                style={{ backgroundColor: `${getRiskColor(r.overallRisk)}20`, color: getRiskColor(r.overallRisk) }}
-                              >
-                                {r.overallRisk}
-                              </span>
-                            </div>
+                        <FileText size={16} className={`shrink-0 mt-0.5 ${isSelected ? 'text-accent' : 'text-tertiary'}`} />
+                        <div className="flex-1 min-w-0">
+                          <p className={`text-sm font-semibold truncate mb-1 ${isSelected ? 'text-accent' : 'text-primary'}`}>{r.title}</p>
+                          <div className="flex items-center gap-2.5">
+                            <span className="text-xs text-tertiary">{format(new Date(r.createdAt), 'MMM dd, HH:mm')}</span>
+                            <Badge variant={getRiskVariant(r.overallRisk)}>
+                              {r.overallRisk}
+                            </Badge>
                           </div>
                         </div>
-                        {/* Delete button â€” appears on hover */}
+                        {/* Delete button — appears on hover */}
                         <button
                           onClick={e => { e.stopPropagation(); setDeleteConfirm(r.id); }}
-                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 w-6 h-6 flex items-center justify-center rounded-md text-tertiary hover:text-red-500 hover:bg-red-500/10 transition-all"
+                          className={`absolute top-2.5 right-2.5 w-7 h-7 flex items-center justify-center rounded-lg transition-all ${isSelected ? 'opacity-100 text-tertiary hover:text-risk-extreme hover:bg-risk-extreme/10' : 'opacity-0 group-hover:opacity-100 text-tertiary hover:text-risk-extreme hover:bg-risk-extreme/10'}`}
                         >
-                          <Trash2 size={11} />
+                          <Trash2 size={14} />
                         </button>
                       </div>
                     </div>
@@ -224,85 +220,70 @@ export default function ReportsPage() {
         </div>
 
         {/* Report Viewer */}
-        <div className="flex-1 flex flex-col min-w-0">
-          <AnimatePresence mode="wait">
+        <div className="flex-1 flex flex-col min-w-0 bg-elevated">
             {selectedReport ? (
-              <motion.div key={selectedReport.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 flex flex-col overflow-hidden">
+              <div className="flex-1 flex flex-col overflow-hidden">
                 {/* Viewer header */}
-                <div className="px-6 py-3 border-b border-subtle bg-subtle shrink-0 flex items-start justify-between gap-4">
+                <div className="px-8 py-5 border-b border-subtle bg-base shrink-0 flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
-                    <h2 className="text-[14px] font-bold text-primary leading-snug">{selectedReport.title}</h2>
-                    <div className="flex items-center gap-3 mt-1.5 flex-wrap">
-                      <div className="flex items-center gap-1 text-[11px] text-secondary">
-                        <Calendar size={11} />
+                    <h2 className="text-lg font-bold text-primary leading-snug">{selectedReport.title}</h2>
+                    <div className="flex items-center gap-3 mt-2.5 flex-wrap">
+                      <div className="flex items-center gap-1.5 text-xs text-secondary font-medium bg-subtle px-2.5 py-1 rounded-md border border-subtle">
+                        <Calendar size={13} />
                         {format(new Date(selectedReport.createdAt), 'MMMM dd, yyyy HH:mm')} UTC
                       </div>
-                      <span className="text-[11px] font-mono text-secondary">
+                      <span className="text-xs font-mono text-secondary bg-subtle px-2.5 py-1 rounded-md border border-subtle">
                         Avg {selectedReport.averageTemperatureCelsius.toFixed(1)}°C · Peak {selectedReport.peakTemperatureCelsius.toFixed(1)}°C
                       </span>
                       {selectedReport.modelUsed && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full border border-subtle text-tertiary">
-                          {selectedReport.modelUsed}
-                        </span>
+                        <Badge variant="outline">{selectedReport.modelUsed}</Badge>
                       )}
-                      <span
-                        className="text-[10px] font-bold uppercase px-2 py-0.5 rounded"
-                        style={{ backgroundColor: `${getRiskColor(selectedReport.overallRisk)}18`, color: getRiskColor(selectedReport.overallRisk) }}
-                      >
+                      <Badge variant={getRiskVariant(selectedReport.overallRisk)}>
                         {selectedReport.overallRisk} Risk
-                      </span>
+                      </Badge>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      onClick={() => exportReport(selectedReport)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-subtle border border-subtle text-secondary text-[11px] font-medium hover:text-primary hover:bg-base transition-colors"
-                    >
-                      <Download size={12} />
+                    <Button variant="secondary" size="sm" onClick={() => exportReport(selectedReport)}>
+                      <Download size={14} className="mr-2" />
                       Export TXT
-                    </button>
-                    <button
-                      onClick={() => setDeleteConfirm(selectedReport.id)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-red-500/20 text-red-500 text-[11px] font-medium hover:bg-red-500/5 transition-colors"
-                    >
-                      <Trash2 size={12} />
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => setDeleteConfirm(selectedReport.id)} className="border-risk-extreme/20 text-risk-extreme hover:bg-risk-extreme/5">
+                      <Trash2 size={14} className="mr-2" />
                       Delete
-                    </button>
+                    </Button>
                   </div>
                 </div>
 
                 {/* Viewer body */}
-                <div className="flex-1 overflow-y-auto px-6 py-5">
-                  <div className="prose prose-sm max-w-none">
-                    <pre className="text-[13px] leading-relaxed text-secondary whitespace-pre-wrap font-sans">{selectedReport.content}</pre>
+                <div className="flex-1 overflow-y-auto px-8 py-6">
+                  <div className="prose prose-sm max-w-[800px]">
+                    <pre className="text-[14px] leading-relaxed text-secondary whitespace-pre-wrap font-sans">{selectedReport.content}</pre>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             ) : (
-              <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 flex flex-col items-center justify-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-subtle border border-subtle flex items-center justify-center">
-                  <FileText size={22} className="text-tertiary" />
+              <div className="flex-1 flex flex-col items-center justify-center gap-4">
+                <div className="w-16 h-16 rounded-2xl bg-subtle border border-default flex items-center justify-center shadow-sm">
+                  <FileText size={24} className="text-tertiary" />
                 </div>
                 <div className="text-center">
-                  <p className="font-semibold text-primary mb-1">Select a Report</p>
+                  <p className="text-base font-bold text-primary mb-1">Select a Report</p>
                   <p className="text-sm text-secondary">Choose a report from the list to view its contents</p>
                 </div>
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
         </div>
       </div>
 
-      {/* â”€â”€ Delete Confirm Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-      <AnimatePresence>
-        {deleteConfirm && (
-          <ConfirmModal
-            onConfirm={() => deleteReport.mutate(deleteConfirm!)}
-            onCancel={() => setDeleteConfirm(null)}
-            loading={deleteReport.isPending}
-          />
-        )}
-      </AnimatePresence>
+      {/* ─── Delete Confirm Modal ───────────────────────── */}
+      {deleteConfirm && (
+        <ConfirmModal
+          onConfirm={() => deleteReport.mutate(deleteConfirm!)}
+          onCancel={() => setDeleteConfirm(null)}
+          loading={deleteReport.isPending}
+        />
+      )}
     </div>
   );
 }

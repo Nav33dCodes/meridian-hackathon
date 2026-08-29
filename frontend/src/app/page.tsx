@@ -80,11 +80,7 @@ export default function DashboardPage() {
 
   return (
     <div className="h-screen max-h-screen overflow-hidden flex flex-col relative">
-      {/* Background decoration */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-base">
-        <div className="absolute -top-[30%] -right-[10%] w-[70%] h-[70%] rounded-full bg-[var(--accent)]/5 blur-[120px]" />
-        <div className="absolute -bottom-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-[var(--risk-high)]/5 blur-[100px]" />
-      </div>
+
       
       <div className="relative z-10 flex flex-col h-full w-full bg-transparent">
 

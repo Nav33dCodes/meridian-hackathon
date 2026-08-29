@@ -9,67 +9,38 @@
   --color-risk-extreme: var(--risk-extreme);
 }
 
-/* ─── Layer 1: Runtime design tokens (Vercel-style) ─── */
-:root {
-  color-scheme: light;
-  --bg-base: oklch(0.99 0 0);
-  /* near-white */
-  --bg-subtle: oklch(0.97 0 0);
-  --bg-elevated: oklch(1.0 0 0);
-  --border-subtle: oklch(0.92 0 0);
-  --border-default: oklch(0.88 0 0);
-  --text-primary: oklch(0.15 0 0);
-  /* near-black */
-  --text-secondary: oklch(0.45 0 0);
-  --text-tertiary: oklch(0.65 0 0);
-  --accent: oklch(0.15 0 0);
-  /* Vercel uses black as accent in light mode */
-  --accent-muted: oklch(0.95 0 0);
-  --accent-border: oklch(0.85 0 0);
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.10), 0 2px 4px -2px rgb(0 0 0 / 0.10);
+/* ─── Layer 1: Runtime design tokens (Linear Midnight & Violet) ─── */
+:root, .dark {
+  color-scheme: dark;
+  
+  /* Midnight Backgrounds */
+  --bg-base: #08090A;
+  --bg-subtle: #121316;
+  --bg-elevated: #0E0F12;
+  
+  /* Ultra-subtle borders */
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  --border-default: rgba(255, 255, 255, 0.08);
+  
+  /* Typography */
+  --text-primary: #F2F2F2;
+  --text-secondary: #8A8F98;
+  --text-tertiary: #60646C;
+  
+  /* Linear Violet Accent */
+  --accent: #5E6AD2;
+  --accent-muted: rgba(94, 106, 210, 0.15);
+  --accent-border: rgba(94, 106, 210, 0.3);
+  
+  /* Glowing / Machined inner shadows */
+  --shadow-sm: 0 2px 8px 0 rgba(0,0,0,0.4), inset 0 1px 0 0 rgba(255,255,255,0.05);
+  --shadow-md: 0 4px 16px 0 rgba(0,0,0,0.5), inset 0 1px 0 0 rgba(255,255,255,0.05);
 
   /* Risk colors */
-  --risk-low: oklch(0.62 0.17 145);
-  --risk-moderate: oklch(0.7 0.17 75);
-  --risk-high: oklch(0.6 0.22 25);
-  --risk-extreme: oklch(0.4 0.15 25);
-}
-
-.dark {
-  color-scheme: dark;
-  --bg-base: oklch(0.15 0 0);
-  /* very dark gray */
-  --bg-subtle: oklch(0.18 0 0);
-  --bg-elevated: oklch(0.2 0 0);
-  --border-subtle: oklch(0.25 0 0);
-  --border-default: oklch(0.3 0 0);
-  --text-primary: oklch(0.98 0 0);
-  --text-secondary: oklch(0.7 0 0);
-  --text-tertiary: oklch(0.5 0 0);
-  --accent: oklch(0.98 0 0);
-  /* White accent in dark mode */
-  --accent-muted: oklch(0.25 0 0);
-  --accent-border: oklch(0.35 0 0);
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.50);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.60), 0 2px 4px -2px rgb(0 0 0 / 0.50);
-}
-
-.oled {
-  color-scheme: dark;
-  --bg-base: oklch(0 0 0);
-  --bg-subtle: oklch(0.1 0 0);
-  --bg-elevated: oklch(0.15 0 0);
-  --border-subtle: oklch(0.2 0 0);
-  --border-default: oklch(0.25 0 0);
-  --text-primary: oklch(0.98 0 0);
-  --text-secondary: oklch(0.7 0 0);
-  --text-tertiary: oklch(0.5 0 0);
-  --accent: oklch(0.98 0 0);
-  --accent-muted: oklch(0.2 0 0);
-  --accent-border: oklch(0.3 0 0);
-  --shadow-sm: 0 1px 3px 0 rgb(255 255 255 / 0.05);
-  --shadow-md: 0 4px 8px -1px rgb(255 255 255 / 0.08), 0 2px 4px -2px rgb(255 255 255 / 0.08);
+  --risk-low: #5E6AD2; 
+  --risk-moderate: #F5A623;
+  --risk-high: #F05050;
+  --risk-extreme: #D0021B;
 }
 
 /* ─── Layer 2: Explicit utility classes (reliable in Tailwind v4) ─── */
