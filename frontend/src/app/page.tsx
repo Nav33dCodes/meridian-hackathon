@@ -20,6 +20,7 @@ const DynamicMap = dynamic(() => import('@/components/Map'), { ssr: false });
 
 import { RiskBadge } from '@/components/ui/RiskBadge';
 import { StatCard } from '@/components/ui/StatCard';
+import { Button } from '@/components/ui/Button';
 
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
@@ -85,35 +86,35 @@ export default function DashboardPage() {
       <div className="relative z-10 flex flex-col h-full w-full bg-transparent">
 
       {/* â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-      <div className="px-5 py-3 border-b border-subtle flex items-center justify-between shrink-0 bg-elevated">
+      <div className="px-8 py-4 border-b border-subtle flex items-center justify-between shrink-0 bg-elevated">
         <div className="flex items-center gap-2.5">
-          <Globe size={15} className="text-accent" />
+          <Globe size={18} className="text-accent" />
           <div>
-            <h1 className="text-[13px] font-bold text-primary leading-none">Meridian Dashboard</h1>
-            <p className="text-[10px] text-tertiary mt-0.5">Global urban heat intelligence</p>
+            <h1 className="text-base font-bold text-primary leading-none">Meridian Dashboard</h1>
+            <p className="text-xs text-tertiary mt-1">Global urban heat intelligence</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-subtle border border-subtle">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-[10px] font-medium text-secondary">Live · 30s</span>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-subtle border border-subtle">
+            <span className="w-1.5 h-1.5 rounded-full bg-risk-low animate-pulse" />
+            <span className="text-[11px] font-semibold text-secondary">Live · 30s</span>
           </div>
-          <button
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={() => hasData && exportToCSV(readings)}
             disabled={!hasData}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-subtle border border-subtle text-secondary text-[11px] font-medium hover:bg-base hover:text-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            <Download size={12} />
+            <Download size={14} className="mr-2" />
             Export CSV
-          </button>
-          <button
+          </Button>
+          <Button
+            size="sm"
             onClick={() => refetch()}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-accent text-[11px] font-medium hover:opacity-90 transition-opacity"
-            style={{ color: 'var(--bg-base)' }}
           >
-            <RefreshCw size={12} className={isFetching ? 'animate-spin' : ''} />
+            <RefreshCw size={14} className={`mr-2 ${isFetching ? 'animate-spin' : ''}`} />
             Refresh
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -142,9 +143,11 @@ export default function DashboardPage() {
             <h2 className="text-base font-bold text-primary mb-1">No Active Zones</h2>
             <p className="text-sm text-secondary max-w-xs">Import a CSV on the Locations page to start receiving live heat data.</p>
           </div>
-          <Link href="/locations" className="flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-sm font-semibold hover:opacity-90 transition-opacity" style={{ color: 'var(--bg-base)' }}>
-            <Plus size={13} />
-            Manage Locations
+          <Link href="/locations">
+            <Button size="sm">
+              <Plus size={14} className="mr-2" />
+              Manage Locations
+            </Button>
           </Link>
         </div>
       ) : (

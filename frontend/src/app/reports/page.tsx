@@ -122,7 +122,7 @@ export default function ReportsPage() {
     <div className="h-screen max-h-screen overflow-hidden flex flex-col bg-base">
 
       {/* ─── Header ───────────────────────────────────────── */}
-      <div className="px-6 py-4 border-b border-subtle flex items-center justify-between shrink-0 bg-elevated">
+      <div className="px-8 py-4 border-b border-subtle flex items-center justify-between shrink-0 bg-elevated">
         <div>
           <div className="flex items-center gap-2 text-xs text-tertiary mb-1 font-medium">
             <span>Dashboard</span>
@@ -143,7 +143,7 @@ export default function ReportsPage() {
       </div>
 
       {/* ─── Risk Filter Bar ────────────────────────────── */}
-      <div className="px-6 py-3 border-b border-subtle shrink-0 bg-subtle flex items-center gap-2">
+      <div className="px-8 py-3 border-b border-subtle shrink-0 bg-subtle flex items-center gap-2">
         <Filter size={14} className="text-tertiary mr-1" />
         <span className="text-xs text-tertiary font-semibold uppercase tracking-wider mr-2">Filter:</span>
         {RISK_LEVELS.map(level => (

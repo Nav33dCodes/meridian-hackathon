@@ -8,6 +8,7 @@ import {
   ChevronRight, Trash2, Zap, Search, Upload, AlertTriangle
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/Button';
 
 function ConfirmModal({ title, message, onConfirm, onCancel, loading }: {
   title: string; message: string;
@@ -27,13 +28,13 @@ function ConfirmModal({ title, message, onConfirm, onCancel, loading }: {
         <h3 className="text-base font-bold text-primary mb-1">{title}</h3>
         <p className="text-sm text-secondary mb-5">{message}</p>
         <div className="flex gap-2 justify-end">
-          <button onClick={onCancel} className="px-4 py-2 rounded-lg bg-subtle border border-subtle text-secondary text-sm font-medium hover:text-primary transition-colors">
+          <Button variant="ghost" size="sm" onClick={onCancel}>
             Cancel
-          </button>
-          <button onClick={onConfirm} disabled={loading} className="px-4 py-2 rounded-lg bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-colors disabled:opacity-50 flex items-center gap-2">
-            {loading && <Loader2 size={14} className="animate-spin" />}
+          </Button>
+          <Button variant="primary" size="sm" onClick={onConfirm} disabled={loading} className="bg-red-500 hover:bg-red-600 border-transparent text-white">
+            {loading && <Loader2 size={14} className="animate-spin mr-2" />}
             Delete
-          </button>
+          </Button>
         </div>
       </motion.div>
     </div>
@@ -152,7 +153,7 @@ export default function LocationsPage() {
     <div className="h-screen max-h-screen overflow-hidden flex flex-col bg-base">
 
       {/* â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-      <div className="px-5 py-4 border-b border-subtle flex items-center justify-between shrink-0 bg-elevated">
+      <div className="px-8 py-4 border-b border-subtle flex items-center justify-between shrink-0 bg-elevated">
         <div>
           <div className="flex items-center gap-2 text-xs text-tertiary mb-1 font-medium">
             <span>Dashboard</span>
@@ -164,54 +165,55 @@ export default function LocationsPage() {
         </div>
         <div className="flex items-center gap-2">
           {/* CSV Upload */}
-          <label className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-subtle border border-subtle text-secondary text-[11px] font-medium hover:bg-base hover:text-primary transition-colors cursor-pointer">
-            <Upload size={12} />
+          <label className="flex items-center gap-1.5 px-3 h-8 rounded-lg bg-subtle border border-subtle text-secondary text-xs font-medium hover:bg-elevated hover:text-primary transition-colors cursor-pointer shadow-token-sm">
+            <Upload size={14} />
             Import CSV
             <input type="file" accept=".csv" className="hidden" onChange={handleCsvUpload} disabled={createBulk.isPending} />
           </label>
 
           {/* Clear All */}
           {totalCount > 0 && (
-            <button
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => setDeleteAllConfirm(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-subtle border border-red-500/20 text-red-500 text-[11px] font-medium hover:bg-red-500/5 transition-colors"
+              className="text-risk-extreme border-risk-extreme/20 hover:bg-risk-extreme/10"
             >
-              <Trash2 size={12} />
+              <Trash2 size={14} className="mr-2" />
               Clear All
-            </button>
+            </Button>
           )}
 
           {/* Add Zone */}
-          <button
+          <Button
+            size="sm"
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-accent text-[11px] font-semibold hover:opacity-90 transition-opacity"
-            style={{ color: 'var(--bg-base)' }}
           >
-            <Plus size={12} />
+            <Plus size={14} className="mr-2" />
             Add Zone
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* ── Search Bar ────────────────────────────────────────── */}
-      <div className="px-5 py-2.5 border-b border-subtle shrink-0 bg-subtle">
+      <div className="px-8 py-3 border-b border-subtle shrink-0 bg-subtle">
         <form onSubmit={handleSearch} className="flex gap-2 max-w-lg">
           <div className="relative flex-1">
-            <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-tertiary" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-tertiary" />
             <input
               value={searchInput}
               onChange={e => setSearchInput(e.target.value)}
               placeholder="Search by name, city, or country…"
-              className="w-full h-8 pl-8 pr-3 rounded-md bg-base border border-subtle text-[12px] text-primary placeholder:text-tertiary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all"
+              className="w-full h-9 pl-9 pr-3 rounded-lg bg-base border border-subtle text-sm text-primary placeholder:text-tertiary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all shadow-token-sm"
             />
           </div>
-          <button type="submit" className="h-8 px-4 rounded-md bg-accent text-[11px] font-medium hover:opacity-90" style={{ color: 'var(--bg-base)' }}>
+          <Button type="submit" size="sm" className="h-9">
             Search
-          </button>
+          </Button>
           {search && (
-            <button type="button" onClick={() => { setSearch(''); setSearchInput(''); setPage(1); }} className="px-3 py-1.5 rounded-md border border-subtle text-[11px] text-secondary hover:text-primary">
+            <Button type="button" variant="ghost" size="sm" onClick={() => { setSearch(''); setSearchInput(''); setPage(1); }} className="h-9">
               Clear
-            </button>
+            </Button>
           )}
         </form>
       </div>

@@ -9,6 +9,7 @@ import {
   MapPin,
   ChevronLeft,
   ChevronRight,
+  Thermometer,
 } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { useState } from 'react';
@@ -35,8 +36,8 @@ export function Sidebar() {
     >
       <div className="flex items-center justify-between p-5 border-b border-subtle">
         <div className="flex items-center gap-3 overflow-hidden">
-          <div className="w-10 h-10 shrink-0 rounded-xl flex items-center justify-center bg-gradient-to-tr from-accent to-accent-muted text-white shadow-sm overflow-hidden">
-             <img src="/logo.png" alt="Meridian" className="w-full h-full object-cover" />
+          <div className="w-10 h-10 shrink-0 rounded-xl flex items-center justify-center bg-accent text-white shadow-token-md overflow-hidden">
+             <Thermometer size={22} className="drop-shadow-md" />
           </div>
           <AnimatePresence>
             {!collapsed && (
@@ -56,7 +57,7 @@ export function Sidebar() {
 
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="absolute top-7 right-[-14px] w-7 h-7 bg-elevated border border-subtle rounded-full flex items-center justify-center text-secondary hover:text-primary hover:bg-subtle transition-colors shadow-sm z-50 cursor-pointer"
+        className="absolute top-6 -right-3.5 w-7 h-7 bg-elevated border border-subtle rounded-full flex items-center justify-center text-secondary hover:text-primary hover:bg-subtle transition-colors shadow-token-sm z-50 cursor-pointer backdrop-blur-md"
       >
         {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
       </button>
