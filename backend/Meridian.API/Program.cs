@@ -49,14 +49,22 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
-// CORS — allow frontend
+// CORS — allow frontend. Extra origins come from configuration
+// (Cors:AllowedOrigins, or the Cors__AllowedOrigins__0 env var) so the
+// deployed Vercel URL can be added without a code change.
+var corsOrigins = new[]
+{
+    "http://localhost:3000",
+    "https://meridian.vercel.app"
+}
+.Concat(builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [])
+.Distinct()
+.ToArray();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("MeridianCors", policy =>
-        policy.WithOrigins(
-             "http://localhost:3000",
-            "https://meridian.vercel.app"
-        )
+        policy.WithOrigins(corsOrigins)
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials()
