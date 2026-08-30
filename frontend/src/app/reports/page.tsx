@@ -7,6 +7,7 @@ import { FileText, Sparkles, Calendar, Loader2, Trash2, Download, AlertTriangle,
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { API_BASE } from '@/lib/api/client';
+import { downloadExport, exportLabel } from '@/lib/api/export';
 import type { Report } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -54,6 +55,21 @@ export default function ReportsPage() {
   const [selected, setSelected] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [riskFilter, setRiskFilter] = useState<RiskFilter>('All');
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
+
+  const exportGlobalPdf = async () => {
+    if (isExportingPdf) return;
+    setIsExportingPdf(true);
+    const toastId = toast.loading(`Preparing ${exportLabel('pdf')}…`);
+    try {
+      const filename = await downloadExport('pdf');
+      toast.success(`Downloaded ${filename}`, { id: toastId });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Export failed', { id: toastId });
+    } finally {
+      setIsExportingPdf(false);
+    }
+  };
   const parentRef = useRef<HTMLDivElement>(null);
 
   const { data: reports, isLoading, refetch } = useQuery({
@@ -227,9 +243,13 @@ export default function ReportsPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <Button variant="secondary" size="sm" onClick={() => window.open(`${API_BASE}/api/export/pdf`, '_blank')}>
-                      <Download size={14} className="mr-2" />
-                      Export Global PDF
+                    <Button variant="secondary" size="sm" onClick={exportGlobalPdf} disabled={isExportingPdf}>
+                      {isExportingPdf ? (
+                        <Loader2 size={14} className="mr-2 animate-spin" />
+                      ) : (
+                        <Download size={14} className="mr-2" />
+                      )}
+                      {isExportingPdf ? 'Exporting…' : 'Export Global PDF'}
                     </Button>
                     <Button variant="ghost" size="sm" onClick={() => setDeleteConfirm(selectedReport.id)} className="border-risk-extreme/20 text-risk-extreme hover:bg-risk-extreme/5">
                       <Trash2 size={14} className="mr-2" />

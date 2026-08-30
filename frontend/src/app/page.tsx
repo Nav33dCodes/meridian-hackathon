@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { heatApi } from '@/lib/api/heat';
 import {
   Thermometer, AlertTriangle, MapPin, Activity, RefreshCw,
-  Download, Plus, Globe, BarChart3, FileText
+  Download, Plus, Globe, BarChart3, FileText, Loader2
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -17,6 +17,7 @@ import Link from 'next/link';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { toast } from 'sonner';
 import { API_BASE } from '@/lib/api/client';
+import { downloadExport, exportLabel, type ExportFormat } from '@/lib/api/export';
 
 const DynamicMap = dynamic(() => import('@/components/Map'), { ssr: false });
 
@@ -46,6 +47,22 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<'map' | 'chart'>('map');
   const [sortKey, setSortKey] = useState<'temp' | 'risk' | 'name'>('temp');
   const [isExportOpen, setIsExportOpen] = useState(false);
+  const [exporting, setExporting] = useState<ExportFormat | null>(null);
+
+  const runExport = async (format: ExportFormat) => {
+    if (exporting) return;
+    setExporting(format);
+    setIsExportOpen(false);
+    const toastId = toast.loading(`Preparing ${exportLabel(format)}…`);
+    try {
+      const filename = await downloadExport(format);
+      toast.success(`Downloaded ${filename}`, { id: toastId });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Export failed', { id: toastId });
+    } finally {
+      setExporting(null);
+    }
+  };
 
   const { data, isLoading, refetch, isFetching } = useQuery({
     queryKey: ['dashboard'],
@@ -172,28 +189,30 @@ export default function DashboardPage() {
                 variant="secondary"
                 size="sm"
                 onClick={() => setIsExportOpen(!isExportOpen)}
-                disabled={!hasData}
+                disabled={!hasData || exporting !== null}
               >
-                <Download size={14} className="mr-2" />
-                Export
+                {exporting ? (
+                  <Loader2 size={14} className="mr-2 animate-spin" />
+                ) : (
+                  <Download size={14} className="mr-2" />
+                )}
+                {exporting ? 'Exporting…' : 'Export'}
               </Button>
               {isExportOpen && (
-                <div className="absolute top-full right-0 mt-2 bg-elevated rounded-2xl shadow-token-md p-1.5 w-40 z-50">
+                <div className="absolute top-full right-0 mt-2 bg-elevated rounded-2xl shadow-token-md p-1.5 w-44 z-50">
                   <button
-                    className="w-full text-left px-3 py-2 text-sm font-medium hover:bg-subtle rounded-full text-primary transition-colors flex items-center"
-                    onClick={async () => {
-                      setIsExportOpen(false);
-                      toast.success("Excel Export Started! You'll be notified when it's ready.", { icon: '📊' });
-                      await fetch(`${API_BASE}/api/export/excel`, { method: 'POST' });
-                    }}
+                    className="w-full text-left px-3 py-2 text-sm font-medium hover:bg-subtle rounded-full text-primary transition-colors flex items-center disabled:opacity-50"
+                    disabled={exporting !== null}
+                    onClick={() => runExport('excel')}
                   >
-                    <FileText size={14} className="mr-2 text-secondary" /> Excel Spreadsheet
+                    <FileText size={14} className="mr-2 text-secondary" /> Excel workbook
                   </button>
                   <button
-                    className="w-full text-left px-3 py-2 text-sm font-medium hover:bg-subtle rounded-full text-primary transition-colors flex items-center mt-0.5"
-                    onClick={() => { window.open(`${API_BASE}/api/export/pdf`, '_blank'); setIsExportOpen(false); }}
+                    className="w-full text-left px-3 py-2 text-sm font-medium hover:bg-subtle rounded-full text-primary transition-colors flex items-center mt-0.5 disabled:opacity-50"
+                    disabled={exporting !== null}
+                    onClick={() => runExport('pdf')}
                   >
-                    <Download size={14} className="mr-2 text-secondary" /> PDF Report
+                    <Download size={14} className="mr-2 text-secondary" /> PDF report
                   </button>
                 </div>
               )}

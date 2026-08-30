@@ -85,9 +85,12 @@ public class ExportController : ControllerBase
     public async Task<IActionResult> ExportExcel(CancellationToken ct)
     {
         var model = await BuildExportModelAsync(ct);
-        var bytes = _excelExporter.ExportToExcel(model.Zones);
+
+        // Workbook building is CPU-bound; keep it off the request thread.
+        var bytes = await Task.Run(() => _excelExporter.ExportToExcel(model), ct);
+
         var fileName = $"meridian-zones-{DateTime.UtcNow:yyyy-MM-dd-HHmmss}.xlsx";
-        // Use the official standard MIME type for .xlsx
+        Response.Headers.CacheControl = "no-store";
         return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
     }
 
@@ -95,11 +98,20 @@ public class ExportController : ControllerBase
     public async Task<IActionResult> ExportPdf(CancellationToken ct)
     {
         var model = await BuildExportModelAsync(ct);
-        
-        var document = new HeatReportDocument(model, _chartRenderer);
-        var bytes = document.GeneratePdf();
-        
-        var fileName = $"meridian-report-{DateTime.UtcNow:yyyy-MM-dd}.pdf";
+
+        var bytes = await Task.Run(() =>
+        {
+            // Rasterising the chart is the expensive step — skip it entirely
+            // when there is nothing to plot.
+            var chart = model.Zones.Count > 0
+                ? _chartRenderer.GenerateTemperatureTrendChart(model.Zones)
+                : null;
+
+            return new HeatReportDocument(model, chart).GeneratePdf();
+        }, ct);
+
+        var fileName = $"meridian-report-{DateTime.UtcNow:yyyy-MM-dd-HHmmss}.pdf";
+        Response.Headers.CacheControl = "no-store";
         return File(bytes, "application/pdf", fileName);
     }
 }

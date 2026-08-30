@@ -6,141 +6,273 @@ namespace Meridian.API.Exports.Pdf;
 
 public class HeatReportDocument : IDocument
 {
-    private readonly ReportExportModel _model;
-    private readonly IChartRenderer _chartRenderer;
+    private static readonly string[] RiskOrder = ["Extreme", "High", "Moderate", "Low"];
 
-    public HeatReportDocument(ReportExportModel model, IChartRenderer chartRenderer)
+    private readonly ReportExportModel _model;
+    private readonly byte[]? _chartBytes;
+
+    public HeatReportDocument(ReportExportModel model, byte[]? chartBytes)
     {
         _model = model;
-        _chartRenderer = chartRenderer;
+        _chartBytes = chartBytes;
     }
 
-    public DocumentMetadata GetMetadata() => DocumentMetadata.Default;
+    public DocumentMetadata GetMetadata() => new()
+    {
+        Title = _model.Title,
+        Author = "Meridian",
+        Subject = "Urban heat risk advisory",
+        Creator = "Meridian Heat Intelligence",
+    };
+
+    // Text is the bulk of the document; caching layout state speeds repeat renders.
+    public DocumentSettings GetSettings() => DocumentSettings.Default;
 
     public void Compose(IDocumentContainer container)
     {
-        container
-            .Page(page =>
-            {
-                page.Margin(50);
-                page.Size(PageSizes.A4);
-                page.PageColor(Colors.White);
-                page.DefaultTextStyle(x => x.FontSize(11).FontFamily("Arial"));
-
-                page.Header().Element(ComposeHeader);
-                page.Content().Element(ComposeContent);
-                page.Footer().Element(ComposeFooter);
-            });
-    }
-
-    void ComposeHeader(IContainer container)
-    {
-        container.Row(row =>
+        container.Page(page =>
         {
-            row.RelativeItem().Column(column =>
-            {
-                column.Item().Text(_model.Title).FontSize(24).SemiBold().FontColor(PdfTheme.PrimaryColor);
-                column.Item().Text(text =>
-                {
-                    text.Span("Generated on: ").SemiBold();
-                    text.Span(_model.Date);
-                });
-            });
+            page.Size(PageSizes.A4);
+            page.Margin(38);
+            page.PageColor(Colors.White);
+            page.DefaultTextStyle(x => x
+                .FontSize(10)
+                .FontFamily(Fonts.Calibri)
+                .FontColor(PdfTheme.Ink));
+
+            page.Header().Element(ComposeHeader);
+            page.Content().Element(ComposeContent);
+            page.Footer().Element(ComposeFooter);
         });
     }
 
-    void ComposeContent(IContainer container)
+    private void ComposeHeader(IContainer container)
     {
-        container.PaddingVertical(20).Column(column =>
+        container.Column(col =>
         {
-            column.Spacing(20);
-
-            if (!string.IsNullOrEmpty(_model.Description))
-            {
-                column.Item().Text("Executive Summary").FontSize(14).SemiBold();
-                column.Item().Text(_model.Description);
-            }
-
-            // Summary Stats
-            column.Item().Row(row =>
+            col.Item().Row(row =>
             {
                 row.RelativeItem().Column(c =>
                 {
-                    c.Item().Text("Global Avg Temp").SemiBold();
-                    c.Item().Text($"{_model.GlobalAverageTemp:F1}°C").FontSize(16).FontColor(PdfTheme.PrimaryColor);
+                    c.Item().Text(_model.Title)
+                        .FontSize(21).Bold().FontColor(PdfTheme.Ink);
+                    c.Item().PaddingTop(2).Text($"Generated {_model.Date} UTC")
+                        .FontSize(9).FontColor(PdfTheme.Muted);
                 });
-                row.RelativeItem().Column(c =>
+
+                row.ConstantItem(120).AlignRight().AlignMiddle().Column(c =>
                 {
-                    c.Item().Text("High Risk Zones").SemiBold();
-                    c.Item().Text(_model.HighRiskCount.ToString()).FontSize(16).FontColor(PdfTheme.DangerColor);
-                });
-                row.RelativeItem().Column(c =>
-                {
-                    c.Item().Text("Total Monitored").SemiBold();
-                    c.Item().Text(_model.Zones.Count.ToString()).FontSize(16);
+                    c.Item().AlignRight().Text("MERIDIAN")
+                        .FontSize(13).Bold().FontColor(PdfTheme.Accent).LetterSpacing(0.18f);
+                    c.Item().AlignRight().Text("Heat Intelligence")
+                        .FontSize(8).FontColor(PdfTheme.Faint);
                 });
             });
 
-            // Chart
-            if (_model.Zones.Any())
+            col.Item().PaddingTop(10).LineHorizontal(1.5f).LineColor(PdfTheme.Accent);
+        });
+    }
+
+    private void ComposeContent(IContainer container)
+    {
+        container.PaddingTop(18).Column(column =>
+        {
+            column.Spacing(18);
+
+            if (!string.IsNullOrWhiteSpace(_model.Description))
             {
-                var chartBytes = _chartRenderer.GenerateTemperatureTrendChart(_model.Zones);
-                column.Item().Image(chartBytes);
+                column.Item().Element(c => SectionTitle(c, "Executive summary"));
+                column.Item().Background(PdfTheme.Surface).Padding(12)
+                    .Text(_model.Description).FontSize(10).LineHeight(1.4f);
             }
 
-            // Table
-            column.Item().Text("Zone Details").FontSize(14).SemiBold();
+            column.Item().Element(ComposeMetrics);
+            column.Item().Element(ComposeRiskBreakdown);
+
+            if (_chartBytes is { Length: > 0 })
+            {
+                column.Item().Element(c => SectionTitle(c, "Top 10 hottest zones"));
+                column.Item().Image(_chartBytes).FitWidth();
+            }
+
+            column.Item().Element(c => SectionTitle(c, $"Zone details ({_model.Zones.Count})"));
             column.Item().Element(ComposeTable);
         });
     }
 
-    void ComposeTable(IContainer container)
+    private static void SectionTitle(IContainer container, string text) =>
+        container.Text(text).FontSize(12).Bold().FontColor(PdfTheme.Ink);
+
+    private void ComposeMetrics(IContainer container)
+    {
+        var hottest = _model.Zones.Count > 0 ? _model.Zones[0] : null;
+
+        container.Row(row =>
+        {
+            row.Spacing(10);
+            MetricCard(row, "Zones monitored", _model.Zones.Count.ToString(), PdfTheme.Ink);
+            MetricCard(row, "Global average", $"{_model.GlobalAverageTemp:F1} °C", PdfTheme.Accent);
+            MetricCard(row, "High / extreme risk", _model.HighRiskCount.ToString(), PdfTheme.RiskHigh);
+            MetricCard(
+                row,
+                "Hottest zone",
+                hottest is null ? "—" : $"{hottest.TemperatureCelsius:F1} °C",
+                PdfTheme.RiskExtreme,
+                hottest?.Location);
+        });
+
+        static void MetricCard(RowDescriptor row, string label, string value, string color, string? sub = null)
+        {
+            row.RelativeItem()
+                .Background(PdfTheme.Surface)
+                .BorderLeft(2.5f).BorderColor(color)
+                .Padding(9)
+                .Column(c =>
+                {
+                    c.Item().Text(label.ToUpperInvariant())
+                        .FontSize(7).Bold().FontColor(PdfTheme.Muted).LetterSpacing(0.09f);
+                    c.Item().PaddingTop(3).Text(value)
+                        .FontSize(15).Bold().FontColor(color);
+                    if (!string.IsNullOrWhiteSpace(sub))
+                    {
+                        c.Item().Text(sub).FontSize(7.5f).FontColor(PdfTheme.Faint);
+                    }
+                });
+        }
+    }
+
+    private void ComposeRiskBreakdown(IContainer container)
+    {
+        var total = _model.Zones.Count;
+        var counts = _model.Zones
+            .GroupBy(z => z.RiskLevel, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.Count(), StringComparer.OrdinalIgnoreCase);
+
+        container.Column(col =>
+        {
+            col.Item().PaddingBottom(6).Element(c => SectionTitle(c, "Risk distribution"));
+
+            col.Item().Row(row =>
+            {
+                row.Spacing(8);
+                foreach (var level in RiskOrder)
+                {
+                    counts.TryGetValue(level, out var count);
+                    var share = total == 0 ? 0d : (double)count / total;
+                    var color = PdfTheme.GetRiskColor(level);
+
+                    row.RelativeItem().Column(c =>
+                    {
+                        c.Item().Row(r =>
+                        {
+                            r.AutoItem().PaddingRight(5).AlignMiddle()
+                                .Width(7).Height(7).Background(color);
+                            r.RelativeItem().Text($"{level}")
+                                .FontSize(9).Bold().FontColor(PdfTheme.Ink);
+                        });
+                        c.Item().PaddingTop(2).Text($"{count}  ({share:P0})")
+                            .FontSize(9).FontColor(PdfTheme.Muted);
+
+                        // Proportional bar: filled portion over a hairline track.
+                        c.Item().PaddingTop(4).Height(4).Background(PdfTheme.Hairline)
+                            .Row(bar =>
+                            {
+                                if (share > 0) bar.RelativeItem((float)share).Background(color);
+                                if (share < 1) bar.RelativeItem((float)(1 - share));
+                            });
+                    });
+                }
+            });
+        });
+    }
+
+    private void ComposeTable(IContainer container)
     {
         container.Table(table =>
         {
             table.ColumnsDefinition(columns =>
             {
-                columns.RelativeColumn(3); // Location
-                columns.RelativeColumn(2); // Temp
-                columns.RelativeColumn(2); // Risk
+                columns.RelativeColumn(3.2f);  // Location
+                columns.RelativeColumn(2.0f);  // Country
+                columns.RelativeColumn(1.5f);  // Temp
+                columns.RelativeColumn(1.5f);  // Heat index
+                columns.RelativeColumn(1.4f);  // Humidity
+                columns.RelativeColumn(1.7f);  // Risk
             });
 
             table.Header(header =>
             {
-                header.Cell().Element(CellStyle).Text("Location");
-                header.Cell().Element(CellStyle).Text("Temp (°C)");
-                header.Cell().Element(CellStyle).Text("Risk Level");
-
-                static IContainer CellStyle(IContainer container)
-                {
-                    return container.DefaultTextStyle(x => x.SemiBold()).PaddingVertical(5).BorderBottom(1).BorderColor(Colors.Black);
-                }
+                HeaderCell(header, "Location", TextAlign.Left);
+                HeaderCell(header, "Country", TextAlign.Left);
+                HeaderCell(header, "Temp", TextAlign.Right);
+                HeaderCell(header, "Heat idx", TextAlign.Right);
+                HeaderCell(header, "Humidity", TextAlign.Right);
+                HeaderCell(header, "Risk", TextAlign.Center);
             });
 
+            var i = 0;
             foreach (var zone in _model.Zones)
             {
+                var zebra = i++ % 2 == 1;
                 var riskColor = PdfTheme.GetRiskColor(zone.RiskLevel);
 
-                table.Cell().Element(CellStyle).Text(zone.Location);
-                table.Cell().Element(CellStyle).Text($"{zone.TemperatureCelsius:F1}°");
-                table.Cell().Element(CellStyle).Text(zone.RiskLevel).FontColor(riskColor).SemiBold();
-
-                static IContainer CellStyle(IContainer container)
-                {
-                    return container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
-                }
+                Body(table, zebra).Text(zone.Location).FontSize(9).SemiBold();
+                Body(table, zebra).Text(zone.Country).FontSize(9).FontColor(PdfTheme.Muted);
+                Body(table, zebra).AlignRight().Text($"{zone.TemperatureCelsius:F1}°").FontSize(9);
+                Body(table, zebra).AlignRight().Text($"{zone.HeatIndex:F1}°").FontSize(9).FontColor(PdfTheme.Muted);
+                Body(table, zebra).AlignRight().Text($"{zone.Humidity:F0}%").FontSize(9).FontColor(PdfTheme.Muted);
+                Body(table, zebra).AlignCenter().Text(zone.RiskLevel.ToUpperInvariant())
+                    .FontSize(7.5f).Bold().FontColor(riskColor).LetterSpacing(0.05f);
             }
         });
+
+        static void HeaderCell(TableCellDescriptor header, string text, TextAlign align)
+        {
+            var cell = header.Cell()
+                .Background(PdfTheme.Ink)
+                .PaddingVertical(6).PaddingHorizontal(6);
+
+            var styled = align switch
+            {
+                TextAlign.Right => cell.AlignRight(),
+                TextAlign.Center => cell.AlignCenter(),
+                _ => cell,
+            };
+
+            styled.Text(text.ToUpperInvariant())
+                .FontSize(7.5f).Bold().FontColor(Colors.White).LetterSpacing(0.07f);
+        }
+
+        static IContainer Body(TableDescriptor table, bool zebra)
+        {
+            var cell = table.Cell()
+                .BorderBottom(0.5f).BorderColor(PdfTheme.Hairline)
+                .PaddingVertical(4.5f).PaddingHorizontal(6);
+            return zebra ? cell.Background(PdfTheme.Surface) : cell;
+        }
     }
 
-    void ComposeFooter(IContainer container)
+    private enum TextAlign { Left, Right, Center }
+
+    private void ComposeFooter(IContainer container)
     {
-        container.AlignCenter().Text(x =>
+        container.PaddingTop(8).Column(col =>
         {
-            x.Span("Page ");
-            x.CurrentPageNumber();
-            x.Span(" of ");
-            x.TotalPages();
+            col.Item().LineHorizontal(0.5f).LineColor(PdfTheme.Hairline);
+            col.Item().PaddingTop(5).Row(row =>
+            {
+                row.RelativeItem().Text("Meridian · FortyGuard API · 20 m² resolution · 2 m AGL")
+                    .FontSize(7.5f).FontColor(PdfTheme.Faint);
+
+                row.ConstantItem(90).AlignRight().Text(x =>
+                {
+                    x.DefaultTextStyle(s => s.FontSize(7.5f).FontColor(PdfTheme.Faint));
+                    x.Span("Page ");
+                    x.CurrentPageNumber();
+                    x.Span(" / ");
+                    x.TotalPages();
+                });
+            });
         });
     }
 }

@@ -41,6 +41,7 @@ builder.Services.AddScoped<Meridian.Core.Interfaces.Services.IHeatNotificationSe
 builder.Services.AddScoped<Meridian.API.Exports.Excel.IZoneExcelExporter, Meridian.API.Exports.Excel.ZoneExcelExporter>();
 builder.Services.AddScoped<IChartRenderer, ChartRenderer>();
 builder.Services.AddHostedService<Meridian.API.Services.LiveHeatSimulatorService>();
+builder.Services.AddHostedService<Meridian.API.Exports.ExportWarmupService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
