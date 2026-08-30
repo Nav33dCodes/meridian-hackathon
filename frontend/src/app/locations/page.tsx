@@ -16,8 +16,8 @@ function ConfirmModal({ title, message, onConfirm, onCancel, loading }: {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50" onClick={onCancel} />
-      <div className="relative bg-elevated border border-subtle rounded-lg p-6 w-full max-w-sm mx-4 shadow-token-md">
-        <div className="w-10 h-10 rounded-md bg-risk-extreme/10 border border-risk-extreme/20 flex items-center justify-center mb-4">
+      <div className="relative bg-elevated rounded-2xl p-6 w-full max-w-sm mx-4 shadow-token-md">
+        <div className="w-10 h-10 rounded-xl bg-risk-extreme/10 flex items-center justify-center mb-4">
           <AlertTriangle size={18} className="text-risk-extreme" />
         </div>
         <h3 className="text-base font-semibold text-primary mb-1">{title}</h3>
@@ -62,7 +62,7 @@ export default function LocationsPage() {
     onMutate: async (newData) => {
       await qc.cancelQueries({ queryKey: ['locations', page, search] });
       const previous = qc.getQueryData(['locations', page, search]);
-      
+
       const optimisticLocation = {
         id: crypto.randomUUID(), // Fake ID for UI
         ...newData,
@@ -77,7 +77,7 @@ export default function LocationsPage() {
           totalCount: old.totalCount + 1
         };
       });
-      
+
       setIsModalOpen(false);
       setFormData({ name: '', city: '', country: '', latitude: '', longitude: '' });
       return { previous };
@@ -106,7 +106,7 @@ export default function LocationsPage() {
     onMutate: async (id) => {
       await qc.cancelQueries({ queryKey: ['locations', page, search] });
       const previous = qc.getQueryData(['locations', page, search]);
-      
+
       qc.setQueryData(['locations', page, search], (old: any) => {
         if (!old) return old;
         return {
@@ -134,7 +134,7 @@ export default function LocationsPage() {
     onMutate: async () => {
       await qc.cancelQueries({ queryKey: ['locations'] });
       const previous = qc.getQueryData(['locations', page, search]);
-      
+
       qc.setQueryData(['locations', page, search], { data: [], totalPages: 1, totalCount: 0 });
       setDeleteAllConfirm(false);
       setPage(1);
@@ -199,19 +199,24 @@ export default function LocationsPage() {
     <div className="h-screen max-h-screen overflow-hidden flex flex-col bg-base">
 
       {/* ─── Header ───────────────────────────────────────── */}
-      <div className="px-8 py-4 border-b border-subtle flex items-center justify-between shrink-0 bg-elevated">
-        <div>
-          <div className="flex items-center gap-2 text-xs text-tertiary mb-1 font-medium">
-            <span>Dashboard</span>
-            <span className="text-secondary">/</span>
-            <span className="text-primary">Locations</span>
+      <div className="px-8 py-4 flex items-center justify-between shrink-0 bg-elevated">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 shrink-0 rounded-xl bg-accent-muted flex items-center justify-center">
+            <MapPin size={18} className="text-accent" />
           </div>
-          <h1 className="text-xl font-semibold tracking-tight text-primary">Monitoring Zones</h1>
-          <p className="text-xs text-tertiary mt-1">{totalCount} total locations</p>
+          <div>
+            <div className="flex items-center gap-2 text-xs text-tertiary mb-1 font-medium">
+              <span>Dashboard</span>
+              <span className="text-secondary">/</span>
+              <span className="text-primary">Locations</span>
+            </div>
+            <h1 className="text-xl font-semibold tracking-tight text-primary leading-none">Monitoring Zones</h1>
+            <p className="text-xs text-tertiary mt-1.5">{totalCount} total locations</p>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           {/* CSV Upload */}
-          <label className="flex items-center gap-1.5 px-3 h-8 rounded-md bg-subtle border border-subtle text-secondary text-xs font-medium hover:bg-elevated hover:text-primary transition-colors cursor-pointer">
+          <label className="flex items-center gap-1.5 px-3.5 h-8 rounded-full bg-subtle text-secondary text-xs font-medium hover:bg-accent-muted hover:text-accent transition-colors cursor-pointer">
             <Upload size={14} />
             Import CSV
             <input type="file" accept=".csv" className="hidden" onChange={handleCsvUpload} disabled={createBulk.isPending} />
@@ -242,7 +247,7 @@ export default function LocationsPage() {
       </div>
 
       {/* ── Search Bar ────────────────────────────────────────── */}
-      <div className="px-8 py-4 border-b border-subtle shrink-0 bg-base">
+      <div className="px-8 py-4 shrink-0 bg-base">
         <form onSubmit={handleSearch} className="flex gap-3 max-w-2xl">
           <div className="relative flex-1">
             <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-tertiary" />
@@ -250,7 +255,7 @@ export default function LocationsPage() {
               value={searchInput}
               onChange={e => setSearchInput(e.target.value)}
               placeholder="Search by name, city, or country…"
-              className="w-full h-11 pl-11 pr-4 rounded-md bg-elevated border border-subtle text-sm font-medium text-primary placeholder:text-tertiary focus:outline-none focus:border-accent/50 focus:ring-4 focus:ring-accent/10 transition-all"
+              className="w-full h-10 pl-11 pr-4 rounded-full bg-elevated shadow-token-sm text-sm font-medium text-primary placeholder:text-tertiary focus:outline-none focus:ring-4 focus:ring-accent/10 transition-all"
             />
           </div>
           <Button type="submit" size="md">
@@ -268,11 +273,11 @@ export default function LocationsPage() {
       <div className="flex-1 overflow-y-auto px-5 py-4">
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-            {[...Array(12)].map((_, i) => <div key={i} className="shimmer h-[170px] rounded-lg" />)}
+            {[...Array(12)].map((_, i) => <div key={i} className="shimmer h-[170px] rounded-xl" />)}
           </div>
         ) : locations.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full gap-3 py-20">
-            <div className="w-14 h-14 rounded-lg bg-subtle border border-subtle flex items-center justify-center">
+            <div className="w-14 h-14 rounded-2xl bg-subtle flex items-center justify-center">
               <MapPin size={24} className="text-tertiary" />
             </div>
             <div className="text-center">
@@ -285,7 +290,7 @@ export default function LocationsPage() {
             {locations.map((loc) => (
               <div
                 key={loc.id}
-                className="bg-elevated border border-subtle rounded-lg p-4 flex flex-col gap-3 hover:border-accent/50 transition-colors group"
+                className="bg-elevated rounded-2xl p-4 flex flex-col gap-3 shadow-token-sm hover:shadow-token-md hover:-translate-y-0.5 transition-[transform,box-shadow] duration-150 group"
               >
                 {/* Card header */}
                 <div className="flex items-start justify-between gap-2">
@@ -316,15 +321,14 @@ export default function LocationsPage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
                         <Thermometer size={14} color={loc.latestReading.riskColor} />
-                        <span className="text-xl font-bold font-mono tracking-tight text-[color:var(--dynamic-color)]" style={{ '--dynamic-color': loc.latestReading.riskColor } as React.CSSProperties}>
+                        <span className="text-xl font-semibold font-mono tracking-tight text-[color:var(--dynamic-color)]" style={{ '--dynamic-color': loc.latestReading.riskColor } as React.CSSProperties}>
                           {loc.latestReading.temperatureCelsius.toFixed(1)}°C
                         </span>
                       </div>
                       <span
-                        className="text-xs font-bold uppercase px-2 py-0.5 rounded-md border text-[color:var(--dynamic-color)] border-[color:var(--dynamic-border)] bg-[color:var(--dynamic-bg)]"
+                        className="text-xs font-semibold uppercase px-2.5 py-0.5 rounded-full text-[color:var(--dynamic-color)] bg-[color:var(--dynamic-bg)]"
                         style={{
                           '--dynamic-color': loc.latestReading.riskColor,
-                          '--dynamic-border': `${loc.latestReading.riskColor}30`,
                           '--dynamic-bg': `${loc.latestReading.riskColor}12`
                         } as React.CSSProperties}
                       >
@@ -363,10 +367,10 @@ export default function LocationsPage() {
 
       {/* ─── Pagination ─────────────────────────────────────── */}
       {totalPages > 1 && (
-        <div className="px-5 py-2.5 border-t border-subtle shrink-0 flex items-center justify-between bg-subtle">
+        <div className="px-5 py-2.5 shrink-0 flex items-center justify-between bg-subtle">
           <span className="text-xs text-tertiary">Page {page} of {totalPages} · {totalCount} zones</span>
           <div className="flex gap-1">
-            <Button variant="ghost" size="sm" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="w-7 h-7 p-0 rounded-md border border-subtle">
+            <Button variant="ghost" size="sm" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="w-7 h-7 p-0">
               <ChevronLeft size={13} />
             </Button>
             {[...Array(Math.min(5, totalPages))].map((_, i) => {
@@ -378,13 +382,13 @@ export default function LocationsPage() {
                   variant={p === page ? "primary" : "ghost"}
                   size="sm"
                   onClick={() => setPage(p)}
-                  className={`w-7 h-7 p-0 rounded-md text-xs font-medium border ${p === page ? 'border-transparent' : 'border-subtle'}`}
+                  className="w-7 h-7 p-0 text-xs font-medium"
                 >
                   {p}
                 </Button>
               );
             })}
-            <Button variant="ghost" size="sm" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="w-7 h-7 p-0 rounded-md border border-subtle">
+            <Button variant="ghost" size="sm" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="w-7 h-7 p-0">
               <ChevronRight size={13} />
             </Button>
           </div>
@@ -395,7 +399,7 @@ export default function LocationsPage() {
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={() => setIsModalOpen(false)} />
-          <div className="relative bg-elevated border border-subtle rounded-lg p-6 w-full max-w-md mx-4 shadow-token-md">
+          <div className="relative bg-elevated rounded-2xl p-6 w-full max-w-md mx-4 shadow-token-md">
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-base font-semibold text-primary">Add Monitoring Zone</h3>
               <Button variant="ghost" size="sm" onClick={() => setIsModalOpen(false)} className="w-7 h-7 p-0">

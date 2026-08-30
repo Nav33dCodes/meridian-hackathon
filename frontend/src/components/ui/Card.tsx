@@ -15,7 +15,7 @@ export function Card({ children, className = '', padding = 'md', ...props }: Car
 
   return (
     <div
-      className={`bg-elevated border border-subtle rounded-lg overflow-hidden ${paddingClasses[padding]} ${className}`}
+      className={`bg-elevated shadow-token-md rounded-2xl overflow-hidden ${paddingClasses[padding]} ${className}`}
       {...props}
     >
       {children}

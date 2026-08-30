@@ -16,11 +16,11 @@ export function TimeLapseSlider({ minTime, maxTime, currentTime, onChange, isPla
 
   return (
     <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-full max-w-xl z-[9999] px-4 pointer-events-auto">
-      <div className="bg-elevated border border-subtle shadow-token-md rounded-lg p-4">
+      <div className="bg-elevated shadow-token-md rounded-2xl p-4">
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between text-xs font-semibold text-tertiary">
             <span>{disabled ? '-' : format(minTime, 'HH:mm')}</span>
-            <span className="text-primary font-semibold bg-accent/10 text-accent px-3 py-1 rounded-md">
+            <span className="text-primary font-semibold bg-accent/10 text-accent px-3 py-1 rounded-full">
               {disabled ? 'Live' : format(currentTime, 'MMM d, HH:mm')}
             </span>
             <span>{disabled ? '-' : format(maxTime, 'HH:mm')}</span>
@@ -30,7 +30,7 @@ export function TimeLapseSlider({ minTime, maxTime, currentTime, onChange, isPla
             <button
               onClick={onTogglePlay}
               disabled={disabled}
-              className="w-10 h-10 shrink-0 rounded-md bg-accent text-white flex items-center justify-center hover:bg-accent/90 transition-colors disabled:opacity-50"
+              className="w-10 h-10 shrink-0 rounded-full bg-accent text-white flex items-center justify-center hover:bg-accent/90 transition-colors disabled:opacity-50"
             >
               {isPlaying ? <Pause size={18} /> : <Play size={18} className="ml-1" />}
             </button>
@@ -41,7 +41,7 @@ export function TimeLapseSlider({ minTime, maxTime, currentTime, onChange, isPla
               value={currentTime}
               onChange={(e) => onChange(Number(e.target.value))}
               disabled={disabled}
-              className="w-full h-2 bg-subtle rounded-lg appearance-none cursor-pointer accent-accent"
+              className="w-full h-2 bg-subtle rounded-full appearance-none cursor-pointer accent-accent"
             />
           </div>
         </div>

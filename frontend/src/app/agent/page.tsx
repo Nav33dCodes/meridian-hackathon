@@ -88,17 +88,22 @@ export default function AgentPage() {
     <div className="flex flex-col h-screen max-w-[900px] mx-auto p-8">
       {/* Header */}
       <div className="flex justify-between items-center mb-6 shrink-0">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-primary">Meridian AI Agent</h1>
-          <p className="text-sm text-secondary mt-1">
-            Powered by Groq · Ask anything about urban heat
-          </p>
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 shrink-0 rounded-xl bg-accent-muted flex items-center justify-center">
+            <Bot size={18} className="text-accent" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight text-primary leading-none">AI Agent</h1>
+            <p className="text-sm text-secondary mt-1.5">
+              Powered by Groq · Ask anything about urban heat
+            </p>
+          </div>
         </div>
         {agentMessages.length > 0 && (
-          <Button 
+          <Button
             variant="ghost"
             size="sm"
-            onClick={clearAgentMessages} 
+            onClick={clearAgentMessages}
             className="text-risk-extreme hover:bg-risk-extreme/10"
           >
             <Trash2 size={14} className="mr-1.5" /> Clear
@@ -107,15 +112,15 @@ export default function AgentPage() {
       </div>
 
       {/* Messages */}
-      <div 
+      <div
         ref={containerRef}
         onScroll={handleScroll}
         className="flex-1 overflow-y-auto flex flex-col gap-4 pb-4 pr-2"
       >
         {agentMessages.length === 0 && !streaming && (
           <div className="h-full flex flex-col items-center justify-center -mt-10">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-lg bg-accent flex items-center justify-center">
-              <Bot size={28} color="var(--bg-base)" />
+            <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-accent-muted flex items-center justify-center">
+              <Bot size={24} className="text-accent" />
             </div>
             <p className="font-semibold text-primary mb-2">Meridian Agent Ready</p>
             <p className="text-sm text-tertiary mb-8">
@@ -123,10 +128,10 @@ export default function AgentPage() {
             </p>
             <div className="flex flex-wrap gap-2 justify-center max-w-[600px] mx-auto">
               {SUGGESTED.map(s => (
-                <button 
-                  key={s} 
-                  onClick={() => send(s)} 
-                  className="px-3.5 py-2 rounded-md bg-accent-muted border border-accent-border text-accent text-xs font-medium hover:bg-accent/10 transition-colors"
+                <button
+                  key={s}
+                  onClick={() => send(s)}
+                  className="px-3.5 py-2 rounded-full bg-accent-muted text-accent text-xs font-medium hover:bg-accent-border/25 transition-colors"
                 >
                   {s}
                 </button>
@@ -140,11 +145,11 @@ export default function AgentPage() {
             key={msg.id}
             className={`flex gap-3 items-start ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
           >
-            <div className={`w-8 h-8 rounded-md shrink-0 flex items-center justify-center ${msg.role === 'user' ? 'bg-accent-muted' : 'bg-accent'}`}>
-              {msg.role === 'user' ? <User size={14} className="text-accent" /> : <Bot size={14} color="var(--bg-base)" />}
+            <div className={`w-8 h-8 rounded-full shrink-0 flex items-center justify-center ${msg.role === 'user' ? 'bg-accent-muted' : 'bg-accent'}`}>
+              {msg.role === 'user' ? <User size={14} className="text-accent" /> : <Bot size={14} className="text-white" />}
             </div>
-            <div className={`max-w-[80%] px-4 py-3 rounded-md text-sm leading-relaxed whitespace-pre-wrap ${
-              msg.role === 'user' ? 'bg-accent-muted border border-accent-border text-primary' : 'bg-elevated border border-subtle text-primary'
+            <div className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
+              msg.role === 'user' ? 'bg-accent-muted text-primary' : 'bg-elevated shadow-token-sm text-primary'
             }`}>
               {msg.content}
             </div>
@@ -154,10 +159,10 @@ export default function AgentPage() {
         {/* Streaming message */}
         {streaming && (
           <div className="flex gap-3 items-start">
-            <div className="w-8 h-8 rounded-md shrink-0 bg-accent flex items-center justify-center">
-              <Bot size={14} color="var(--bg-base)" />
+            <div className="w-8 h-8 rounded-full shrink-0 bg-accent flex items-center justify-center">
+              <Bot size={14} className="text-white" />
             </div>
-            <div className="max-w-[80%] px-4 py-3 rounded-md bg-elevated border border-subtle text-primary text-sm leading-relaxed">
+            <div className="max-w-[80%] px-4 py-3 rounded-2xl bg-elevated shadow-token-sm text-primary text-sm leading-relaxed">
               {streamingText ? (
                 <p className="whitespace-pre-wrap cursor">{streamingText}</p>
               ) : (
@@ -177,7 +182,7 @@ export default function AgentPage() {
       </div>
 
       {/* Input */}
-      <div className="bg-elevated border border-subtle rounded-md flex gap-3 p-3 mt-2 shrink-0 focus-within:border-accent/50 transition-colors">
+      <div className="bg-elevated shadow-token-sm rounded-full flex gap-3 p-3 pl-5 mt-2 shrink-0 focus-within:shadow-token-md transition-shadow">
         <input
           value={input}
           onChange={e => setInput(e.target.value)}

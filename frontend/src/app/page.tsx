@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { heatApi } from '@/lib/api/heat';
 import {
   Thermometer, AlertTriangle, MapPin, Activity, RefreshCw,
-  Download, Plus, TrendingUp, Globe, BarChart3, FileText
+  Download, Plus, Globe, BarChart3, FileText
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -29,7 +29,7 @@ const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     const d = payload[0].payload;
     return (
-      <div className="bg-elevated border border-default px-3 py-2.5 rounded-md shadow-token-md">
+      <div className="bg-elevated px-3 py-2.5 rounded-xl shadow-token-md">
         <p className="font-semibold text-sm text-primary">{d.locationName}</p>
         <div className="mt-1 flex gap-3">
           <span className="text-xs text-secondary">{d.temperatureCelsius.toFixed(1)}°C</span>
@@ -41,7 +41,6 @@ const CustomTooltip = ({ active, payload }: any) => {
   return null;
 };
 
-// old export logic removed
 export default function DashboardPage() {
   useSignalR();
   const [activeTab, setActiveTab] = useState<'map' | 'chart'>('map');
@@ -139,49 +138,38 @@ export default function DashboardPage() {
   });
 
   return (
-    <div className="h-screen max-h-screen overflow-hidden flex flex-col relative bg-base">
-      {/* Subtle top gradient glow */}
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-72 z-0"
-        style={{ background: 'radial-gradient(60% 100% at 50% 0%, var(--accent-muted), transparent 70%)' }}
-      />
-
-      <div className="relative z-10 flex flex-col h-full w-full gap-4 p-5 overflow-hidden">
+    <div className="h-screen max-h-screen overflow-hidden flex flex-col bg-base">
+      <div className="flex flex-col h-full w-full gap-4 p-5 overflow-hidden">
 
         {/* ─── Header ───────────────────────────────────────── */}
         <div className="flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 shrink-0 rounded-md bg-accent/10 border border-accent/20 flex items-center justify-center">
-              <Globe size={18} className="text-accent" />
-            </div>
-            <div>
-              <h1 className="text-xl font-semibold text-primary leading-none tracking-tight">Meridian Dashboard</h1>
-              <p className="text-xs text-tertiary mt-1.5">Global urban heat intelligence</p>
-            </div>
+          <div>
+            <h1 className="text-2xl font-bold text-primary leading-none tracking-tight">Heat Intelligence</h1>
+            <p className="text-sm text-tertiary mt-2">Global hyperlocal monitoring, live</p>
           </div>
           <div className="flex items-center gap-3">
             {/* Segmented Control for Live/History */}
-            <div className="flex items-center p-1 bg-subtle border border-subtle rounded-md mr-1">
+            <div className="flex items-center p-1 bg-subtle rounded-full mr-1">
               <button
                 onClick={() => setIsHistorical(false)}
-                className={`text-xs px-3 py-1 rounded-lg font-semibold transition-colors ${!isHistorical ? 'bg-elevated text-primary shadow-sm border border-default' : 'text-tertiary hover:text-secondary'}`}
+                className={`text-xs px-3.5 py-1.5 rounded-full font-medium transition-colors ${!isHistorical ? 'bg-elevated text-primary shadow-token-sm' : 'text-tertiary hover:text-secondary'}`}
               >
                 Live
               </button>
               <button
                 onClick={() => setIsHistorical(true)}
-                className={`text-xs px-3 py-1 rounded-lg font-semibold transition-colors ${isHistorical ? 'bg-elevated text-primary shadow-sm border border-default' : 'text-tertiary hover:text-secondary'}`}
+                className={`text-xs px-3.5 py-1.5 rounded-full font-medium transition-colors ${isHistorical ? 'bg-elevated text-primary shadow-token-sm' : 'text-tertiary hover:text-secondary'}`}
               >
                 24h History
               </button>
             </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-subtle border border-subtle">
+            <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-subtle">
               <span className={`w-1.5 h-1.5 rounded-full ${!isHistorical ? 'bg-risk-low animate-pulse' : 'bg-secondary'}`} />
-              <span className="text-xs font-semibold text-secondary">{isHistorical ? 'Playback' : 'Live Sync'}</span>
+              <span className="text-xs font-medium text-secondary">{isHistorical ? 'Playback' : 'Live Sync'}</span>
             </div>
             <div className="relative">
               <Button
-                variant="ghost"
+                variant="secondary"
                 size="sm"
                 onClick={() => setIsExportOpen(!isExportOpen)}
                 disabled={!hasData}
@@ -190,9 +178,9 @@ export default function DashboardPage() {
                 Export
               </Button>
               {isExportOpen && (
-                <div className="absolute top-full right-0 mt-2 bg-elevated border border-default rounded-md shadow-token-md p-1.5 w-36 z-50">
+                <div className="absolute top-full right-0 mt-2 bg-elevated rounded-2xl shadow-token-md p-1.5 w-40 z-50">
                   <button
-                    className="w-full text-left px-3 py-2 text-sm font-semibold hover:bg-subtle rounded-lg text-primary transition-colors flex items-center"
+                    className="w-full text-left px-3 py-2 text-sm font-medium hover:bg-subtle rounded-full text-primary transition-colors flex items-center"
                     onClick={async () => {
                       setIsExportOpen(false);
                       toast.success("Excel Export Started! You'll be notified when it's ready.", { icon: '📊' });
@@ -202,7 +190,7 @@ export default function DashboardPage() {
                     <FileText size={14} className="mr-2 text-secondary" /> Excel Spreadsheet
                   </button>
                   <button
-                    className="w-full text-left px-3 py-2 text-sm font-semibold hover:bg-subtle rounded-lg text-primary transition-colors flex items-center mt-0.5"
+                    className="w-full text-left px-3 py-2 text-sm font-medium hover:bg-subtle rounded-full text-primary transition-colors flex items-center mt-0.5"
                     onClick={() => { window.open(`${API_BASE}/api/export/pdf`, '_blank'); setIsExportOpen(false); }}
                   >
                     <Download size={14} className="mr-2 text-secondary" /> PDF Report
@@ -211,7 +199,6 @@ export default function DashboardPage() {
               )}
             </div>
             <Button
-              variant="ghost"
               size="sm"
               onClick={() => refetch()}
               disabled={isHistorical}
@@ -225,13 +212,13 @@ export default function DashboardPage() {
         {/* ─── Stat Cards ───────────────────────────────────── */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 shrink-0">
           {isLoading ? (
-            skeletonRows.slice(0, 4).map((_, i) => <div key={i} className="shimmer h-[100px] rounded-lg" />)
+            skeletonRows.slice(0, 4).map((_, i) => <div key={i} className="shimmer h-[112px] rounded-2xl" />)
           ) : (
             <>
-              <StatCard title="Monitored Zones" value={data?.totalLocations ?? 0} trend={{ direction: 'neutral', value: readings.length, label: 'live' }} icon={<MapPin size={20} />} />
-              <StatCard title="Global Avg Temp" value={`${(data?.globalAverageTemp ?? 0).toFixed(1)}°C`} trend={{ direction: 'up', value: '+1.2°', label: 'vs avg' }} icon={<Thermometer size={20} />} />
-              <StatCard title="Extreme Risk" value={data?.extremeRiskCount ?? 0} trend={{ direction: (data?.extremeRiskCount ?? 0) > 0 ? 'up' : 'neutral', value: (data?.extremeRiskCount ?? 0) > 0 ? '+Action req' : 'Stable' }} icon={<AlertTriangle size={20} />} />
-              <StatCard title="High Risk" value={data?.highRiskCount ?? 0} trend={{ direction: 'neutral', value: 'Monitor' }} icon={<Activity size={20} />} />
+              <StatCard tone={2} title="Monitored Zones" value={data?.totalLocations ?? 0} trend={{ direction: 'neutral', value: readings.length, label: 'live' }} icon={<MapPin size={20} />} />
+              <StatCard tone={1} title="Global Avg Temp" value={`${(data?.globalAverageTemp ?? 0).toFixed(1)}°C`} trend={{ direction: 'up', value: '+1.2°', label: 'vs avg' }} icon={<Thermometer size={20} />} />
+              <StatCard tone={3} title="Extreme Risk" value={data?.extremeRiskCount ?? 0} trend={{ direction: (data?.extremeRiskCount ?? 0) > 0 ? 'up' : 'neutral', value: (data?.extremeRiskCount ?? 0) > 0 ? '+Action req' : 'Stable' }} icon={<AlertTriangle size={20} />} />
+              <StatCard tone={4} title="High Risk" value={data?.highRiskCount ?? 0} trend={{ direction: 'neutral', value: 'Monitor' }} icon={<Activity size={20} />} />
             </>
           )}
         </div>
@@ -239,11 +226,11 @@ export default function DashboardPage() {
         {/* ─── Main Content ─────────────────────────────────── */}
         {!isLoading && readings.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-4">
-            <div className="w-14 h-14 rounded-lg bg-subtle border border-subtle flex items-center justify-center">
+            <div className="w-14 h-14 rounded-2xl bg-subtle flex items-center justify-center">
               <MapPin size={24} className="text-tertiary" />
             </div>
             <div className="text-center">
-              <h2 className="text-base font-bold text-primary mb-1">No Active Zones</h2>
+              <h2 className="text-base font-semibold text-primary mb-1">No Active Zones</h2>
               <p className="text-sm text-secondary max-w-xs">Import a CSV on the Locations page to start receiving live heat data.</p>
             </div>
             <Link href="/locations">
@@ -257,19 +244,18 @@ export default function DashboardPage() {
           <div className="flex-1 min-h-0 flex gap-4 overflow-hidden w-full relative">
 
             {/* Left: Data Table (55%) */}
-            <div className="flex flex-col rounded-lg border border-subtle bg-elevated relative z-10 shrink-0 w-[55%] overflow-hidden">
-              <div className="px-4 py-2.5 border-b border-subtle flex items-center justify-between shrink-0">
+            <div className="flex flex-col rounded-2xl bg-elevated shadow-token-md relative z-10 shrink-0 w-[55%] overflow-hidden">
+              <div className="px-4 py-3 flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-semibold text-tertiary uppercase tracking-wider">Live Readings</span>
-                  <span className="text-xs bg-base border border-subtle text-secondary px-2 py-0.5 rounded-md">{readings.length} zones</span>
+                  <span className="text-xs bg-subtle text-secondary px-2.5 py-0.5 rounded-full">{readings.length} zones</span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <span className="text-xs text-tertiary mr-1">Sort:</span>
+                <div className="flex items-center gap-1 bg-subtle rounded-full p-1">
                   {(['temp', 'risk', 'name'] as const).map(k => (
                     <button
                       key={k}
                       onClick={() => setSortKey(k)}
-                      className={`text-xs px-2 py-0.5 rounded-md font-medium transition-colors ${sortKey === k ? 'bg-accent text-white' : 'text-tertiary hover:text-secondary'}`}
+                      className={`text-xs px-2.5 py-1 rounded-full font-medium transition-colors ${sortKey === k ? 'bg-elevated text-primary shadow-token-sm' : 'text-tertiary hover:text-secondary'}`}
                     >
                       {k === 'temp' ? '°C' : k === 'risk' ? 'Risk' : 'A-Z'}
                     </button>
@@ -279,7 +265,7 @@ export default function DashboardPage() {
 
               <div className="flex-1 overflow-y-auto" ref={parentRef}>
                 {/* Virtualized List Header */}
-                <div className="sticky top-0 z-10 bg-elevated border-b border-subtle flex items-center shadow-sm">
+                <div className="sticky top-0 z-10 bg-elevated border-b border-subtle flex items-center">
                   <div className="text-xs font-semibold text-tertiary uppercase tracking-wider py-2 px-4 flex-1 min-w-[120px]">Location</div>
                   <div className="text-xs font-semibold text-tertiary uppercase tracking-wider py-2 px-3 w-24 shrink-0">Temp</div>
                   <div className="text-xs font-semibold text-tertiary uppercase tracking-wider py-2 px-3 w-20 shrink-0 hidden xl:block">Humid</div>
@@ -295,7 +281,7 @@ export default function DashboardPage() {
                         <div className="shimmer h-3.5 w-10 rounded w-24 shrink-0 mr-2" />
                         <div className="shimmer h-3.5 w-8 rounded w-20 shrink-0 hidden xl:block mr-2" />
                         <div className="shimmer h-3.5 w-10 rounded w-20 shrink-0 hidden xl:block mr-2" />
-                        <div className="shimmer h-4 w-14 rounded-md w-28 shrink-0" />
+                        <div className="shimmer h-4 w-14 rounded-full w-28 shrink-0" />
                       </div>
                     ))}
                   </div>
@@ -314,7 +300,7 @@ export default function DashboardPage() {
                             <p className="text-xs text-tertiary truncate max-w-[160px]">{r.resolution}</p>
                           </div>
                           <div className="py-2 px-3 w-24 shrink-0">
-                            <span className="text-base font-bold font-mono text-[color:var(--dynamic-color)]" style={{ '--dynamic-color': r.riskColor } as React.CSSProperties}>{r.temperatureCelsius.toFixed(1)}°</span>
+                            <span className="text-base font-semibold font-mono text-[color:var(--dynamic-color)]" style={{ '--dynamic-color': r.riskColor } as React.CSSProperties}>{r.temperatureCelsius.toFixed(1)}°</span>
                           </div>
                           <div className="py-2 px-3 w-20 shrink-0 hidden xl:block">
                             <span className="text-xs text-secondary font-mono">{r.humidityPercent.toFixed(0)}%</span>
@@ -332,20 +318,20 @@ export default function DashboardPage() {
                 )}
               </div>
 
-              <div className="px-4 py-2 border-t border-subtle bg-subtle shrink-0">
+              <div className="px-4 py-2.5 border-t border-subtle bg-subtle shrink-0">
                 <p className="text-xs text-tertiary">FortyGuard API · 20m² · 2m AGL · Groq llama-3.3-70b</p>
               </div>
             </div>
 
             {/* Right: Map + Chart tabs (45%) */}
-            <div className="flex flex-col rounded-lg border border-subtle bg-elevated flex-1 min-w-0 relative z-0 overflow-hidden">
-              <div className="px-3 py-2 border-b border-subtle bg-subtle shrink-0 flex items-center gap-1">
+            <div className="flex flex-col rounded-2xl bg-elevated shadow-token-md flex-1 min-w-0 relative z-0 overflow-hidden">
+              <div className="px-3 py-2.5 shrink-0 flex items-center gap-1">
                 {(['map', 'chart'] as const).map(tab => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`px-3 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all ${activeTab === tab
-                      ? 'bg-elevated border border-subtle text-primary shadow-sm'
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition-all ${activeTab === tab
+                      ? 'bg-subtle text-primary'
                       : 'text-tertiary hover:text-secondary'
                       }`}
                   >
@@ -377,7 +363,7 @@ export default function DashboardPage() {
                   </div>
                 ) : (
                   <div className="absolute inset-0 p-4">
-                    {isLoading ? <div className="w-full h-full shimmer rounded-lg" /> : (
+                    {isLoading ? <div className="w-full h-full shimmer rounded-xl" /> : (
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={chartData} margin={{ top: 8, right: 8, left: -18, bottom: 45 }}>
                           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-subtle)" />

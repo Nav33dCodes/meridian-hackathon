@@ -6,18 +6,18 @@ interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 export function Badge({ children, variant = 'default', className = '', ...props }: BadgeProps) {
-  const baseStyles = 'inline-flex items-center justify-center px-2 py-0.5 text-xs font-medium rounded-md transition-colors';
+  const baseStyles = 'inline-flex items-center justify-center px-2.5 py-0.5 text-xs font-medium rounded-full transition-colors';
 
   const variants = {
-    default: 'bg-subtle text-secondary border border-subtle',
-    success: 'bg-risk-low/10 text-risk-low border border-risk-low/20',
-    warning: 'bg-risk-moderate/10 text-risk-moderate border border-risk-moderate/20',
-    error: 'bg-risk-extreme/10 text-risk-extreme border border-risk-extreme/20',
+    default: 'bg-subtle text-secondary',
+    success: 'bg-risk-low/10 text-risk-low',
+    warning: 'bg-risk-moderate/10 text-risk-moderate',
+    error: 'bg-risk-extreme/10 text-risk-extreme',
     outline: 'border border-default text-tertiary'
   };
 
   return (
-    <span 
+    <span
       className={`${baseStyles} ${variants[variant]} ${className}`}
       {...props}
     >

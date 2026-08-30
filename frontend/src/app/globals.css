@@ -8,81 +8,121 @@
   --color-risk-high: var(--risk-high);
   --color-risk-extreme: var(--risk-extreme);
 
-  /* Typography Scale */
+  /* Compact utility scale (chips, meta text) */
   --text-xs: 11px;
   --text-sm: 13px;
-  --text-base: 15px;
-  --text-lg: 20px;
+  --text-base: 14px;
+  --text-lg: 17px;
+  --text-2xl: 24px;
+  --text-3xl: 28px;
+  --text-4xl: 34px;
 }
 
-/* ─── Layer 1: Runtime design tokens (Vercel-inspired: flat, neutral, one accent) ─── */
+/*
+  ─── Design system ───
+  A light, colorful admin-dashboard register: soft lavender-gray canvas, white cards with
+  no border (separation via soft shadow only), a fixed dark floating sidebar as the one
+  deliberately dark element, and flat pastel "KPI tint" backgrounds on stat cards — each
+  tied to a real semantic meaning (heat, zones, extreme risk, high risk) rather than
+  arbitrary decoration. No gradients, no glow, no blur — flat colors only, cheap to paint.
+
+  Shape scale: rounded-full (pill) for buttons, inputs, nav items and status chips;
+  rounded-2xl/3xl for cards, panels and the sidebar. Motion is functional only.
+*/
 :root {
   color-scheme: light;
 
-  /* Neutral surfaces */
-  --bg-base: #FFFFFF;
-  --bg-subtle: #FAFAFA;
-
-  /* Solid elevated surface — no translucency/blur, separation via hairline border */
+  /* Surfaces — soft lavender-gray canvas, white cards */
+  --bg-base: #F3F4F8;
+  --bg-subtle: #ECEDF3;
   --bg-elevated: #FFFFFF;
 
-  /* Hairline borders */
-  --border-subtle: rgba(0, 0, 0, 0.08);
-  --border-default: rgba(0, 0, 0, 0.14);
+  --border-subtle: rgba(17, 24, 39, 0.06);
+  --border-default: rgba(17, 24, 39, 0.12);
 
-  /* Typography */
-  --text-primary: #0A0A0A;
-  --text-secondary: #666666;
-  --text-tertiary: #8F8F8F;
+  --text-primary: #111827;
+  --text-secondary: #6B7280;
+  --text-tertiary: #9CA3AF;
 
-  /* Accent */
-  --accent: #0070F3;
-  --accent-muted: rgba(0, 112, 243, 0.1);
-  --accent-border: rgba(0, 112, 243, 0.3);
-  --accent-glow: rgba(0, 112, 243, 0.35);
+  /* Accent — single solid heat-orange, used for icons/links/primary actions. No gradient. */
+  --accent: #EA580C;
+  --accent-hover: #C2410C;
+  --accent-muted: rgba(234, 88, 12, 0.10);
+  --accent-on-container: #9A3412;
+  --accent-border: rgba(234, 88, 12, 0.25);
 
-  /* Minimal shadows — hairline borders do most of the work */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 14px 0 rgba(0, 0, 0, 0.08);
+  /* Shadows — soft, floating-card feel (a bit more presence than a hairline) */
+  --shadow-sm: 0 1px 3px 0 rgba(17, 24, 39, 0.05);
+  --shadow-md: 0 12px 28px -10px rgba(17, 24, 39, 0.16), 0 2px 6px -1px rgba(17, 24, 39, 0.06);
 
   /* Risk colors */
-  --risk-low: #10B981;
-  --risk-moderate: #F59E0B;
-  --risk-high: #EF4444;
+  --risk-low: #16A34A;
+  --risk-moderate: #D97706;
+  --risk-high: #DC2626;
   --risk-extreme: #991B1B;
+
+  /* Sidebar — fixed dark surface, independent of the light/dark app theme toggle */
+  --sidebar-bg: #16171C;
+  --sidebar-active-bg: rgba(255, 255, 255, 0.09);
+  --sidebar-text: rgba(255, 255, 255, 0.92);
+  --sidebar-text-muted: rgba(255, 255, 255, 0.48);
+  --sidebar-border: rgba(255, 255, 255, 0.07);
+
+  /* KPI tint pairs — flat pastel bg + matching foreground, each mapped to a real metric */
+  --kpi-1-bg: #FDEEE3;
+  --kpi-1-fg: #C2410C;
+  --kpi-2-bg: #E7F1FF;
+  --kpi-2-fg: #2563EB;
+  --kpi-3-bg: #FCE8EA;
+  --kpi-3-fg: #DC2626;
+  --kpi-4-bg: #FDF3DC;
+  --kpi-4-fg: #B45309;
 }
 
 .dark {
   color-scheme: dark;
 
-  /* True-black neutral surfaces */
-  --bg-base: #000000;
-  --bg-subtle: #0A0A0A;
+  --bg-base: #0E0F13;
+  --bg-subtle: #16171C;
+  --bg-elevated: #1B1C22;
 
-  /* Solid elevated surface — no translucency/blur */
-  --bg-elevated: #111111;
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-default: rgba(255, 255, 255, 0.12);
 
-  /* Hairline borders */
-  --border-subtle: rgba(255, 255, 255, 0.1);
-  --border-default: rgba(255, 255, 255, 0.16);
+  --text-primary: #F3F4F6;
+  --text-secondary: #9CA3AF;
+  --text-tertiary: #6B7280;
 
-  /* Typography */
-  --text-primary: #FFFFFF;
-  --text-secondary: #A1A1A1;
-  --text-tertiary: #666666;
+  --accent: #FB923C;
+  --accent-hover: #FDBA74;
+  --accent-muted: rgba(251, 146, 60, 0.14);
+  --accent-on-container: #FED7AA;
+  --accent-border: rgba(251, 146, 60, 0.32);
 
-  /* Accent — slightly brighter for contrast against black */
-  --accent: #3291FF;
-  --accent-muted: rgba(50, 145, 255, 0.15);
-  --accent-border: rgba(50, 145, 255, 0.35);
-  --accent-glow: rgba(50, 145, 255, 0.45);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 12px 28px -10px rgba(0, 0, 0, 0.55), 0 2px 6px -1px rgba(0, 0, 0, 0.35);
 
-  /* Minimal shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 20px 0 rgba(0, 0, 0, 0.6);
+  --risk-low: #34D399;
+  --risk-moderate: #FBBF24;
+  --risk-high: #F87171;
+  --risk-extreme: #FB7185;
 
-  /* Extreme risk needs a brighter shade on true black — #991B1B fails contrast here */
-  --risk-extreme: #F43F5E;
+  /* Sidebar stays visually the same dark register in both themes */
+  --sidebar-bg: #0C0D10;
+  --sidebar-active-bg: rgba(255, 255, 255, 0.10);
+  --sidebar-text: rgba(255, 255, 255, 0.92);
+  --sidebar-text-muted: rgba(255, 255, 255, 0.45);
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+
+  /* KPI tints — muted tonal-on-dark instead of pastel-on-light */
+  --kpi-1-bg: rgba(194, 65, 12, 0.16);
+  --kpi-1-fg: #FDBA74;
+  --kpi-2-bg: rgba(37, 99, 235, 0.16);
+  --kpi-2-fg: #93C5FD;
+  --kpi-3-bg: rgba(220, 38, 38, 0.16);
+  --kpi-3-fg: #FCA5A5;
+  --kpi-4-bg: rgba(180, 83, 9, 0.18);
+  --kpi-4-fg: #FCD34D;
 }
 
 /* ─── Layer 2: Explicit utility classes (reliable in Tailwind v4) ─── */
@@ -104,6 +144,41 @@
   .bg-accent-muted {
     background-color: var(--accent-muted);
   }
+
+  .text-accent-on-container {
+    color: var(--accent-on-container);
+  }
+
+  /* Sidebar */
+  .bg-sidebar {
+    background-color: var(--sidebar-bg);
+  }
+
+  .bg-sidebar-active {
+    background-color: var(--sidebar-active-bg);
+  }
+
+  .text-sidebar {
+    color: var(--sidebar-text);
+  }
+
+  .text-sidebar-muted {
+    color: var(--sidebar-text-muted);
+  }
+
+  .border-sidebar {
+    border-color: var(--sidebar-border);
+  }
+
+  /* KPI tint cards */
+  .bg-kpi-1 { background-color: var(--kpi-1-bg); }
+  .text-kpi-1 { color: var(--kpi-1-fg); }
+  .bg-kpi-2 { background-color: var(--kpi-2-bg); }
+  .text-kpi-2 { color: var(--kpi-2-fg); }
+  .bg-kpi-3 { background-color: var(--kpi-3-bg); }
+  .text-kpi-3 { color: var(--kpi-3-fg); }
+  .bg-kpi-4 { background-color: var(--kpi-4-bg); }
+  .text-kpi-4 { color: var(--kpi-4-fg); }
 
   /* Borders */
   .border-subtle {
@@ -195,11 +270,6 @@
   .btn-accent:hover {
     background-color: var(--accent-border);
   }
-
-  /* Subtle accent glow for primary CTAs / focus states — used sparingly */
-  .glow-accent {
-    box-shadow: 0 0 0 1px var(--accent-border), 0 4px 20px -4px var(--accent-glow);
-  }
 }
 
 /* ─── Transition scope (scoped to avoid FOUC on initial load) ─── */
@@ -247,7 +317,7 @@ body {
   border-radius: 999px;
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
@@ -256,10 +326,10 @@ body {
   font-family: var(--font-geist-mono), monospace;
 }
 
-/* Live indicator */
+/* Live indicator — a real status signal, kept */
 .live-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background-color: var(--risk-low);
   animation: pulse-dot 2s ease-in-out infinite;
@@ -280,7 +350,7 @@ body {
   background: linear-gradient(90deg, var(--bg-elevated) 25%, var(--border-subtle) 50%, var(--bg-elevated) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
-  border-radius: 8px;
+  border-radius: 14px;
 }
 
 /* Agent stream cursor */
@@ -303,12 +373,21 @@ body {
 }
 
 @keyframes pulse-dot {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.4;
     transform: scale(0.8);
   }
+
   50% {
     opacity: 1;
     transform: scale(1.2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-dot {
+    animation: none !important;
   }
 }

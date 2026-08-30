@@ -5,14 +5,14 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 import { analysisApi } from '@/lib/api/analysis';
 import { locationApi } from '@/lib/api/heat';
 import { format } from 'date-fns';
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { BarChart3, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-elevated border border-default rounded-md px-3.5 py-2.5 shadow-token-md text-sm">
+    <div className="bg-elevated rounded-xl px-3.5 py-2.5 shadow-token-md text-sm">
       <p className="text-secondary mb-1">{label}</p>
       <p className="font-mono font-semibold text-base text-risk-moderate">
         {payload[0]?.value?.toFixed(1)}°C
@@ -63,18 +63,23 @@ export default function AnalysisPage() {
 
   return (
     <div className="p-8 max-w-[1400px] mx-auto">
-      <div className="mb-8">
-        <div className="flex items-center gap-2 text-xs text-tertiary mb-2 font-medium">
-          <span>Dashboard</span>
-          <span className="text-secondary">/</span>
-          <span className="text-primary">Analysis</span>
+      <div className="mb-8 flex items-center gap-3">
+        <div className="w-9 h-9 shrink-0 rounded-xl bg-accent-muted flex items-center justify-center">
+          <BarChart3 size={18} className="text-accent" />
         </div>
-        <h1 className="text-3xl font-semibold tracking-tight text-primary">
-          Data Analysis & Correlation
-        </h1>
-        <p className="text-sm text-secondary mt-1">
-          Pearson correlation analysis · Heat trend detection · AI-powered insights
-        </p>
+        <div>
+          <div className="flex items-center gap-2 text-xs text-tertiary mb-1 font-medium">
+            <span>Dashboard</span>
+            <span className="text-secondary">/</span>
+            <span className="text-primary">Analysis</span>
+          </div>
+          <h1 className="text-xl font-semibold tracking-tight text-primary leading-none">
+            Data Analysis
+          </h1>
+          <p className="text-sm text-secondary mt-1.5">
+            Pearson correlation analysis · Heat trend detection · AI-powered insights
+          </p>
+        </div>
       </div>
 
       {/* Location selector */}
@@ -85,7 +90,7 @@ export default function AnalysisPage() {
         <select
           value={selectedLocationId}
           onChange={e => setSelectedLocationId(e.target.value)}
-          className="w-full max-w-[360px] bg-base border border-default text-primary text-sm rounded-lg px-3.5 py-2.5 outline-none cursor-pointer focus:ring-2 focus:ring-accent/50 transition-shadow"
+          className="w-full max-w-[360px] bg-subtle text-primary text-sm rounded-full px-4 py-2.5 outline-none cursor-pointer focus:ring-2 focus:ring-accent/50 transition-shadow"
         >
           <option value="">-- Select location --</option>
           {locations?.map((l: any) => (
@@ -107,7 +112,7 @@ export default function AnalysisPage() {
               )}
             </div>
             {trend && (
-              <div className="flex items-center gap-1.5 px-2 py-1 rounded-md border border-subtle bg-subtle">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-subtle">
                 <TrendIcon size={14} style={{ color: trendColor }} />
                 <span className="text-xs font-semibold capitalize" style={{ color: trendColor }}>
                   {trend.direction} ({trend.changeRate > 0 ? '+' : ''}{trend.changeRate}°C)
@@ -121,13 +126,13 @@ export default function AnalysisPage() {
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={trendChartData}>
                 <XAxis dataKey="time" stroke="var(--text-tertiary)" tick={{ fill: 'var(--text-secondary)', fontSize: 11 }} tickLine={false} axisLine={false} dy={10} />
-                <YAxis stroke="var(--text-tertiary)" domain={['dataMin - 1', 'dataMax + 1']} tick={{ fill: 'var(--text-secondary)', fontSize: 11 }} tickLine={false} axisLine={false} dx={-10} unit="°" />
+                <YAxis domain={['dataMin - 1', 'dataMax + 1']} tick={{ fill: 'var(--text-secondary)', fontSize: 11 }} tickLine={false} axisLine={false} dx={-10} unit="°" />
                 <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'var(--border-subtle)', strokeWidth: 1, strokeDasharray: '4 4' }} />
                 <Line type="monotone" dataKey="temp" stroke={trendColor} strokeWidth={2.5} dot={false} activeDot={{ r: 4, strokeWidth: 0 }} />
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-[200px] flex items-center justify-center text-sm text-tertiary border border-dashed border-subtle rounded-lg">
+            <div className="h-[200px] flex items-center justify-center text-sm text-tertiary border border-dashed border-subtle rounded-xl">
               Select a location with data to view trend
             </div>
           )}
@@ -146,19 +151,19 @@ export default function AnalysisPage() {
                 ].map(({ label, val }) => (
                   <div
                     key={label}
-                    className="flex-1 bg-subtle rounded-lg px-3.5 py-3 border border-default"
+                    className="flex-1 bg-subtle rounded-xl px-3.5 py-3"
                   >
                     <p className="text-xs text-tertiary font-semibold uppercase tracking-widest mb-1">{label}</p>
                     <p className="font-mono text-lg font-bold text-risk-moderate">{val}</p>
                   </div>
                 ))}
               </div>
-              <p className="text-sm text-secondary leading-relaxed bg-subtle p-4 rounded-lg border border-default">
+              <p className="text-sm text-secondary leading-relaxed bg-subtle p-4 rounded-xl">
                 {analysis.aiInsight}
               </p>
             </div>
           ) : (
-            <div className="h-[180px] flex items-center justify-center text-sm text-tertiary border border-dashed border-subtle rounded-lg">
+            <div className="h-[180px] flex items-center justify-center text-sm text-tertiary border border-dashed border-subtle rounded-xl">
               Select a location to get AI insights
             </div>
           )}
@@ -172,7 +177,7 @@ export default function AnalysisPage() {
           <p className="text-xs text-secondary mt-1">Statistical heat pattern relationships between monitored zones</p>
         </div>
 
-        <div className="grid grid-cols-[1fr_1fr_120px_1fr] px-5 py-2.5 gap-3 border-y border-default bg-subtle">
+        <div className="grid grid-cols-[1fr_1fr_120px_1fr] px-5 py-2.5 gap-3 bg-subtle">
           {['Zone A', 'Zone B', 'Coefficient', 'Interpretation'].map(h => (
             <p key={h} className="text-xs font-semibold text-tertiary uppercase tracking-widest">{h}</p>
           ))}
@@ -180,7 +185,7 @@ export default function AnalysisPage() {
 
         <div className="flex flex-col max-h-[400px] overflow-y-auto">
           {corrLoading ? (
-            <div className="p-6"><div className="shimmer h-[60px] rounded-lg" /></div>
+            <div className="p-6"><div className="shimmer h-[60px] rounded-xl" /></div>
           ) : !correlations || correlations.length === 0 ? (
             <div className="p-10 text-center text-tertiary text-sm">
               Waiting for sufficient data. The AI requires historical temperature readings from at least two different monitored zones to calculate Pearson correlation coefficients.

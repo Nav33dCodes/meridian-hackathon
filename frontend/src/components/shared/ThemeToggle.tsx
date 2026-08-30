@@ -2,10 +2,10 @@
 
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
-import { Sun, Moon, Contrast } from 'lucide-react';
+import { Sun, Moon } from 'lucide-react';
 import { Button } from '../ui/Button';
 
-export function ThemeToggle() {
+export function ThemeToggle({ dark = false }: { dark?: boolean }) {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -19,20 +19,10 @@ export function ThemeToggle() {
     return <div className="w-9 h-9" aria-hidden="true" />;
   }
 
-  const cycleTheme = () => {
+  const toggleTheme = () => {
     // Temporarily add theme-transitioning class to html to enable transitions
     document.documentElement.classList.add('theme-transitioning');
-    
-    // Cycle logic based on resolvedTheme
-    if (resolvedTheme === 'light') {
-      setTheme('dark');
-    } else if (resolvedTheme === 'dark') {
-      setTheme('oled');
-    } else {
-      setTheme('light');
-    }
-
-    // Remove the class after the transition duration (150ms + small buffer)
+    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
     setTimeout(() => {
       document.documentElement.classList.remove('theme-transitioning');
     }, 200);
@@ -42,15 +32,13 @@ export function ThemeToggle() {
     <Button
       variant="ghost"
       size="sm"
-      onClick={cycleTheme}
-      className="w-9 h-9 p-0 flex items-center justify-center text-secondary hover:text-primary"
-      aria-label={`Current theme is ${resolvedTheme}. Click to cycle.`}
+      onClick={toggleTheme}
+      className={`w-9 h-9 p-0 flex items-center justify-center ${dark ? 'text-sidebar-muted hover:text-sidebar hover:bg-sidebar-active' : 'text-secondary hover:text-primary'}`}
+      aria-label={`Current theme is ${resolvedTheme}. Click to switch.`}
       title="Toggle Theme"
     >
       <span className="sr-only">Toggle theme</span>
-      {resolvedTheme === 'light' && <Sun size={18} />}
-      {resolvedTheme === 'dark' && <Moon size={18} />}
-      {resolvedTheme === 'oled' && <Contrast size={18} />}
+      {resolvedTheme === 'dark' ? <Moon size={17} /> : <Sun size={17} />}
     </Button>
   );
 }

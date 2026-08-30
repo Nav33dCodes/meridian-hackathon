@@ -72,7 +72,7 @@ export function CommandPalette() {
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh]">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setOpen(false)} />
 
-      <div className="relative w-full max-w-xl mx-4 bg-elevated rounded-lg shadow-token-md border border-default overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-xl mx-4 bg-elevated rounded-2xl shadow-token-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         <div className="flex items-center px-4 py-3 border-b border-subtle">
           <Search size={18} className="text-tertiary mr-3" />
           <input
@@ -99,7 +99,7 @@ export function CommandPalette() {
                 <button
                   key={loc}
                   onClick={() => jumpToLocation(loc)}
-                  className="w-full flex items-center px-3 py-2.5 text-sm text-primary hover:bg-subtle rounded-md transition-colors"
+                  className="w-full flex items-center px-3 py-2.5 text-sm text-primary hover:bg-subtle rounded-full transition-colors"
                 >
                   <MapPin size={16} className="text-secondary mr-3 shrink-0" />
                   Jump to {loc}
@@ -114,21 +114,22 @@ export function CommandPalette() {
               <button
                 onClick={handleGenerateReport}
                 disabled={isGenerating}
-                className="w-full flex items-center px-3 py-2.5 text-sm text-primary hover:bg-subtle rounded-md transition-colors disabled:opacity-50"
+                className="w-full flex items-center px-3 py-2.5 text-sm text-primary hover:bg-subtle rounded-full transition-colors disabled:opacity-50"
+
               >
                 {isGenerating ? <Loader2 size={16} className="text-accent mr-3 shrink-0 animate-spin" /> : <Sparkles size={16} className="text-accent mr-3 shrink-0" />}
                 Run AI Heat Advisory Report
               </button>
               <button
                 onClick={() => { setOpen(false); router.push('/reports'); }}
-                className="w-full flex items-center px-3 py-2.5 text-sm text-primary hover:bg-subtle rounded-md transition-colors"
+                className="w-full flex items-center px-3 py-2.5 text-sm text-primary hover:bg-subtle rounded-full transition-colors"
               >
                 <FileText size={16} className="text-secondary mr-3 shrink-0" />
                 View Reports
               </button>
               <button
                 onClick={toggleTheme}
-                className="w-full flex items-center px-3 py-2.5 text-sm text-primary hover:bg-subtle rounded-md transition-colors"
+                className="w-full flex items-center px-3 py-2.5 text-sm text-primary hover:bg-subtle rounded-full transition-colors"
               >
                 {theme === 'dark' ? <Sun size={16} className="text-secondary mr-3 shrink-0" /> : <Moon size={16} className="text-secondary mr-3 shrink-0" />}
                 Toggle {theme === 'dark' ? 'Light' : 'Dark'} Mode

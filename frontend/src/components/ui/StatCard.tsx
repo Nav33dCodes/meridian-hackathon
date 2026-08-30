@@ -5,43 +5,43 @@ interface StatCardProps {
   title: string;
   value: string | number;
   icon?: ReactNode;
+  tone?: 1 | 2 | 3 | 4;
   trend?: {
     direction: 'up' | 'down' | 'neutral';
     value: string | number;
     label?: string;
   };
-  delay?: number;
   className?: string;
 }
 
-export function StatCard({ title, value, icon, trend, delay = 0, className = '' }: StatCardProps) {
+export function StatCard({ title, value, icon, tone = 1, trend, className = '' }: StatCardProps) {
   return (
     <div
-      className={`bg-elevated border border-subtle rounded-lg p-5 hover:border-accent/50 hover:-translate-y-0.5 transition-[transform,border-color] duration-150 ${className}`}
+      className={`bg-kpi-${tone} rounded-2xl p-5 transition-transform duration-150 hover:-translate-y-0.5 ${className}`}
     >
       <div className="flex items-start justify-between mb-4">
-        <h3 className="text-sm font-medium text-secondary">{title}</h3>
-        {icon && <div className="text-accent p-2 bg-accent/10 rounded-md border border-accent/20">{icon}</div>}
+        <h3 className={`text-sm font-medium text-kpi-${tone} opacity-80`}>{title}</h3>
+        {icon && <div className={`text-kpi-${tone} p-2 rounded-full bg-white/50`}>{icon}</div>}
       </div>
 
       <div className="flex items-baseline gap-3">
-        <h2 className="text-[2.25rem] leading-none font-semibold text-primary tracking-tight">{value}</h2>
-
-        {trend && (
-          <div className="flex items-center gap-1.5 text-xs font-medium px-2 py-1 rounded-md bg-subtle border border-subtle">
-            {trend.direction === 'up' && <TrendingUp size={14} className="text-risk-high" />}
-            {trend.direction === 'down' && <TrendingDown size={14} className="text-risk-low" />}
-            {trend.direction === 'neutral' && <Minus size={14} className="text-tertiary" />}
-            <span className={
-              trend.direction === 'up' ? 'text-risk-high' :
-              trend.direction === 'down' ? 'text-risk-low' : 'text-tertiary'
-            }>
-              {trend.value}
-            </span>
-            {trend.label && <span className="text-tertiary font-normal ml-0.5">{trend.label}</span>}
-          </div>
-        )}
+        <h2 className={`text-3xl leading-none font-bold text-kpi-${tone} tracking-tight`}>{value}</h2>
       </div>
+
+      {trend && (
+        <div className="flex items-center gap-1 text-xs font-semibold mt-3">
+          {trend.direction === 'up' && <TrendingUp size={13} className="text-risk-low" />}
+          {trend.direction === 'down' && <TrendingDown size={13} className="text-risk-extreme" />}
+          {trend.direction === 'neutral' && <Minus size={13} className={`text-kpi-${tone} opacity-60`} />}
+          <span className={
+            trend.direction === 'up' ? 'text-risk-low' :
+            trend.direction === 'down' ? 'text-risk-extreme' : `text-kpi-${tone} opacity-70`
+          }>
+            {trend.value}
+          </span>
+          {trend.label && <span className={`text-kpi-${tone} opacity-60 font-normal ml-0.5`}>{trend.label}</span>}
+        </div>
+      )}
     </div>
   );
 }

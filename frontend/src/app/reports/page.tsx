@@ -27,17 +27,17 @@ function ConfirmModal({ onConfirm, onCancel, loading }: { onConfirm: () => void;
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50" onClick={onCancel} />
       <Card padding="md" className="relative w-full max-w-sm mx-4 z-10 shadow-token-md">
-        <div className="w-10 h-10 rounded-md bg-risk-extreme/10 border border-risk-extreme/20 flex items-center justify-center mb-4">
+        <div className="w-10 h-10 rounded-xl bg-risk-extreme/10 flex items-center justify-center mb-4">
           <AlertTriangle size={18} className="text-risk-extreme" />
         </div>
         <h3 className="text-base font-semibold text-primary mb-1">Delete Report</h3>
         <p className="text-sm text-secondary mb-6">This report will be permanently removed. This action cannot be undone.</p>
         <div className="flex gap-3 justify-end">
           <Button variant="ghost" size="sm" onClick={onCancel}>Cancel</Button>
-          <Button 
-            className="bg-risk-extreme text-white hover:opacity-90 border border-transparent" 
-            size="sm" 
-            onClick={onConfirm} 
+          <Button
+            className="bg-risk-extreme text-white hover:opacity-90 border border-transparent"
+            size="sm"
+            onClick={onConfirm}
             disabled={loading}
           >
             {loading && <Loader2 size={14} className="animate-spin mr-2" />}
@@ -95,15 +95,20 @@ export default function ReportsPage() {
     <div className="h-screen max-h-screen overflow-hidden flex flex-col bg-base">
 
       {/* ─── Header ───────────────────────────────────────── */}
-      <div className="px-8 py-4 border-b border-subtle flex items-center justify-between shrink-0 bg-elevated">
-        <div>
-          <div className="flex items-center gap-2 text-xs text-tertiary mb-1 font-medium">
-            <span>Dashboard</span>
-            <span className="text-secondary">/</span>
-            <span className="text-primary">Reports</span>
+      <div className="px-8 py-4 flex items-center justify-between shrink-0 bg-elevated">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 shrink-0 rounded-xl bg-accent-muted flex items-center justify-center">
+            <FileText size={18} className="text-accent" />
           </div>
-          <h1 className="text-xl font-semibold tracking-tight text-primary">AI Risk Reports</h1>
-          <p className="text-xs text-tertiary mt-1">Government-grade advisories · Meridian AI</p>
+          <div>
+            <div className="flex items-center gap-2 text-xs text-tertiary mb-1 font-medium">
+              <span>Dashboard</span>
+              <span className="text-secondary">/</span>
+              <span className="text-primary">Reports</span>
+            </div>
+            <h1 className="text-xl font-semibold tracking-tight text-primary leading-none">AI Risk Reports</h1>
+            <p className="text-xs text-tertiary mt-1.5">Government-grade advisories · Meridian AI</p>
+          </div>
         </div>
         <Button
           onClick={() => generate.mutate()}
@@ -116,7 +121,7 @@ export default function ReportsPage() {
       </div>
 
       {/* ─── Risk Filter Bar ────────────────────────────── */}
-      <div className="px-8 py-3 border-b border-subtle shrink-0 bg-subtle flex items-center gap-2">
+      <div className="px-8 py-3 shrink-0 bg-subtle flex items-center gap-2">
         <Filter size={14} className="text-tertiary mr-1" />
         <span className="text-xs text-tertiary font-semibold uppercase tracking-wider mr-2">Filter:</span>
         {RISK_LEVELS.map(level => (
@@ -125,12 +130,12 @@ export default function ReportsPage() {
             variant={riskFilter === level ? 'primary' : 'ghost'}
             size="sm"
             onClick={() => setRiskFilter(level)}
-            className="text-xs px-3 h-7 rounded-md font-medium transition-colors"
+            className="text-xs px-3 h-7 font-medium transition-colors"
           >
             {level}
           </Button>
         ))}
-        <span className="ml-auto text-xs font-semibold text-tertiary bg-elevated px-2 py-1 rounded-md border border-subtle">{filtered.length} reports</span>
+        <span className="ml-auto text-xs font-semibold text-tertiary bg-elevated px-2.5 py-1 rounded-full shadow-token-sm">{filtered.length} reports</span>
       </div>
 
       {/* ─── Main 2-col layout ──────────────────────────── */}
@@ -141,7 +146,7 @@ export default function ReportsPage() {
           <div ref={parentRef} className="flex-1 overflow-y-auto">
             {isLoading ? (
               <div className="p-4 flex flex-col gap-3">
-                {[...Array(6)].map((_, i) => <div key={i} className="shimmer h-[72px] rounded-lg" />)}
+                {[...Array(6)].map((_, i) => <div key={i} className="shimmer h-[72px] rounded-2xl" />)}
               </div>
             ) : filtered.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full py-16 gap-3">
@@ -165,8 +170,8 @@ export default function ReportsPage() {
                     >
                       <div
                         onClick={() => setSelected(r.id)}
-                        className={`mx-3 my-1.5 p-3.5 rounded-md cursor-pointer border transition-colors group relative flex items-start gap-3 ${
-                          isSelected ? 'border-accent/30 bg-accent/10' : 'border-transparent hover:bg-subtle hover:border-subtle'
+                        className={`mx-3 my-1.5 p-3.5 rounded-2xl cursor-pointer transition-colors group relative flex items-start gap-3 ${
+                          isSelected ? 'bg-accent-muted' : 'hover:bg-subtle'
                         }`}
                       >
                         <FileText size={16} className={`shrink-0 mt-0.5 ${isSelected ? 'text-accent' : 'text-tertiary'}`} />
@@ -202,15 +207,15 @@ export default function ReportsPage() {
             {selectedReport ? (
               <div className="flex-1 flex flex-col overflow-hidden">
                 {/* Viewer header */}
-                <div className="px-8 py-5 border-b border-subtle bg-base shrink-0 flex items-start justify-between gap-4">
+                <div className="px-8 py-5 bg-base shrink-0 flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <h2 className="text-lg font-semibold text-primary leading-snug">{selectedReport.title}</h2>
                     <div className="flex items-center gap-3 mt-2.5 flex-wrap">
-                      <div className="flex items-center gap-1.5 text-xs text-secondary font-medium bg-subtle px-2.5 py-1 rounded-md border border-subtle">
+                      <div className="flex items-center gap-1.5 text-xs text-secondary font-medium bg-subtle px-2.5 py-1 rounded-full">
                         <Calendar size={13} />
                         {format(new Date(selectedReport.createdAt), 'MMMM dd, yyyy HH:mm')} UTC
                       </div>
-                      <span className="text-xs font-mono text-secondary bg-subtle px-2.5 py-1 rounded-md border border-subtle">
+                      <span className="text-xs font-mono text-secondary bg-subtle px-2.5 py-1 rounded-full">
                         Avg {selectedReport.averageTemperatureCelsius.toFixed(1)}°C · Peak {selectedReport.peakTemperatureCelsius.toFixed(1)}°C
                       </span>
                       {selectedReport.modelUsed && (
@@ -242,7 +247,7 @@ export default function ReportsPage() {
               </div>
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center gap-4">
-                <div className="w-16 h-16 rounded-lg bg-subtle border border-default flex items-center justify-center">
+                <div className="w-16 h-16 rounded-2xl bg-subtle flex items-center justify-center">
                   <FileText size={24} className="text-tertiary" />
                 </div>
                 <div className="text-center">
