@@ -400,5 +400,5 @@ All tokens live in `src/app/globals.css` as CSS custom properties, re-exposed to
 Built for the **FortyGuard Hackathon**.
 
 <div align="center">
-  <sub>FortyGuard API · 20 m² resolution · 2 m AGL · Groq llama-3.3-70b</sub>
+  <sub>FortyGuard API · 20 m² resolution · 2 m AGL</sub>
 </div>

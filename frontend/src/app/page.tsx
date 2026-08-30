@@ -319,7 +319,7 @@ export default function DashboardPage() {
               </div>
 
               <div className="px-4 py-2.5 border-t border-subtle bg-subtle shrink-0">
-                <p className="text-xs text-tertiary">FortyGuard API · 20m² · 2m AGL · Groq llama-3.3-70b</p>
+                <p className="text-xs text-tertiary">FortyGuard API · 20m² · 2m AGL</p>
               </div>
             </div>
 
