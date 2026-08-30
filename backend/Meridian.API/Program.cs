@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 using Serilog;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.HttpOverrides;
 using Meridian.API.Exports.Pdf;
 using QuestPDF.Infrastructure;
 
@@ -103,9 +104,29 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Meridian API v1"));
 }
 
+// Behind a TLS-terminating proxy (Render, Azure, etc.) the app receives plain
+// HTTP, so trust the forwarded scheme/host and skip the HTTPS redirect there —
+// redirecting would loop forever. Locally this is unchanged.
+var behindProxy = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
+
+if (behindProxy)
+{
+    app.UseForwardedHeaders(new ForwardedHeadersOptions
+    {
+        ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedFor,
+        KnownNetworks = { },
+        KnownProxies = { }
+    });
+}
+
 app.UseCors("MeridianCors");
 app.UseRateLimiter();
-app.UseHttpsRedirection();
+
+if (!behindProxy)
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/health");

@@ -1,0 +1,48 @@
+name: Deploy backend to Azure
+
+# Deploys Meridian.API to Azure App Service on every push that touches the
+# backend. Publishes self-contained so the deploy does not depend on the host
+# having a .NET 10 runtime available.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
+  workflow_dispatch:
+
+env:
+  AZURE_WEBAPP_NAME: meridian-api        # must match the Web App name in Azure
+  PROJECT_PATH: backend/Meridian.API/Meridian.API.csproj
+  DOTNET_VERSION: '10.0.x'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore ${{ env.PROJECT_PATH }}
+
+      - name: Publish (self-contained linux-x64)
+        run: |
+          dotnet publish ${{ env.PROJECT_PATH }} \
+            --configuration Release \
+            --runtime linux-x64 \
+            --self-contained true \
+            --no-restore \
+            --output ${{ github.workspace }}/publish
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
+          package: ${{ github.workspace }}/publish
