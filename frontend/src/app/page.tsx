@@ -29,7 +29,7 @@ const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     const d = payload[0].payload;
     return (
-      <div className="bg-elevated border border-default px-3 py-2.5 rounded-xl shadow-lg">
+      <div className="bg-elevated border border-default px-3 py-2.5 rounded-md shadow-token-md">
         <p className="font-semibold text-sm text-primary">{d.locationName}</p>
         <div className="mt-1 flex gap-3">
           <span className="text-xs text-secondary">{d.temperatureCelsius.toFixed(1)}°C</span>
@@ -149,13 +149,13 @@ export default function DashboardPage() {
           <div className="flex items-center gap-2.5">
             <Globe size={18} className="text-accent" />
             <div>
-              <h1 className="text-base font-bold text-primary leading-none">Meridian Dashboard</h1>
+              <h1 className="text-base font-semibold text-primary leading-none">Meridian Dashboard</h1>
               <p className="text-xs text-tertiary mt-1">Global urban heat intelligence</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             {/* Segmented Control for Live/History */}
-            <div className="flex items-center p-1 bg-subtle border border-subtle rounded-xl mr-1">
+            <div className="flex items-center p-1 bg-subtle border border-subtle rounded-md mr-1">
               <button
                 onClick={() => setIsHistorical(false)}
                 className={`text-xs px-3 py-1 rounded-lg font-semibold transition-colors ${!isHistorical ? 'bg-elevated text-primary shadow-sm border border-default' : 'text-tertiary hover:text-secondary'}`}
@@ -184,7 +184,7 @@ export default function DashboardPage() {
                 Export
               </Button>
               {isExportOpen && (
-                <div className="absolute top-full right-0 mt-2 bg-elevated border border-default rounded-xl shadow-xl p-1.5 w-36 z-50">
+                <div className="absolute top-full right-0 mt-2 bg-elevated border border-default rounded-md shadow-token-md p-1.5 w-36 z-50">
                   <button
                     className="w-full text-left px-3 py-2 text-sm font-semibold hover:bg-subtle rounded-lg text-primary transition-colors flex items-center"
                     onClick={async () => {
@@ -219,7 +219,7 @@ export default function DashboardPage() {
         {/* ─── Stat Cards ───────────────────────────────────── */}
         <div className="px-5 py-3 grid grid-cols-2 lg:grid-cols-4 gap-3 shrink-0 border-b border-subtle">
           {isLoading ? (
-            skeletonRows.slice(0, 4).map((_, i) => <div key={i} className="shimmer h-[88px] rounded-xl" />)
+            skeletonRows.slice(0, 4).map((_, i) => <div key={i} className="shimmer h-[88px] rounded-lg" />)
           ) : (
             <>
               <StatCard title="Monitored Zones" value={data?.totalLocations ?? 0} trend={{ direction: 'neutral', value: readings.length, label: 'live' }} icon={<MapPin size={20} />} />
@@ -233,7 +233,7 @@ export default function DashboardPage() {
         {/* ─── Main Content ─────────────────────────────────── */}
         {!isLoading && readings.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-subtle border border-subtle flex items-center justify-center">
+            <div className="w-14 h-14 rounded-lg bg-subtle border border-subtle flex items-center justify-center">
               <MapPin size={24} className="text-tertiary" />
             </div>
             <div className="text-center">

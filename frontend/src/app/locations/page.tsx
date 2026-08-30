@@ -15,18 +15,18 @@ function ConfirmModal({ title, message, onConfirm, onCancel, loading }: {
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onCancel} />
-      <div className="relative bg-elevated border border-subtle rounded-xl p-6 w-full max-w-sm mx-4 shadow-2xl">
-        <div className="w-10 h-10 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-4">
-          <AlertTriangle size={18} className="text-red-500" />
+      <div className="absolute inset-0 bg-black/50" onClick={onCancel} />
+      <div className="relative bg-elevated border border-subtle rounded-lg p-6 w-full max-w-sm mx-4 shadow-token-md">
+        <div className="w-10 h-10 rounded-md bg-risk-extreme/10 border border-risk-extreme/20 flex items-center justify-center mb-4">
+          <AlertTriangle size={18} className="text-risk-extreme" />
         </div>
-        <h3 className="text-base font-bold text-primary mb-1">{title}</h3>
+        <h3 className="text-base font-semibold text-primary mb-1">{title}</h3>
         <p className="text-sm text-secondary mb-5">{message}</p>
         <div className="flex gap-2 justify-end">
           <Button variant="ghost" size="sm" onClick={onCancel}>
             Cancel
           </Button>
-          <Button variant="primary" size="sm" onClick={onConfirm} disabled={loading} className="bg-red-500 hover:bg-red-600 border-transparent text-white">
+          <Button variant="primary" size="sm" onClick={onConfirm} disabled={loading} className="bg-risk-extreme hover:bg-risk-extreme/90 border-transparent text-white">
             {loading && <Loader2 size={14} className="animate-spin mr-2" />}
             Delete
           </Button>
@@ -206,12 +206,12 @@ export default function LocationsPage() {
             <span className="text-secondary">/</span>
             <span className="text-primary">Locations</span>
           </div>
-          <h1 className="text-xl font-bold tracking-tight text-primary">Monitoring Zones</h1>
+          <h1 className="text-xl font-semibold tracking-tight text-primary">Monitoring Zones</h1>
           <p className="text-xs text-tertiary mt-1">{totalCount} total locations</p>
         </div>
         <div className="flex items-center gap-2">
           {/* CSV Upload */}
-          <label className="flex items-center gap-1.5 px-3 h-8 rounded-lg bg-subtle border border-subtle text-secondary text-xs font-medium hover:bg-elevated hover:text-primary transition-colors cursor-pointer shadow-token-sm">
+          <label className="flex items-center gap-1.5 px-3 h-8 rounded-md bg-subtle border border-subtle text-secondary text-xs font-medium hover:bg-elevated hover:text-primary transition-colors cursor-pointer">
             <Upload size={14} />
             Import CSV
             <input type="file" accept=".csv" className="hidden" onChange={handleCsvUpload} disabled={createBulk.isPending} />
@@ -250,7 +250,7 @@ export default function LocationsPage() {
               value={searchInput}
               onChange={e => setSearchInput(e.target.value)}
               placeholder="Search by name, city, or country…"
-              className="w-full h-11 pl-11 pr-4 rounded-xl bg-elevated border border-subtle text-sm font-medium text-primary placeholder:text-tertiary focus:outline-none focus:border-accent/50 focus:ring-4 focus:ring-accent/10 transition-all shadow-sm"
+              className="w-full h-11 pl-11 pr-4 rounded-md bg-elevated border border-subtle text-sm font-medium text-primary placeholder:text-tertiary focus:outline-none focus:border-accent/50 focus:ring-4 focus:ring-accent/10 transition-all"
             />
           </div>
           <Button type="submit" size="md">
@@ -268,11 +268,11 @@ export default function LocationsPage() {
       <div className="flex-1 overflow-y-auto px-5 py-4">
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-            {[...Array(12)].map((_, i) => <div key={i} className="shimmer h-[170px] rounded-xl" />)}
+            {[...Array(12)].map((_, i) => <div key={i} className="shimmer h-[170px] rounded-lg" />)}
           </div>
         ) : locations.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full gap-3 py-20">
-            <div className="w-14 h-14 rounded-2xl bg-subtle border border-subtle flex items-center justify-center">
+            <div className="w-14 h-14 rounded-lg bg-subtle border border-subtle flex items-center justify-center">
               <MapPin size={24} className="text-tertiary" />
             </div>
             <div className="text-center">
@@ -285,7 +285,7 @@ export default function LocationsPage() {
             {locations.map((loc) => (
               <div
                 key={loc.id}
-                className="bg-elevated border border-subtle rounded-xl p-4 flex flex-col gap-3 hover:border-accent hover:shadow-token-sm transition-all group"
+                className="bg-elevated border border-subtle rounded-lg p-4 flex flex-col gap-3 hover:border-accent/50 transition-colors group"
               >
                 {/* Card header */}
                 <div className="flex items-start justify-between gap-2">
@@ -297,12 +297,12 @@ export default function LocationsPage() {
                     <p className="text-xs text-secondary">{loc.city}, {loc.country}</p>
                   </div>
                   <div className="flex items-center gap-1">
-                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${loc.isActive ? 'bg-green-500' : 'bg-gray-400'}`} />
+                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${loc.isActive ? 'bg-risk-low' : 'bg-[var(--text-tertiary)]/40'}`} />
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => setDeleteConfirm(loc.id)}
-                      className="opacity-0 group-hover:opacity-100 w-6 h-6 p-0 text-tertiary hover:text-red-500 hover:bg-red-500/10 transition-all"
+                      className="opacity-0 group-hover:opacity-100 w-6 h-6 p-0 text-tertiary hover:text-risk-extreme hover:bg-risk-extreme/10 transition-all"
                       title="Delete location"
                     >
                       <Trash2 size={12} />
@@ -394,10 +394,10 @@ export default function LocationsPage() {
       {/* ─── Add Zone Modal ─────────────────────────────────── */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
-          <div className="relative bg-elevated border border-subtle rounded-xl p-6 w-full max-w-md mx-4 shadow-2xl">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setIsModalOpen(false)} />
+          <div className="relative bg-elevated border border-subtle rounded-lg p-6 w-full max-w-md mx-4 shadow-token-md">
             <div className="flex items-center justify-between mb-5">
-              <h3 className="text-base font-bold text-primary">Add Monitoring Zone</h3>
+              <h3 className="text-base font-semibold text-primary">Add Monitoring Zone</h3>
               <Button variant="ghost" size="sm" onClick={() => setIsModalOpen(false)} className="w-7 h-7 p-0">
                 <X size={15} />
               </Button>
@@ -419,7 +419,7 @@ export default function LocationsPage() {
                     required
                     value={(formData as any)[field]}
                     onChange={e => setFormData(f => ({ ...f, [field]: e.target.value }))}
-                    className="w-full px-3 py-2 rounded-lg bg-base border border-subtle text-sm text-primary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all"
+                    className="w-full px-3 py-2 rounded-md bg-base border border-subtle text-sm text-primary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all"
                     placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
                   />
                 </div>
@@ -432,7 +432,7 @@ export default function LocationsPage() {
                       required type="number" step="any"
                       value={(formData as any)[field]}
                       onChange={e => setFormData(f => ({ ...f, [field]: e.target.value }))}
-                      className="w-full px-3 py-2 rounded-lg bg-base border border-subtle text-sm text-primary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all"
+                      className="w-full px-3 py-2 rounded-md bg-base border border-subtle text-sm text-primary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all"
                       placeholder="0.0000"
                     />
                   </div>

@@ -25,12 +25,12 @@ function getRiskVariant(risk: string): any {
 function ConfirmModal({ onConfirm, onCancel, loading }: { onConfirm: () => void; onCancel: () => void; loading?: boolean; }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onCancel} />
-      <Card padding="md" className="relative w-full max-w-sm mx-4 z-10 shadow-2xl">
-        <div className="w-10 h-10 rounded-full bg-risk-extreme/10 border border-risk-extreme/20 flex items-center justify-center mb-4">
+      <div className="absolute inset-0 bg-black/50" onClick={onCancel} />
+      <Card padding="md" className="relative w-full max-w-sm mx-4 z-10 shadow-token-md">
+        <div className="w-10 h-10 rounded-md bg-risk-extreme/10 border border-risk-extreme/20 flex items-center justify-center mb-4">
           <AlertTriangle size={18} className="text-risk-extreme" />
         </div>
-        <h3 className="text-base font-bold text-primary mb-1">Delete Report</h3>
+        <h3 className="text-base font-semibold text-primary mb-1">Delete Report</h3>
         <p className="text-sm text-secondary mb-6">This report will be permanently removed. This action cannot be undone.</p>
         <div className="flex gap-3 justify-end">
           <Button variant="ghost" size="sm" onClick={onCancel}>Cancel</Button>
@@ -102,7 +102,7 @@ export default function ReportsPage() {
             <span className="text-secondary">/</span>
             <span className="text-primary">Reports</span>
           </div>
-          <h1 className="text-xl font-bold tracking-tight text-primary">AI Risk Reports</h1>
+          <h1 className="text-xl font-semibold tracking-tight text-primary">AI Risk Reports</h1>
           <p className="text-xs text-tertiary mt-1">Government-grade advisories · Meridian AI</p>
         </div>
         <Button
@@ -125,7 +125,7 @@ export default function ReportsPage() {
             variant={riskFilter === level ? 'primary' : 'ghost'}
             size="sm"
             onClick={() => setRiskFilter(level)}
-            className="text-xs px-3 h-7 rounded-lg font-semibold transition-colors"
+            className="text-xs px-3 h-7 rounded-md font-medium transition-colors"
           >
             {level}
           </Button>
@@ -141,7 +141,7 @@ export default function ReportsPage() {
           <div ref={parentRef} className="flex-1 overflow-y-auto">
             {isLoading ? (
               <div className="p-4 flex flex-col gap-3">
-                {[...Array(6)].map((_, i) => <div key={i} className="shimmer h-[72px] rounded-xl" />)}
+                {[...Array(6)].map((_, i) => <div key={i} className="shimmer h-[72px] rounded-lg" />)}
               </div>
             ) : filtered.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full py-16 gap-3">
@@ -165,8 +165,8 @@ export default function ReportsPage() {
                     >
                       <div
                         onClick={() => setSelected(r.id)}
-                        className={`mx-3 my-1.5 p-3.5 rounded-xl cursor-pointer border transition-all group relative flex items-start gap-3 ${
-                          isSelected ? 'border-accent/30 bg-accent/10 shadow-sm' : 'border-transparent hover:bg-subtle hover:border-subtle'
+                        className={`mx-3 my-1.5 p-3.5 rounded-md cursor-pointer border transition-colors group relative flex items-start gap-3 ${
+                          isSelected ? 'border-accent/30 bg-accent/10' : 'border-transparent hover:bg-subtle hover:border-subtle'
                         }`}
                       >
                         <FileText size={16} className={`shrink-0 mt-0.5 ${isSelected ? 'text-accent' : 'text-tertiary'}`} />
@@ -204,7 +204,7 @@ export default function ReportsPage() {
                 {/* Viewer header */}
                 <div className="px-8 py-5 border-b border-subtle bg-base shrink-0 flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
-                    <h2 className="text-lg font-bold text-primary leading-snug">{selectedReport.title}</h2>
+                    <h2 className="text-lg font-semibold text-primary leading-snug">{selectedReport.title}</h2>
                     <div className="flex items-center gap-3 mt-2.5 flex-wrap">
                       <div className="flex items-center gap-1.5 text-xs text-secondary font-medium bg-subtle px-2.5 py-1 rounded-md border border-subtle">
                         <Calendar size={13} />
@@ -242,11 +242,11 @@ export default function ReportsPage() {
               </div>
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-subtle border border-default flex items-center justify-center shadow-sm">
+                <div className="w-16 h-16 rounded-lg bg-subtle border border-default flex items-center justify-center">
                   <FileText size={24} className="text-tertiary" />
                 </div>
                 <div className="text-center">
-                  <p className="text-base font-bold text-primary mb-1">Select a Report</p>
+                  <p className="text-base font-semibold text-primary mb-1">Select a Report</p>
                   <p className="text-sm text-secondary">Choose a report from the list to view its contents</p>
                 </div>
               </div>

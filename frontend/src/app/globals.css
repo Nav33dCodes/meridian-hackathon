@@ -15,37 +15,38 @@
   --text-lg: 20px;
 }
 
-/* ─── Layer 1: Runtime design tokens (Glassmorphism Bento Box) ─── */
+/* ─── Layer 1: Runtime design tokens (Vercel-inspired: flat, neutral, one accent) ─── */
 :root {
   color-scheme: light;
-  
-  /* Soft Light Background */
-  --bg-base: #F3F5F8;
-  --bg-subtle: #E2E8F0;
-  
-  /* Translucent Elevated for Glassmorphism */
-  --bg-elevated: rgba(255, 255, 255, 0.85);
-  
-  /* Borders */
-  --border-subtle: rgba(0, 0, 0, 0.05);
-  --border-default: rgba(0, 0, 0, 0.1);
-  
+
+  /* Neutral surfaces */
+  --bg-base: #FFFFFF;
+  --bg-subtle: #FAFAFA;
+
+  /* Solid elevated surface — no translucency/blur, separation via hairline border */
+  --bg-elevated: #FFFFFF;
+
+  /* Hairline borders */
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --border-default: rgba(0, 0, 0, 0.14);
+
   /* Typography */
-  --text-primary: #0F172A;
-  --text-secondary: #475569;
-  --text-tertiary: #94A3B8;
-  
-  /* Bright Blue Accent */
-  --accent: #3B82F6;
-  --accent-muted: rgba(59, 130, 246, 0.15);
-  --accent-border: rgba(59, 130, 246, 0.3);
-  
-  /* Soft Bento Shadows */
-  --shadow-sm: 0 4px 12px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  --text-primary: #0A0A0A;
+  --text-secondary: #666666;
+  --text-tertiary: #8F8F8F;
+
+  /* Accent */
+  --accent: #0070F3;
+  --accent-muted: rgba(0, 112, 243, 0.1);
+  --accent-border: rgba(0, 112, 243, 0.3);
+  --accent-glow: rgba(0, 112, 243, 0.35);
+
+  /* Minimal shadows — hairline borders do most of the work */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 14px 0 rgba(0, 0, 0, 0.08);
 
   /* Risk colors */
-  --risk-low: #10B981; 
+  --risk-low: #10B981;
   --risk-moderate: #F59E0B;
   --risk-high: #EF4444;
   --risk-extreme: #991B1B;
@@ -53,31 +54,32 @@
 
 .dark {
   color-scheme: dark;
-  
-  /* Deep Dark Background */
-  --bg-base: #0B0F19;
-  --bg-subtle: #131B2C;
-  
-  /* Translucent Elevated */
-  --bg-elevated: rgba(30, 41, 59, 0.75);
-  
-  /* Borders */
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-default: rgba(255, 255, 255, 0.15);
-  
+
+  /* True-black neutral surfaces */
+  --bg-base: #000000;
+  --bg-subtle: #0A0A0A;
+
+  /* Solid elevated surface — no translucency/blur */
+  --bg-elevated: #111111;
+
+  /* Hairline borders */
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --border-default: rgba(255, 255, 255, 0.16);
+
   /* Typography */
-  --text-primary: #F8FAFC;
-  --text-secondary: #94A3B8;
-  --text-tertiary: #64748B;
-  
-  /* Bright Blue Accent */
-  --accent: #60A5FA;
-  --accent-muted: rgba(96, 165, 250, 0.15);
-  --accent-border: rgba(96, 165, 250, 0.3);
-  
-  /* Soft Bento Shadows */
-  --shadow-sm: 0 4px 12px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  --text-primary: #FFFFFF;
+  --text-secondary: #A1A1A1;
+  --text-tertiary: #666666;
+
+  /* Accent — slightly brighter for contrast against black */
+  --accent: #3291FF;
+  --accent-muted: rgba(50, 145, 255, 0.15);
+  --accent-border: rgba(50, 145, 255, 0.35);
+  --accent-glow: rgba(50, 145, 255, 0.45);
+
+  /* Minimal shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 20px 0 rgba(0, 0, 0, 0.6);
 }
 
 /* ─── Layer 2: Explicit utility classes (reliable in Tailwind v4) ─── */
@@ -188,7 +190,12 @@
   }
 
   .btn-accent:hover {
-    background-color: rgba(37, 99, 235, 0.18);
+    background-color: var(--accent-border);
+  }
+
+  /* Subtle accent glow for primary CTAs / focus states — used sparingly */
+  .glow-accent {
+    box-shadow: 0 0 0 1px var(--accent-border), 0 4px 20px -4px var(--accent-glow);
   }
 }
 
@@ -247,20 +254,6 @@ body {
 }
 
 /* Live indicator */
-@keyframes pulse-dot {
-
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  50% {
-    opacity: 0.5;
-    transform: scale(0.85);
-  }
-}
-
 .live-dot {
   width: 8px;
   height: 8px;

@@ -27,11 +27,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning className={`${GeistSans.variable} ${GeistMono.variable}`}>
       <head>
       </head>
-      <body className="bg-base text-primary font-sans antialiased" style={{ backgroundColor: 'var(--bg-base)', color: 'var(--text-primary)' }}>
+      <body className="bg-base text-primary font-sans antialiased">
         <Providers>
-          <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--bg-base)' }}>
+          <div className="flex min-h-screen bg-base">
             <Sidebar />
-            <main style={{ flex: 1, overflow: 'auto', backgroundColor: 'var(--bg-base)' }}>
+            <main className="flex-1 overflow-auto bg-base">
               {children}
             </main>
           </div>

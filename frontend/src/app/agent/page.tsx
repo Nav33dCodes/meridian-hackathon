@@ -89,7 +89,7 @@ export default function AgentPage() {
       {/* Header */}
       <div className="flex justify-between items-center mb-6 shrink-0">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-primary">Meridian AI Agent</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-primary">Meridian AI Agent</h1>
           <p className="text-sm text-secondary mt-1">
             Powered by Groq · Ask anything about urban heat
           </p>
@@ -114,7 +114,7 @@ export default function AgentPage() {
       >
         {agentMessages.length === 0 && !streaming && (
           <div className="h-full flex flex-col items-center justify-center -mt-10">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-accent flex items-center justify-center shadow-token-sm">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-lg bg-accent flex items-center justify-center">
               <Bot size={28} color="var(--bg-base)" />
             </div>
             <p className="font-semibold text-primary mb-2">Meridian Agent Ready</p>
@@ -143,7 +143,7 @@ export default function AgentPage() {
             <div className={`w-8 h-8 rounded-md shrink-0 flex items-center justify-center ${msg.role === 'user' ? 'bg-accent-muted' : 'bg-accent'}`}>
               {msg.role === 'user' ? <User size={14} className="text-accent" /> : <Bot size={14} color="var(--bg-base)" />}
             </div>
-            <div className={`max-w-[80%] px-4 py-3 rounded-xl text-sm leading-relaxed whitespace-pre-wrap shadow-token-sm ${
+            <div className={`max-w-[80%] px-4 py-3 rounded-md text-sm leading-relaxed whitespace-pre-wrap ${
               msg.role === 'user' ? 'bg-accent-muted border border-accent-border text-primary' : 'bg-elevated border border-subtle text-primary'
             }`}>
               {msg.content}
@@ -157,7 +157,7 @@ export default function AgentPage() {
             <div className="w-8 h-8 rounded-md shrink-0 bg-accent flex items-center justify-center">
               <Bot size={14} color="var(--bg-base)" />
             </div>
-            <div className="max-w-[80%] px-4 py-3 rounded-xl bg-elevated border border-subtle text-primary text-sm leading-relaxed shadow-token-sm">
+            <div className="max-w-[80%] px-4 py-3 rounded-md bg-elevated border border-subtle text-primary text-sm leading-relaxed">
               {streamingText ? (
                 <p className="whitespace-pre-wrap cursor">{streamingText}</p>
               ) : (
@@ -177,7 +177,7 @@ export default function AgentPage() {
       </div>
 
       {/* Input */}
-      <div className="bg-elevated border border-subtle rounded-xl flex gap-3 p-3 mt-2 shadow-token-sm shrink-0">
+      <div className="bg-elevated border border-subtle rounded-md flex gap-3 p-3 mt-2 shrink-0 focus-within:border-accent/50 transition-colors">
         <input
           value={input}
           onChange={e => setInput(e.target.value)}

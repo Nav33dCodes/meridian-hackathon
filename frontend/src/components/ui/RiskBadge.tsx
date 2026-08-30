@@ -55,7 +55,7 @@ export function RiskBadge({ level, className = '' }: RiskBadgeProps) {
         {pulse && <div className={`absolute inset-0 rounded-full ${bg.replace('/10', '/40')} animate-ping`} />}
         <Icon size={14} className={`relative z-10 ${color}`} />
       </div>
-      <span className={`text-xs font-bold tracking-wide uppercase ${color}`}>
+      <span className={`text-xs font-semibold tracking-wide uppercase ${color}`}>
         {level}
       </span>
     </div>

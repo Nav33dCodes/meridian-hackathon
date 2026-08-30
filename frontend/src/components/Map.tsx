@@ -102,7 +102,7 @@ export default function Map({ data }: MapProps) {
       <div className="absolute top-4 right-4 z-[9999] pointer-events-auto">
         <button
           onClick={() => setViewMode(prev => prev === 'heatmap' ? 'markers' : 'heatmap')}
-          className="flex items-center gap-2 px-3 py-2 bg-elevated/90 backdrop-blur-md border border-subtle shadow-md rounded-lg text-xs font-semibold text-primary hover:bg-subtle transition-colors"
+          className="flex items-center gap-2 px-3 py-2 bg-elevated border border-subtle shadow-token-md rounded-md text-xs font-medium text-primary hover:bg-subtle transition-colors"
         >
           <Layers size={16} />
           {viewMode === 'heatmap' ? 'Show Markers' : 'Show Heatmap'}

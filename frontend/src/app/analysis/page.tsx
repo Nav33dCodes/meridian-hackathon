@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/Badge';
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-elevated border border-default rounded-lg px-3.5 py-2.5 shadow-md text-sm">
+    <div className="bg-elevated border border-default rounded-md px-3.5 py-2.5 shadow-token-md text-sm">
       <p className="text-secondary mb-1">{label}</p>
       <p className="font-mono font-semibold text-base text-risk-moderate">
         {payload[0]?.value?.toFixed(1)}°C
@@ -69,7 +69,7 @@ export default function AnalysisPage() {
           <span className="text-secondary">/</span>
           <span className="text-primary">Analysis</span>
         </div>
-        <h1 className="text-3xl font-bold tracking-tight text-primary">
+        <h1 className="text-3xl font-semibold tracking-tight text-primary">
           Data Analysis & Correlation
         </h1>
         <p className="text-sm text-secondary mt-1">
@@ -107,7 +107,7 @@ export default function AnalysisPage() {
               )}
             </div>
             {trend && (
-              <div className="flex items-center gap-1.5 px-2 py-1 rounded-full border border-subtle bg-subtle">
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded-md border border-subtle bg-subtle">
                 <TrendIcon size={14} style={{ color: trendColor }} />
                 <span className="text-xs font-semibold capitalize" style={{ color: trendColor }}>
                   {trend.direction} ({trend.changeRate > 0 ? '+' : ''}{trend.changeRate}°C)
@@ -153,7 +153,7 @@ export default function AnalysisPage() {
                   </div>
                 ))}
               </div>
-              <p className="text-sm text-secondary leading-relaxed bg-subtle/50 p-4 rounded-lg border border-default">
+              <p className="text-sm text-secondary leading-relaxed bg-subtle p-4 rounded-lg border border-default">
                 {analysis.aiInsight}
               </p>
             </div>

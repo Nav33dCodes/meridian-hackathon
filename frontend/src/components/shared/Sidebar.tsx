@@ -30,7 +30,7 @@ export function Sidebar() {
 
   return (
     <aside
-      className={`h-screen sticky top-0 flex flex-col bg-elevated/80 backdrop-blur-xl border-r border-subtle z-50 transition-[width] duration-200 ease-in-out ${collapsed ? 'w-[72px]' : 'w-[260px]'}`}
+      className={`h-screen sticky top-0 flex flex-col bg-base border-r border-subtle z-50 transition-[width] duration-200 ease-in-out ${collapsed ? 'w-[72px]' : 'w-[260px]'}`}
     >
       <div className={`flex items-center border-b border-subtle shrink-0 h-[81px] overflow-hidden ${collapsed ? 'px-0 justify-center' : 'px-5'}`}>
         <div className={`flex items-center w-full ${collapsed ? 'justify-center' : 'gap-3'}`}>
@@ -39,8 +39,8 @@ export function Sidebar() {
           </div>
           {!collapsed && (
             <div className="overflow-hidden whitespace-nowrap">
-              <p className="font-bold text-base tracking-tight text-primary">Meridian</p>
-              <p className="text-xs text-tertiary font-medium">Bento UI</p>
+              <p className="font-semibold text-base tracking-tight text-primary">Meridian</p>
+              <p className="text-xs text-tertiary font-medium">Heat Intelligence</p>
             </div>
           )}
         </div>
@@ -54,8 +54,8 @@ export function Sidebar() {
               key={href}
               href={href}
               prefetch={true}
-              className={`relative flex items-center rounded-xl transition-all ${collapsed ? 'justify-center h-12 w-12 mx-auto' : 'gap-3 p-3'} ${active
-                ? 'bg-accent/10 text-accent font-semibold shadow-sm'
+              className={`relative flex items-center rounded-md transition-colors ${collapsed ? 'justify-center h-11 w-11 mx-auto' : 'gap-3 px-3 py-2.5'} ${active
+                ? 'bg-accent/10 text-accent font-medium'
                 : 'text-secondary hover:text-primary hover:bg-subtle'
                 }`}
               title={collapsed ? label : undefined}
@@ -74,7 +74,7 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className={`flex flex-col border-t border-subtle bg-base/50 shrink-0 overflow-hidden ${collapsed ? 'p-2 gap-2' : 'p-4 gap-4'}`}>
+      <div className={`flex flex-col border-t border-subtle shrink-0 overflow-hidden ${collapsed ? 'p-2 gap-2' : 'p-4 gap-4'}`}>
         {!collapsed && (
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 shrink-0 rounded-full bg-risk-low" />
