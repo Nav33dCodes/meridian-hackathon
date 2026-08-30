@@ -61,25 +61,25 @@ Meridian is a two-tier system: a **.NET 10 Clean Architecture API** and a **Next
 flowchart LR
     subgraph EXT["① External Data Sources"]
         direction TB
-        FG["FortyGuard API<br/><i>hyperlocal telemetry</i>"]
-        GROQ["Groq API<br/><i>OpenAI-compatible LLM</i>"]
+        FG["FortyGuard API<br/>hyperlocal telemetry"]
+        GROQ["Groq API<br/>OpenAI-compatible LLM"]
     end
 
     subgraph BE["② Backend — .NET 10 Clean Architecture"]
         direction TB
-        INFRA["Meridian.Infrastructure<br/><i>EF Core · repositories · HTTP clients</i>"]
-        APP["Meridian.Application<br/><i>use-case services · AutoMapper · worker</i>"]
-        API["Meridian.API<br/><i>controllers · SignalR hub · exports</i>"]
-        CORE["Meridian.Core<br/><i>entities · interfaces · Result</i>"]
+        INFRA["Meridian.Infrastructure<br/>EF Core · repositories · HTTP clients"]
+        APP["Meridian.Application<br/>use-case services · AutoMapper · worker"]
+        API["Meridian.API<br/>controllers · SignalR hub · exports"]
+        CORE["Meridian.Core<br/>entities · interfaces · Result"]
     end
 
     DB[("Neon PostgreSQL<br/>Locations · HeatReadings · Reports")]
 
     subgraph FE["③ Frontend — Next.js 15"]
         direction TB
-        SR["useSignalR<br/><i>push channel</i>"]
-        RQ["React Query<br/><i>cache of record</i>"]
-        ZU["Zustand<br/><i>client-only UI state</i>"]
+        SR["useSignalR<br/>push channel"]
+        RQ["React Query<br/>cache of record"]
+        ZU["Zustand<br/>client-only UI state"]
         UI["Dashboard · Agent · Analysis<br/>Reports · Locations"]
     end
 
@@ -110,7 +110,7 @@ The dependency arrow points **inward only** — `Core` knows nothing about the o
 
 ```mermaid
 flowchart LR
-    API["Meridian.API<br/><i>controllers, hub</i>"] --> INFRA["Meridian.Infrastructure<br/><i>EF Core, HTTP</i>"] --> APP["Meridian.Application<br/><i>use cases</i>"] --> CORE["Meridian.Core<br/><i>domain — zero dependencies</i>"]
+    API["Meridian.API<br/>controllers, hub"] --> INFRA["Meridian.Infrastructure<br/>EF Core, HTTP"] --> APP["Meridian.Application<br/>use cases"] --> CORE["Meridian.Core<br/>domain — zero dependencies"]
 
     classDef l fill:#E7F1FF,stroke:#2563EB,color:#1E3A8A
     classDef c fill:#FDEEE3,stroke:#EA580C,color:#7C2D12
