@@ -1,4 +1,4 @@
-import { apiClient } from './client';
+import { apiClient, API_BASE } from './client';
 import type { HeatAnalysis, Correlation, Report } from '@/types';
 
 export const analysisApi = {
@@ -31,5 +31,5 @@ export const agentApi = {
   query: (query: string, location?: string) =>
     apiClient.post<{ response: string; timestamp: string }>('/agent/query', { query, location }).then((r) => r.data),
 
-  streamUrl: () => `${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000'}/api/agent/stream`,
+  streamUrl: () => `${API_BASE}/api/agent/stream`,
 };
