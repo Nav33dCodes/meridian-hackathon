@@ -30,23 +30,29 @@ export function Sidebar() {
 
   return (
     <aside
-      className={`h-screen sticky top-0 flex flex-col bg-base border-r border-subtle z-50 transition-[width] duration-200 ease-in-out ${collapsed ? 'w-[72px]' : 'w-[260px]'}`}
+      className={`h-screen sticky top-0 flex flex-col bg-base border-r border-subtle z-50 transition-[width] duration-200 ease-in-out ${collapsed ? 'w-[76px]' : 'w-[264px]'}`}
     >
-      <div className={`flex items-center border-b border-subtle shrink-0 h-[81px] overflow-hidden ${collapsed ? 'px-0 justify-center' : 'px-5'}`}>
+      {/* Logo */}
+      <div className={`flex items-center border-b border-subtle shrink-0 h-[72px] overflow-hidden ${collapsed ? 'px-0 justify-center' : 'px-5'}`}>
         <div className={`flex items-center w-full ${collapsed ? 'justify-center' : 'gap-3'}`}>
-          <div className="w-9 h-9 shrink-0 relative flex items-center justify-center">
-             <Image src="/logo.png" alt="Meridian Logo" fill className="object-contain" priority />
+          <div className="w-9 h-9 shrink-0 relative rounded-md bg-accent/10 border border-accent/20 flex items-center justify-center overflow-hidden">
+            <div className="absolute inset-0 bg-accent/20 blur-md" />
+            <Image src="/logo.png" alt="Meridian Logo" width={20} height={20} className="relative object-contain" priority />
           </div>
           {!collapsed && (
             <div className="overflow-hidden whitespace-nowrap">
-              <p className="font-semibold text-base tracking-tight text-primary">Meridian</p>
-              <p className="text-xs text-tertiary font-medium">Heat Intelligence</p>
+              <p className="font-semibold text-[15px] tracking-tight text-primary leading-tight">Meridian</p>
+              <p className="text-[11px] text-tertiary font-medium leading-tight">Heat Intelligence</p>
             </div>
           )}
         </div>
       </div>
 
-      <nav className={`flex flex-col gap-2 flex-1 overflow-x-hidden overflow-y-auto ${collapsed ? 'p-2' : 'p-3'}`}>
+      {/* Nav */}
+      <nav className={`flex flex-col flex-1 overflow-x-hidden overflow-y-auto ${collapsed ? 'p-2 gap-1' : 'p-3 gap-0.5'}`}>
+        {!collapsed && (
+          <p className="px-3 pt-2 pb-1.5 text-[10px] font-semibold text-tertiary uppercase tracking-widest">Menu</p>
+        )}
         {nav.map(({ href, label, icon: Icon }) => {
           const active = path === href;
           return (
@@ -54,31 +60,29 @@ export function Sidebar() {
               key={href}
               href={href}
               prefetch={true}
-              className={`relative flex items-center rounded-md transition-colors ${collapsed ? 'justify-center h-11 w-11 mx-auto' : 'gap-3 px-3 py-2.5'} ${active
-                ? 'bg-accent/10 text-accent font-medium'
+              className={`group relative flex items-center rounded-md transition-colors duration-150 ${collapsed ? 'justify-center h-11 w-11 mx-auto' : 'gap-3 px-3 py-2.5'} ${active
+                ? 'bg-accent text-white font-medium'
                 : 'text-secondary hover:text-primary hover:bg-subtle'
                 }`}
               title={collapsed ? label : undefined}
             >
-              <Icon size={20} className={`shrink-0 ${active ? 'text-accent' : 'text-tertiary'}`} />
+              <Icon size={18} className={`shrink-0 transition-colors ${active ? 'text-white' : 'text-tertiary group-hover:text-primary'}`} />
               {!collapsed && (
                 <span className="whitespace-nowrap text-sm">
                   {label}
                 </span>
-              )}
-              {active && !collapsed && (
-                <div className="absolute left-0 top-0 bottom-0 w-1 bg-accent rounded-r-full" />
               )}
             </Link>
           );
         })}
       </nav>
 
-      <div className={`flex flex-col border-t border-subtle shrink-0 overflow-hidden ${collapsed ? 'p-2 gap-2' : 'p-4 gap-4'}`}>
+      {/* Footer */}
+      <div className={`flex flex-col border-t border-subtle shrink-0 overflow-hidden ${collapsed ? 'p-2 gap-2' : 'p-3 gap-3'}`}>
         {!collapsed && (
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 shrink-0 rounded-full bg-risk-low" />
-            <span className="text-xs font-medium text-tertiary whitespace-nowrap">System Live</span>
+          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-subtle border border-subtle w-fit">
+            <span className="live-dot" />
+            <span className="text-[11px] font-medium text-secondary whitespace-nowrap">System Live</span>
           </div>
         )}
         <div className={`flex items-center ${collapsed ? 'flex-col gap-2' : 'justify-between'}`}>

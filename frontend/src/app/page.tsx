@@ -139,18 +139,24 @@ export default function DashboardPage() {
   });
 
   return (
-    <div className="h-screen max-h-screen overflow-hidden flex flex-col relative">
+    <div className="h-screen max-h-screen overflow-hidden flex flex-col relative bg-base">
+      {/* Subtle top gradient glow */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-72 z-0"
+        style={{ background: 'radial-gradient(60% 100% at 50% 0%, var(--accent-muted), transparent 70%)' }}
+      />
 
-
-      <div className="relative z-10 flex flex-col h-full w-full bg-transparent">
+      <div className="relative z-10 flex flex-col h-full w-full gap-4 p-5 overflow-hidden">
 
         {/* ─── Header ───────────────────────────────────────── */}
-        <div className="px-8 py-4 border-b border-subtle flex items-center justify-between shrink-0 bg-elevated">
-          <div className="flex items-center gap-2.5">
-            <Globe size={18} className="text-accent" />
+        <div className="flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 shrink-0 rounded-md bg-accent/10 border border-accent/20 flex items-center justify-center">
+              <Globe size={18} className="text-accent" />
+            </div>
             <div>
-              <h1 className="text-base font-semibold text-primary leading-none">Meridian Dashboard</h1>
-              <p className="text-xs text-tertiary mt-1">Global urban heat intelligence</p>
+              <h1 className="text-xl font-semibold text-primary leading-none tracking-tight">Meridian Dashboard</h1>
+              <p className="text-xs text-tertiary mt-1.5">Global urban heat intelligence</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -217,9 +223,9 @@ export default function DashboardPage() {
         </div>
 
         {/* ─── Stat Cards ───────────────────────────────────── */}
-        <div className="px-5 py-3 grid grid-cols-2 lg:grid-cols-4 gap-3 shrink-0 border-b border-subtle">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 shrink-0">
           {isLoading ? (
-            skeletonRows.slice(0, 4).map((_, i) => <div key={i} className="shimmer h-[88px] rounded-lg" />)
+            skeletonRows.slice(0, 4).map((_, i) => <div key={i} className="shimmer h-[100px] rounded-lg" />)
           ) : (
             <>
               <StatCard title="Monitored Zones" value={data?.totalLocations ?? 0} trend={{ direction: 'neutral', value: readings.length, label: 'live' }} icon={<MapPin size={20} />} />
@@ -248,11 +254,11 @@ export default function DashboardPage() {
             </Link>
           </div>
         ) : (
-          <div className="flex-1 min-h-0 flex overflow-hidden w-full relative">
+          <div className="flex-1 min-h-0 flex gap-4 overflow-hidden w-full relative">
 
             {/* Left: Data Table (55%) */}
-            <div className="flex flex-col border-r border-subtle bg-base relative z-10 shrink-0 w-[55%]">
-              <div className="px-4 py-2 border-b border-subtle flex items-center justify-between shrink-0 bg-subtle">
+            <div className="flex flex-col rounded-lg border border-subtle bg-elevated relative z-10 shrink-0 w-[55%] overflow-hidden">
+              <div className="px-4 py-2.5 border-b border-subtle flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-semibold text-tertiary uppercase tracking-wider">Live Readings</span>
                   <span className="text-xs bg-base border border-subtle text-secondary px-2 py-0.5 rounded-md">{readings.length} zones</span>
@@ -332,7 +338,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Right: Map + Chart tabs (45%) */}
-            <div className="flex flex-col flex-1 min-w-0 bg-base relative z-0">
+            <div className="flex flex-col rounded-lg border border-subtle bg-elevated flex-1 min-w-0 relative z-0 overflow-hidden">
               <div className="px-3 py-2 border-b border-subtle bg-subtle shrink-0 flex items-center gap-1">
                 {(['map', 'chart'] as const).map(tab => (
                   <button
