@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${GeistSans.variable} ${GeistMono.variable}`}>
+    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
       <head>
       </head>
       <body className="bg-base text-primary font-sans antialiased">
@@ -35,7 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               {children}
             </main>
           </div>
-          <Toaster position="bottom-right" theme="system" />
+          <Toaster position="bottom-right" theme="light" />
           <GlobalAlerts />
           <CommandPalette />
         </Providers>

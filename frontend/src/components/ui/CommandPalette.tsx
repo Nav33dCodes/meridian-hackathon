@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, MapPin, FileText, Sun, Moon, Sparkles, Loader2 } from 'lucide-react';
-import { useTheme } from 'next-themes';
+import { Search, MapPin, FileText, Sparkles, Loader2 } from 'lucide-react';
 import { reportApi } from '@/lib/api/analysis';
 import { toast } from 'sonner';
 import { useQuery } from '@tanstack/react-query';
@@ -14,7 +13,6 @@ export function CommandPalette() {
   const [search, setSearch] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const router = useRouter();
-  const { theme, setTheme } = useTheme();
 
   const { data: dashboard } = useQuery({
     queryKey: ['dashboard'],
@@ -55,11 +53,6 @@ export function CommandPalette() {
     setOpen(false);
     router.push('/locations');
     // Can optionally pass state or query param for search
-  };
-
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-    setOpen(false);
   };
 
   // Filter locations
@@ -126,13 +119,6 @@ export function CommandPalette() {
               >
                 <FileText size={16} className="text-secondary mr-3 shrink-0" />
                 View Reports
-              </button>
-              <button
-                onClick={toggleTheme}
-                className="w-full flex items-center px-3 py-2.5 text-sm text-primary hover:bg-subtle rounded-full transition-colors"
-              >
-                {theme === 'dark' ? <Sun size={16} className="text-secondary mr-3 shrink-0" /> : <Moon size={16} className="text-secondary mr-3 shrink-0" />}
-                Toggle {theme === 'dark' ? 'Light' : 'Dark'} Mode
               </button>
             </div>
           )}

@@ -21,13 +21,13 @@
 /*
   ─── Design system ───
   A light, colorful admin-dashboard register: soft lavender-gray canvas, white cards with
-  no border (separation via soft shadow only), a fixed dark floating sidebar as the one
-  deliberately dark element, and flat pastel "KPI tint" backgrounds on stat cards — each
-  tied to a real semantic meaning (heat, zones, extreme risk, high risk) rather than
-  arbitrary decoration. No gradients, no glow, no blur — flat colors only, cheap to paint.
+  no border (separation via soft shadow only), a flush white sidebar separated by a hairline
+  border, and flat pastel "KPI tint" backgrounds on stat cards — each tied to a real semantic
+  meaning (heat, zones, extreme risk, high risk) rather than arbitrary decoration. No
+  gradients, no glow, no blur — flat colors only, cheap to paint.
 
-  Shape scale: rounded-full (pill) for buttons, inputs, nav items and status chips;
-  rounded-2xl/3xl for cards, panels and the sidebar. Motion is functional only.
+  Shape scale: rounded-full (pill) for buttons, inputs and status chips; rounded-xl for nav
+  items; rounded-2xl/3xl for cards and panels. Motion is functional only.
 */
 :root {
   color-scheme: light;
@@ -61,13 +61,6 @@
   --risk-high: #DC2626;
   --risk-extreme: #991B1B;
 
-  /* Sidebar — fixed dark surface, independent of the light/dark app theme toggle */
-  --sidebar-bg: #16171C;
-  --sidebar-active-bg: rgba(255, 255, 255, 0.09);
-  --sidebar-text: rgba(255, 255, 255, 0.92);
-  --sidebar-text-muted: rgba(255, 255, 255, 0.48);
-  --sidebar-border: rgba(255, 255, 255, 0.07);
-
   /* KPI tint pairs — flat pastel bg + matching foreground, each mapped to a real metric */
   --kpi-1-bg: #FDEEE3;
   --kpi-1-fg: #C2410C;
@@ -77,52 +70,6 @@
   --kpi-3-fg: #DC2626;
   --kpi-4-bg: #FDF3DC;
   --kpi-4-fg: #B45309;
-}
-
-.dark {
-  color-scheme: dark;
-
-  --bg-base: #0E0F13;
-  --bg-subtle: #16171C;
-  --bg-elevated: #1B1C22;
-
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-default: rgba(255, 255, 255, 0.12);
-
-  --text-primary: #F3F4F6;
-  --text-secondary: #9CA3AF;
-  --text-tertiary: #6B7280;
-
-  --accent: #FB923C;
-  --accent-hover: #FDBA74;
-  --accent-muted: rgba(251, 146, 60, 0.14);
-  --accent-on-container: #FED7AA;
-  --accent-border: rgba(251, 146, 60, 0.32);
-
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.45);
-  --shadow-md: 0 12px 28px -10px rgba(0, 0, 0, 0.55), 0 2px 6px -1px rgba(0, 0, 0, 0.35);
-
-  --risk-low: #34D399;
-  --risk-moderate: #FBBF24;
-  --risk-high: #F87171;
-  --risk-extreme: #FB7185;
-
-  /* Sidebar stays visually the same dark register in both themes */
-  --sidebar-bg: #0C0D10;
-  --sidebar-active-bg: rgba(255, 255, 255, 0.10);
-  --sidebar-text: rgba(255, 255, 255, 0.92);
-  --sidebar-text-muted: rgba(255, 255, 255, 0.45);
-  --sidebar-border: rgba(255, 255, 255, 0.08);
-
-  /* KPI tints — muted tonal-on-dark instead of pastel-on-light */
-  --kpi-1-bg: rgba(194, 65, 12, 0.16);
-  --kpi-1-fg: #FDBA74;
-  --kpi-2-bg: rgba(37, 99, 235, 0.16);
-  --kpi-2-fg: #93C5FD;
-  --kpi-3-bg: rgba(220, 38, 38, 0.16);
-  --kpi-3-fg: #FCA5A5;
-  --kpi-4-bg: rgba(180, 83, 9, 0.18);
-  --kpi-4-fg: #FCD34D;
 }
 
 /* ─── Layer 2: Explicit utility classes (reliable in Tailwind v4) ─── */
@@ -147,27 +94,6 @@
 
   .text-accent-on-container {
     color: var(--accent-on-container);
-  }
-
-  /* Sidebar */
-  .bg-sidebar {
-    background-color: var(--sidebar-bg);
-  }
-
-  .bg-sidebar-active {
-    background-color: var(--sidebar-active-bg);
-  }
-
-  .text-sidebar {
-    color: var(--sidebar-text);
-  }
-
-  .text-sidebar-muted {
-    color: var(--sidebar-text-muted);
-  }
-
-  .border-sidebar {
-    border-color: var(--sidebar-border);
   }
 
   /* KPI tint cards */
@@ -272,25 +198,19 @@
   }
 }
 
-/* ─── Transition scope (scoped to avoid FOUC on initial load) ─── */
-.theme-transitioning * {
-  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease !important;
-}
-
 /* ─── Base resets ─── */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+/* Tailwind preflight already resets box-sizing, margin and padding inside @layer base.
+   Repeating that unlayered here would outrank every layered spacing utility. */
+@layer base {
 
-html,
-body {
-  background-color: var(--bg-base);
-  color: var(--text-primary);
-  font-family: var(--font-geist-sans), sans-serif;
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
+  html,
+  body {
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    font-family: var(--font-geist-sans), sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
 }
 
 /* Scrollbar */

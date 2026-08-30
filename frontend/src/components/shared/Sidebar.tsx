@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
@@ -9,11 +10,8 @@ import {
   MapPin,
   ChevronLeft,
   ChevronRight,
-  Flame,
 } from 'lucide-react';
-import { ThemeToggle } from './ThemeToggle';
-import { useState } from 'react';
-import { Button } from '../ui/Button';
+import { useEffect, useRef, useState } from 'react';
 
 const nav = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -23,78 +21,103 @@ const nav = [
   { href: '/locations', label: 'Locations', icon: MapPin },
 ];
 
+type IndicatorRect = { top: number; left: number; width: number; height: number };
+
 export function Sidebar() {
   const path = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
+  const itemRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
+  const [indicator, setIndicator] = useState<IndicatorRect | null>(null);
+
+  // Measure the active nav item and slide a single indicator to it, so
+  // switching routes (or collapsing) animates instead of just swapping colors.
+  useEffect(() => {
+    const activeEl = itemRefs.current[path];
+    const navEl = navRef.current;
+    if (!activeEl || !navEl) {
+      setIndicator(null);
+      return;
+    }
+    const navRect = navEl.getBoundingClientRect();
+    const itemRect = activeEl.getBoundingClientRect();
+    setIndicator({
+      top: itemRect.top - navRect.top,
+      left: itemRect.left - navRect.left,
+      width: itemRect.width,
+      height: itemRect.height,
+    });
+  }, [path, collapsed]);
 
   return (
-    <div className={`h-screen sticky top-0 shrink-0 p-3 transition-[width] duration-200 ease-in-out ${collapsed ? 'w-[88px]' : 'w-[260px]'}`}>
-      <aside className="bg-sidebar rounded-3xl h-full flex flex-col overflow-hidden">
-        {/* Logo */}
-        <div className={`flex items-center shrink-0 h-[68px] overflow-hidden ${collapsed ? 'px-0 justify-center' : 'px-5'}`}>
-          <div className={`flex items-center w-full ${collapsed ? 'justify-center' : 'gap-2.5'}`}>
-            <div className="w-8 h-8 shrink-0 rounded-lg bg-accent flex items-center justify-center">
-              <Flame size={16} className="text-white" strokeWidth={2.25} />
-            </div>
-            {!collapsed && (
-              <div className="overflow-hidden whitespace-nowrap">
-                <p className="font-bold text-sm tracking-tight text-sidebar leading-tight">Meridian</p>
-              </div>
-            )}
+    <aside className={`h-screen sticky top-0 shrink-0 bg-elevated border-r border-subtle flex flex-col transition-[width] duration-200 ease-in-out ${collapsed ? 'w-[80px]' : 'w-[248px]'}`}>
+      {/* Logo */}
+      <div className={`flex items-center shrink-0 h-[72px] border-b border-subtle overflow-hidden ${collapsed ? 'justify-center px-0' : 'px-5 gap-3'}`}>
+        <Image src="/logo.png" alt="Meridian" width={34} height={34} className="shrink-0" priority />
+        {!collapsed && (
+          <div className="overflow-hidden whitespace-nowrap">
+            <p className="font-bold text-sm tracking-tight text-primary leading-tight">Meridian</p>
+            <p className="text-[11px] text-tertiary leading-tight">Heat Intelligence</p>
           </div>
-        </div>
+        )}
+      </div>
 
-        {/* Nav */}
-        <nav className={`flex flex-col flex-1 overflow-x-hidden overflow-y-auto ${collapsed ? 'p-2.5 gap-1' : 'p-3 gap-1'}`}>
-          {!collapsed && (
-            <p className="px-3 pt-1 pb-2 text-[10px] font-semibold text-sidebar-muted uppercase tracking-widest">General</p>
-          )}
-          {nav.map(({ href, label, icon: Icon }) => {
-            const active = path === href;
-            return (
-              <Link
-                key={href}
-                href={href}
-                prefetch={true}
-                className={`group relative flex items-center rounded-full transition-colors duration-150 ${collapsed ? 'justify-center h-11 w-11 mx-auto' : 'gap-3 px-4 py-2.5'} ${active
-                  ? 'bg-sidebar-active text-sidebar font-semibold'
-                  : 'text-sidebar-muted hover:text-sidebar font-medium'
-                  }`}
-                title={collapsed ? label : undefined}
-              >
-                <Icon size={17} className="shrink-0" />
-                {!collapsed && (
-                  <span className="whitespace-nowrap text-sm">
-                    {label}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
-        </nav>
+      {/* Nav */}
+      <nav ref={navRef} className={`relative flex flex-col flex-1 overflow-x-hidden overflow-y-auto p-3 gap-1`}>
+        {indicator && (
+          <div
+            aria-hidden
+            className="absolute bg-accent-muted rounded-xl transition-all duration-200 ease-out pointer-events-none"
+            style={{ top: indicator.top, left: indicator.left, width: indicator.width, height: indicator.height }}
+          />
+        )}
 
-        {/* Footer */}
-        <div className={`flex flex-col border-t border-sidebar shrink-0 overflow-hidden ${collapsed ? 'p-2.5 gap-2' : 'p-3 gap-2.5'}`}>
-          {!collapsed && (
-            <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-sidebar-active w-fit">
-              <span className="live-dot" />
-              <span className="text-[11px] font-medium text-sidebar whitespace-nowrap">System Live</span>
-            </div>
-          )}
-          <div className={`flex items-center ${collapsed ? 'flex-col gap-2' : 'justify-between'}`}>
-            <ThemeToggle dark />
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setCollapsed(!collapsed)}
-              className={`flex items-center justify-center p-0 text-sidebar-muted hover:text-sidebar hover:bg-sidebar-active ${collapsed ? 'w-9 h-9' : 'w-8 h-8'}`}
-              title="Toggle Sidebar"
+        {!collapsed && (
+          <p className="relative px-3 pt-1 pb-2 text-[10px] font-semibold text-tertiary uppercase tracking-widest">General</p>
+        )}
+
+        {nav.map(({ href, label, icon: Icon }) => {
+          const active = path === href;
+          return (
+            <Link
+              key={href}
+              href={href}
+              prefetch={true}
+              ref={(el) => { itemRefs.current[href] = el; }}
+              className={`group relative z-10 flex items-center rounded-xl transition-colors duration-150 ${collapsed ? 'justify-center h-11 w-11 mx-auto' : 'gap-3 px-3.5 h-11'} ${active
+                ? 'text-accent font-semibold'
+                : 'text-secondary hover:text-primary hover:bg-subtle font-medium'
+                }`}
+              title={collapsed ? label : undefined}
             >
-              {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-            </Button>
-          </div>
+              <Icon size={18} className="shrink-0" strokeWidth={active ? 2.25 : 2} />
+              {!collapsed && (
+                <span className="whitespace-nowrap text-sm">
+                  {label}
+                </span>
+              )}
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* Footer */}
+      <div className={`flex shrink-0 border-t border-subtle overflow-hidden ${collapsed ? 'flex-col items-center p-4 gap-3' : 'items-center justify-between p-4'}`}>
+        <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-subtle">
+          <span className="live-dot shrink-0" />
+          {!collapsed && (
+            <span className="text-[11px] font-medium text-secondary whitespace-nowrap">System Live</span>
+          )}
         </div>
-      </aside>
-    </div>
+        <button
+          type="button"
+          onClick={() => setCollapsed(!collapsed)}
+          className="flex items-center justify-center shrink-0 w-8 h-8 rounded-lg text-secondary hover:text-primary hover:bg-subtle transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+          title="Toggle Sidebar"
+        >
+          {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+        </button>
+      </div>
+    </aside>
   );
 }
