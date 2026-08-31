@@ -9,6 +9,8 @@ using System.Threading.RateLimiting;
 using Serilog;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.ResponseCompression;
+using System.IO.Compression;
 using Meridian.API.Exports.Pdf;
 using Meridian.API.Configuration;
 using Meridian.API.Startup;
@@ -34,6 +36,18 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 builder.Services.AddMemoryCache();
+
+// JSON telemetry compresses roughly 10:1, and the time-lapse history response is
+// the largest thing this API serves. Enabled for HTTPS too: BREACH needs a secret
+// in the response body, and these payloads carry no credentials or tokens.
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+    options.Providers.Add<BrotliCompressionProvider>();
+    options.Providers.Add<GzipCompressionProvider>();
+});
+builder.Services.Configure<BrotliCompressionProviderOptions>(o => o.Level = CompressionLevel.Fastest);
+builder.Services.Configure<GzipCompressionProviderOptions>(o => o.Level = CompressionLevel.Fastest);
 builder.Services.AddSignalR()
     .AddJsonProtocol(options => 
     {
@@ -124,6 +138,7 @@ if (!simulatorOptions.Enabled)
 
 // Middleware pipeline
 app.UseMiddleware<GlobalExceptionMiddleware>();
+app.UseResponseCompression();
 
 if (app.Environment.IsDevelopment())
 {
@@ -141,7 +156,7 @@ if (behindProxy)
     app.UseForwardedHeaders(new ForwardedHeadersOptions
     {
         ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedFor,
-        KnownNetworks = { },
+        KnownIPNetworks = { },
         KnownProxies = { }
     });
 }

@@ -23,6 +23,9 @@ public class HeatController : ControllerBase
     private readonly IMapper _mapper;
     private readonly ILogger<HeatController> _logger;
     private readonly IMemoryCache _cache;
+
+    /// <summary>Frames the time-lapse slider is downsampled to, whatever window is requested.</summary>
+    private const int HistoryFrames = 60;
     private readonly IHubContext<HeatHub> _hubContext;
 
     public HeatController(
@@ -43,12 +46,13 @@ public class HeatController : ControllerBase
         _hubContext = hubContext;
     }
 
-    /// <summary>Get all heat readings (latest 100)</summary>
+    /// <summary>Get the most recent heat readings across all locations</summary>
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<HeatReadingResponse>>> GetAll(CancellationToken ct)
+    public async Task<ActionResult<IEnumerable<HeatReadingResponse>>> GetAll([FromQuery] int limit = 100, CancellationToken ct = default)
     {
-        var readings = await _repo.GetAllAsync(ct);
-        return Ok(_mapper.Map<IEnumerable<HeatReadingResponse>>(readings.Take(100)));
+        // Previously read the whole table and took 100 in memory.
+        var readings = await _repo.GetRecentAsync(Math.Clamp(limit, 1, 500), ct);
+        return Ok(_mapper.Map<IEnumerable<HeatReadingResponse>>(readings));
     }
 
     /// <summary>Get readings for a specific location</summary>
@@ -158,12 +162,21 @@ public class HeatController : ControllerBase
         return Ok(responseObj);
     }
 
-    /// <summary>Get historical readings for time-lapse slider</summary>
+    /// <summary>Get historical readings for the time-lapse slider, downsampled to a fixed number of frames</summary>
     [HttpGet("history")]
     public async Task<ActionResult<IEnumerable<HeatReadingResponse>>> GetHistory([FromQuery] int hours = 24, CancellationToken ct = default)
     {
-        var fromDate = DateTime.UtcNow.AddHours(-hours);
-        var readings = await _repo.GetByDateRangeAsync(fromDate, DateTime.UtcNow, ct);
+        hours = Math.Clamp(hours, 1, 8760);
+
+        var to = DateTime.UtcNow;
+        var from = to.AddHours(-hours);
+
+        // Aim for a constant number of frames whatever the window, so the payload
+        // stays flat as the table grows: 1h -> 1-minute frames, 24h -> 24-minute
+        // frames, 7d -> ~3-hour frames. The slider spans the same period either way.
+        var bucket = TimeSpan.FromSeconds(Math.Max(60, hours * 3600 / HistoryFrames));
+
+        var readings = await _repo.GetBucketedHistoryAsync(from, to, bucket, ct: ct);
         return Ok(_mapper.Map<IEnumerable<HeatReadingResponse>>(readings));
     }
 }

@@ -18,7 +18,15 @@ public static class DependencyInjection
     {
         // Database
         services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(config.GetConnectionString("DefaultConnection") ?? "Host=localhost;Database=meridian;Username=postgres;Password=password"));
+            options.UseNpgsql(config.GetConnectionString("DefaultConnection") ?? "Host=localhost;Database=meridian;Username=postgres;Password=password")
+                   // Reads dominate this app and none of them mutate what they load,
+                   // so change tracking was pure overhead on every dashboard, analysis
+                   // and export query. Writes go through Add/Update/Remove explicitly
+                   // (Repository<T>), which work regardless of tracking — but note that
+                   // loading an entity, mutating it, and calling SaveChanges will NOT
+                   // persist under this default. Call .AsTracking() on a query if you
+                   // ever need that pattern.
+                   .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
 
         // Repositories
         services.AddScoped<IHeatReadingRepository, HeatReadingRepository>();

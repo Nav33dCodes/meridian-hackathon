@@ -5,10 +5,6 @@ import {
   Thermometer, AlertTriangle, MapPin, Activity, RefreshCw,
   Download, Plus, Globe, BarChart3, FileText, Loader2
 } from 'lucide-react';
-import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  Cell, CartesianGrid
-} from 'recharts';
 import type { HeatReading } from '@/types';
 import dynamic from 'next/dynamic';
 import { useState, useMemo, useEffect, useRef } from 'react';
@@ -21,26 +17,17 @@ import { downloadExport, exportLabel, type ExportFormat } from '@/lib/api/export
 
 const DynamicMap = dynamic(() => import('@/components/Map'), { ssr: false });
 
+// Recharts is the heaviest dependency on this route and the default tab is the
+// map, so it is fetched only once the chart tab is actually opened.
+const TemperatureBarChart = dynamic(
+  () => import('@/components/features/charts/TemperatureBarChart'),
+  { ssr: false, loading: () => <div className="w-full h-full shimmer rounded-xl" /> }
+);
+
 import { RiskBadge } from '@/components/ui/RiskBadge';
 import { StatCard } from '@/components/ui/StatCard';
 import { Button } from '@/components/ui/Button';
 import { TimeLapseSlider } from '@/components/features/TimeLapseSlider';
-
-const CustomTooltip = ({ active, payload }: any) => {
-  if (active && payload && payload.length) {
-    const d = payload[0].payload;
-    return (
-      <div className="bg-elevated px-3 py-2.5 rounded-xl shadow-token-md">
-        <p className="font-semibold text-sm text-primary">{d.locationName}</p>
-        <div className="mt-1 flex gap-3">
-          <span className="text-xs text-secondary">{d.temperatureCelsius.toFixed(1)}°C</span>
-          <span className="text-xs text-secondary">{d.humidityPercent?.toFixed(0)}% RH</span>
-        </div>
-      </div>
-    );
-  }
-  return null;
-};
 
 export default function DashboardPage() {
   useSignalR();
@@ -383,17 +370,7 @@ export default function DashboardPage() {
                 ) : (
                   <div className="absolute inset-0 p-4">
                     {isLoading ? <div className="w-full h-full shimmer rounded-xl" /> : (
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={chartData} margin={{ top: 8, right: 8, left: -18, bottom: 45 }}>
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-subtle)" />
-                          <XAxis dataKey="locationName" tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} tickLine={false} axisLine={false} angle={-35} textAnchor="end" interval={0} tickFormatter={v => v.length > 12 ? v.substring(0, 12) + '…' : v} />
-                          <YAxis domain={['dataMin - 2', 'dataMax + 2']} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} tickLine={false} axisLine={false} tickFormatter={v => `${v}°`} />
-                          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--bg-subtle)' }} />
-                          <Bar dataKey="temperatureCelsius" radius={[3, 3, 0, 0]} maxBarSize={28}>
-                            {chartData.map((e, i) => <Cell key={i} fill={e.riskColor || 'var(--accent)'} />)}
-                          </Bar>
-                        </BarChart>
-                      </ResponsiveContainer>
+                      <TemperatureBarChart data={chartData} />
                     )}
                   </div>
                 )}

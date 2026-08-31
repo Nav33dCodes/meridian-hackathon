@@ -32,23 +32,24 @@ public class ReportService
         var from = request.From ?? DateTime.UtcNow.AddHours(-24);
         var to = request.To ?? DateTime.UtcNow;
 
-        var readings = (await _heatRepo.GetByDateRangeAsync(from, to, ct)).ToList();
-        var extremeReadings = readings.Where(r => r.RiskLevel >= RiskLevel.High).ToList();
+        // Aggregated in SQL. This used to materialise every reading in the window
+        // just to count and average them, so report cost grew with the table.
+        var summary = await _heatRepo.GetRangeSummaryAsync(from, to, ct);
 
         var context = $"""
             Heat Analysis Report Request
             Location: {request.LocationName ?? "All Monitored Zones"}
             Period: {from:yyyy-MM-dd HH:mm} to {to:yyyy-MM-dd HH:mm} UTC
-            Total Readings: {readings.Count}
-            Average Temperature: {(readings.Any() ? readings.Average(r => r.TemperatureCelsius):0):F1}°C
-            Peak Temperature: {(readings.Any() ? readings.Max(r => r.TemperatureCelsius):0):F1}°C
-            High/Extreme Risk Events: {extremeReadings.Count}
-            Affected Locations: {string.Join(", ", extremeReadings.Select(r => r.Location?.Name ?? "Unknown").Distinct().Take(5))}
+            Total Readings: {summary.TotalReadings}
+            Average Temperature: {summary.AverageTemperatureCelsius:F1}°C
+            Peak Temperature: {summary.PeakTemperatureCelsius:F1}°C
+            High/Extreme Risk Events: {summary.HighRiskCount}
+            Affected Locations: {string.Join(", ", summary.AffectedLocations)}
             """;
 
         var content = await _agentService.GenerateReportAsync(context, ct);
-        var avgTemp = readings.Any() ? readings.Average(r => r.TemperatureCelsius) : 0;
-        var peakTemp = readings.Any() ? readings.Max(r => r.TemperatureCelsius) : 0;
+        var avgTemp = summary.AverageTemperatureCelsius;
+        var peakTemp = summary.PeakTemperatureCelsius;
         var overallRisk = RiskLevelExtensions.FromTemperature(peakTemp);
 
         var report = new Report

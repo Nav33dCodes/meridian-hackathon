@@ -30,5 +30,12 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<HeatReading>()
             .HasIndex(h => new { h.LocationId, h.MeasuredAt })
             .IsDescending(false, true);
+
+        // The composite index above leads on LocationId, so it cannot serve a filter
+        // on MeasuredAt alone. Both the time-lapse history window and the retention
+        // sweep filter purely by time, and were full-scanning the table without this.
+        modelBuilder.Entity<HeatReading>()
+            .HasIndex(h => h.MeasuredAt)
+            .IsDescending(true);
     }
 }

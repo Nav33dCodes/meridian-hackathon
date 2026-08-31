@@ -25,11 +25,73 @@ public class HeatReadingRepository : Repository<HeatReading>, IHeatReadingReposi
             .Take(limit)
             .ToListAsync(ct);
 
-    public async Task<IEnumerable<HeatReading>> GetByDateRangeAsync(DateTime from, DateTime to, CancellationToken ct = default) =>
+    public async Task<IEnumerable<HeatReading>> GetRecentAsync(int limit = 100, CancellationToken ct = default) =>
         await _dbSet.Include(r => r.Location)
-            .Where(r => r.MeasuredAt >= from && r.MeasuredAt <= to)
+            .OrderByDescending(r => r.MeasuredAt)
+            .Take(limit)
+            .ToListAsync(ct);
+
+    public async Task<IEnumerable<HeatReading>> GetBucketedHistoryAsync(DateTime from, DateTime to, TimeSpan bucket, int maxRows = 10_000, CancellationToken ct = default)
+    {
+        // Downsampled server-side: DISTINCT ON keeps the newest reading per
+        // location per time bucket, so a 24h window returns ~(locations x buckets)
+        // rows instead of every raw row written in that period. The time span
+        // covered is unchanged — only the granularity is.
+        const string sql = """
+            SELECT * FROM (
+                SELECT DISTINCT ON (h."LocationId", date_bin({0}, h."MeasuredAt", {1}))
+                       h.*
+                FROM "HeatReadings" AS h
+                WHERE h."MeasuredAt" >= {2} AND h."MeasuredAt" <= {3}
+                ORDER BY h."LocationId",
+                         date_bin({0}, h."MeasuredAt", {1}),
+                         h."MeasuredAt" DESC
+            ) AS b
+            LIMIT {4}
+            """;
+
+        // date_bin needs a timestamptz origin; any fixed instant works as the grid anchor.
+        var origin = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        return await _dbSet
+            .FromSqlRaw(sql, bucket, origin, from, to, maxRows)
+            .Include(r => r.Location)
             .OrderByDescending(r => r.MeasuredAt)
             .ToListAsync(ct);
+    }
+
+    public async Task<HeatRangeSummary> GetRangeSummaryAsync(DateTime from, DateTime to, CancellationToken ct = default)
+    {
+        var inRange = _dbSet.Where(r => r.MeasuredAt >= from && r.MeasuredAt <= to);
+
+        var aggregate = await inRange
+            .GroupBy(_ => 1)
+            .Select(g => new
+            {
+                Total = g.Count(),
+                Average = (double?)g.Average(x => x.TemperatureCelsius),
+                Peak = (double?)g.Max(x => x.TemperatureCelsius),
+                HighRisk = g.Count(x => x.RiskLevel >= RiskLevel.High)
+            })
+            .FirstOrDefaultAsync(ct);
+
+        if (aggregate is null || aggregate.Total == 0) return HeatRangeSummary.Empty;
+
+        var affected = await inRange
+            .Where(r => r.RiskLevel >= RiskLevel.High)
+            .Select(r => r.Location.Name)
+            .Distinct()
+            .OrderBy(name => name)   // deterministic: without it, which 5 names appear varies per run
+            .Take(5)
+            .ToListAsync(ct);
+
+        return new HeatRangeSummary(
+            aggregate.Total,
+            aggregate.Average ?? 0,
+            aggregate.Peak ?? 0,
+            aggregate.HighRisk,
+            affected);
+    }
 
     public async Task<HeatReading?> GetLatestByLocationAsync(Guid locationId, CancellationToken ct = default) =>
         await _dbSet.Include(r => r.Location)
