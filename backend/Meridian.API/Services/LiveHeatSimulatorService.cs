@@ -3,30 +3,43 @@ using Meridian.Core.Entities;
 using Meridian.Core.Interfaces.Repositories;
 using Microsoft.AspNetCore.SignalR;
 using Meridian.Application.DTOs.Responses;
+using Meridian.API.Configuration;
+using Microsoft.Extensions.Options;
 using AutoMapper;
 
 namespace Meridian.API.Services;
 
+/// <summary>
+/// Writes synthetic readings so the live dashboard keeps moving during demos.
+/// This is not real telemetry, and it appends to the same table as the FortyGuard
+/// ingestion worker — set <c>Simulator__Enabled=false</c> to switch it off.
+/// </summary>
 public class LiveHeatSimulatorService : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IHubContext<HeatHub> _hubContext;
+    private readonly SimulatorOptions _options;
     private readonly ILogger<LiveHeatSimulatorService> _logger;
     private readonly Random _random = new();
 
     public LiveHeatSimulatorService(
         IServiceProvider serviceProvider,
         IHubContext<HeatHub> hubContext,
+        IOptions<SimulatorOptions> options,
         ILogger<LiveHeatSimulatorService> logger)
     {
         _serviceProvider = serviceProvider;
         _hubContext = hubContext;
+        _options = options.Value;
         _logger = logger;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Live Heat Simulator Service is starting.");
+        _logger.LogWarning(
+            "Live Heat Simulator ENABLED — writing synthetic readings every {Interval}s. "
+            + "Set Simulator__Enabled=false to disable.",
+            _options.Interval.TotalSeconds);
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -39,8 +52,9 @@ public class LiveHeatSimulatorService : BackgroundService
                 _logger.LogError(ex, "Error occurred during heat simulation.");
             }
 
-            // Fluctuate a random location every 2.5 seconds to make the UI look very alive
-            await Task.Delay(2500, stoppingToken);
+            // Fluctuate a random location on an interval to keep the UI visibly live.
+            try { await Task.Delay(_options.Interval, stoppingToken); }
+            catch (OperationCanceledException) { return; }
         }
     }
 

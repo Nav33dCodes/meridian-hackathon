@@ -160,7 +160,7 @@ sequenceDiagram
 ```
 
 > [!IMPORTANT]
-> `LiveHeatSimulatorService` (2.5 s tick) exists to keep the demo visually alive — it is **not** real telemetry. Disable it before drawing conclusions about data volume or freshness. `HeatIngestionWorker` (15 min poll) is the real FortyGuard path.
+> `LiveHeatSimulatorService` (2.5 s tick by default) exists to keep the demo visually alive — it is **not** real telemetry. Disable it with `Simulator__Enabled=false` before drawing conclusions about data volume or freshness. `HeatIngestionWorker` (15 min poll) is the real FortyGuard path. `DataRetentionService` trims raw readings past 7 days so neither writer can grow the table without bound.
 
 ### Why SignalR patches the cache instead of triggering refetches
 

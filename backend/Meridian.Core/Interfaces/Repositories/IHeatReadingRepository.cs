@@ -14,4 +14,11 @@ public interface IHeatReadingRepository : IRepository<HeatReading>
     Task<IEnumerable<HeatReading>> GetLatestForLocationsAsync(IEnumerable<Guid> locationIds, CancellationToken ct = default);
     Task<Dictionary<Guid, List<double>>> GetTemperaturesForLocationsAsync(IEnumerable<Guid> locationIds, int limit = 50, CancellationToken ct = default);
     Task DeleteAllAsync(CancellationToken ct = default);
+
+    /// <summary>
+    /// Deletes up to <paramref name="batchSize"/> readings older than <paramref name="cutoff"/>,
+    /// always preserving each location's most recent reading. Returns the number deleted;
+    /// call repeatedly until it returns 0.
+    /// </summary>
+    Task<int> DeleteOlderThanAsync(DateTime cutoff, int batchSize, CancellationToken ct = default);
 }

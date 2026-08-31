@@ -10,6 +10,8 @@ using Serilog;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Meridian.API.Exports.Pdf;
+using Meridian.API.Configuration;
+using Meridian.API.Startup;
 using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,8 +42,31 @@ builder.Services.AddSignalR()
 builder.Services.AddScoped<Meridian.Core.Interfaces.Services.IHeatNotificationService, Meridian.API.Services.HeatNotificationService>();
 builder.Services.AddScoped<Meridian.API.Exports.Excel.IZoneExcelExporter, Meridian.API.Exports.Excel.ZoneExcelExporter>();
 builder.Services.AddScoped<IChartRenderer, ChartRenderer>();
-builder.Services.AddHostedService<Meridian.API.Services.LiveHeatSimulatorService>();
 builder.Services.AddHostedService<Meridian.API.Exports.ExportWarmupService>();
+
+// Background writers are configuration-gated. The simulator appends synthetic
+// rows to the same table as real ingestion, so it must be switchable off in any
+// environment where the data matters (Simulator__Enabled=false) — and retention
+// keeps that table from growing without bound either way.
+builder.Services.Configure<SimulatorOptions>(
+    builder.Configuration.GetSection(SimulatorOptions.SectionName));
+builder.Services.Configure<RetentionOptions>(
+    builder.Configuration.GetSection(RetentionOptions.SectionName));
+
+var simulatorOptions = builder.Configuration.GetSection(SimulatorOptions.SectionName)
+    .Get<SimulatorOptions>() ?? new SimulatorOptions();
+var retentionOptions = builder.Configuration.GetSection(RetentionOptions.SectionName)
+    .Get<RetentionOptions>() ?? new RetentionOptions();
+
+if (simulatorOptions.Enabled)
+{
+    builder.Services.AddHostedService<Meridian.API.Services.LiveHeatSimulatorService>();
+}
+
+if (retentionOptions.Enabled)
+{
+    builder.Services.AddHostedService<Meridian.API.Services.DataRetentionService>();
+}
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -88,12 +113,13 @@ builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
-// Migrate DB on startup
-using (var scope = app.Services.CreateScope())
+// Migrate DB on startup, with retries so a transient outage does not become a
+// permanent restart loop.
+await DatabaseInitializer.MigrateAsync(app);
+
+if (!simulatorOptions.Enabled)
 {
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await db.Database.MigrateAsync();
-    Log.Information("Database migrated successfully");
+    Log.Information("Live heat simulator is disabled (Simulator:Enabled=false)");
 }
 
 // Middleware pipeline

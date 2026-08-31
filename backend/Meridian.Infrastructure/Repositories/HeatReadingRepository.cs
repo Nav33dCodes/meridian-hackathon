@@ -63,16 +63,55 @@ public class HeatReadingRepository : Repository<HeatReading>, IHeatReadingReposi
 
     public async Task<Dictionary<Guid, List<double>>> GetTemperaturesForLocationsAsync(IEnumerable<Guid> locationIds, int limit = 50, CancellationToken ct = default)
     {
-        // Batch fetch temperatures. To respect the limit per location in a single query, we fetch more and group in-memory.
-        // For correlations (usually < 20 locations, 50 points), fetching 1000 rows into memory is extremely fast compared to N queries.
-        var data = await _dbSet
-            .Where(r => locationIds.Contains(r.LocationId))
-            .OrderByDescending(r => r.MeasuredAt)
+        var ids = locationIds as IReadOnlyList<Guid> ?? locationIds.ToList();
+        if (ids.Count == 0) return [];
+
+        // Hand-written because the LINQ equivalent (SelectMany over a correlated
+        // Take) compiles to a ROW_NUMBER() over the *entire* table with the
+        // location filter applied afterwards in a join — bounded transfer, but a
+        // full scan on every call. LATERAL + LIMIT instead walks
+        // IX_HeatReadings_LocationId_MeasuredAt and stops after `limit` rows per
+        // location, so cost tracks (locations x limit) rather than table size.
+        const string sql = """
+            SELECT t.*
+            FROM "Locations" AS l
+            JOIN LATERAL (
+                SELECT h.*
+                FROM "HeatReadings" AS h
+                WHERE h."LocationId" = l."Id"
+                ORDER BY h."MeasuredAt" DESC
+                LIMIT {0}
+            ) AS t ON TRUE
+            WHERE l."Id" = ANY({1})
+            """;
+
+        var rows = await _dbSet
+            .FromSqlRaw(sql, limit, ids.ToArray())
+            .AsNoTracking()
             .Select(r => new { r.LocationId, r.TemperatureCelsius })
             .ToListAsync(ct);
 
-        return data.GroupBy(r => r.LocationId)
-                   .ToDictionary(g => g.Key, g => g.Select(x => x.TemperatureCelsius).Take(limit).ToList());
+        // Rows arrive newest-first within each partition, which the grouping preserves.
+        return rows.GroupBy(r => r.LocationId)
+                   .ToDictionary(g => g.Key, g => g.Select(x => x.TemperatureCelsius).ToList());
+    }
+
+    public async Task<int> DeleteOlderThanAsync(DateTime cutoff, int batchSize, CancellationToken ct = default)
+    {
+        // A location's most recent reading is never deleted, however old it is —
+        // otherwise a quiet ingestion window would empty the dashboard.
+        var expired = _dbSet.Where(r => r.MeasuredAt < cutoff
+            && _dbSet.Any(n => n.LocationId == r.LocationId && n.MeasuredAt > r.MeasuredAt));
+
+        var ids = await expired
+            .OrderBy(r => r.MeasuredAt)
+            .Select(r => r.Id)
+            .Take(batchSize)
+            .ToListAsync(ct);
+
+        if (ids.Count == 0) return 0;
+
+        return await _dbSet.Where(r => ids.Contains(r.Id)).ExecuteDeleteAsync(ct);
     }
 
     public async Task DeleteAllAsync(CancellationToken ct = default)
