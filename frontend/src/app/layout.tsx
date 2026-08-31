@@ -4,9 +4,15 @@ import { GeistMono } from 'geist/font/mono';
 import './globals.css';
 import { Providers } from './providers';
 import { Sidebar } from '@/components/shared/Sidebar';
-import { Toaster } from 'sonner';
 import { GlobalAlerts } from '@/components/shared/GlobalAlerts';
 import { CommandPalette } from '@/components/ui/CommandPalette';
+import { ThermalController } from '@/components/shared/ThermalController';
+import { AppToaster } from '@/components/shared/AppToaster';
+import { THERMAL_ATTRIBUTE, THERMAL_STORAGE_KEY } from '@/lib/thermal';
+
+// Applies the stored Thermal Vision preference before first paint, so a reload
+// in thermal mode never flashes the light palette.
+const thermalBootScript = `(function(){try{if(localStorage.getItem('${THERMAL_STORAGE_KEY}')==='1'){document.documentElement.setAttribute('${THERMAL_ATTRIBUTE}','on')}}catch(e){}})();`;
 
 export const metadata: Metadata = {
   title: 'Meridian — Urban Heat Intelligence',
@@ -26,6 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: thermalBootScript }} />
       </head>
       <body className="bg-base text-primary font-sans antialiased">
         <Providers>
@@ -35,9 +42,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               {children}
             </main>
           </div>
-          <Toaster position="bottom-right" theme="light" />
+          <AppToaster />
           <GlobalAlerts />
           <CommandPalette />
+          <ThermalController />
         </Providers>
       </body>
     </html>

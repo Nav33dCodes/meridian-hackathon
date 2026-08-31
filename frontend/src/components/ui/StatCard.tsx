@@ -21,11 +21,11 @@ export function StatCard({ title, value, icon, tone = 1, trend, className = '' }
     >
       <div className="flex items-start justify-between mb-4">
         <h3 className={`text-sm font-medium text-kpi-${tone} opacity-80`}>{title}</h3>
-        {icon && <div className={`text-kpi-${tone} p-2 rounded-full bg-white/50`}>{icon}</div>}
+        {icon && <div className={`text-kpi-${tone} p-2 rounded-full bg-kpi-icon`}>{icon}</div>}
       </div>
 
       <div className="flex items-baseline gap-3">
-        <h2 className={`text-3xl leading-none font-bold text-kpi-${tone} tracking-tight`}>{value}</h2>
+        <h2 className={`thermal-readout text-3xl leading-none font-bold text-kpi-${tone} tracking-tight`}>{value}</h2>
       </div>
 
       {trend && (

@@ -7,6 +7,9 @@ import L from 'leaflet';
 import type { HeatReading } from '@/types';
 import HeatmapLayer from './HeatmapLayer';
 import { Layers } from 'lucide-react';
+import { useAppStore } from '@/lib/store/useAppStore';
+import { THERMAL_RISK_COLOR } from '@/lib/thermal';
+import { ThermalOverlay } from './ThermalOverlay';
 
 // Fix Leaflet's default icon issue with Next.js SSR
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -23,6 +26,7 @@ interface MapProps {
 export default function Map({ data }: MapProps) {
   const [mounted, setMounted] = useState(false);
   const [viewMode, setViewMode] = useState<'heatmap' | 'markers'>('heatmap');
+  const thermal = useAppStore((s) => s.thermal);
 
   // Create a beautiful glowing marker using DivIcon
   const createCustomIcon = (color: string) => {
@@ -48,7 +52,13 @@ export default function Map({ data }: MapProps) {
     : [25.2048, 55.2708];
 
   const cartoApiKey = process.env.NEXT_PUBLIC_CARTO_API_KEY || 'cb1_2h2f_1_4173fd78da0b8728b9022689';
-  const mapStyle = 'light_all';
+  // Thermal vision swaps in the dark basemap; CSS then desaturates and dims it
+  // so the heat ramp is the only colour on screen.
+  const mapStyle = thermal ? 'dark_all' : 'light_all';
+
+  const temps = data.map(r => r.temperatureCelsius).filter(t => Number.isFinite(t));
+  const minTemp = temps.length ? Math.min(...temps) : NaN;
+  const maxTemp = temps.length ? Math.max(...temps) : NaN;
 
   // Prepare heatmap data: mapping temperature to an intensity value (0.0 to 1.0)
   // Clamp minimum to 0.4 so even very cold temperatures are highly visible on the map.
@@ -71,11 +81,12 @@ export default function Map({ data }: MapProps) {
         attributionControl={true}
       >
         <TileLayer
+          key={mapStyle}
           url={`https://{s}.basemaps.cartocdn.com/${mapStyle}/{z}/{x}/{y}{r}.png?key=${cartoApiKey}`}
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         />
       {viewMode === 'heatmap' ? (
-        <HeatmapLayer data={heatmapData} />
+        <HeatmapLayer data={heatmapData} thermal={thermal} />
       ) : (
         data.map((reading) => {
           if (!reading.latitude || !reading.longitude) return null;
@@ -83,7 +94,9 @@ export default function Map({ data }: MapProps) {
             <Marker
               key={reading.id}
               position={[reading.latitude, reading.longitude]}
-              icon={createCustomIcon(reading.riskColor || 'var(--accent)')}
+              icon={createCustomIcon(
+                (thermal ? THERMAL_RISK_COLOR[reading.riskLevel] : reading.riskColor) || 'var(--accent)'
+              )}
             >
               <Popup className="heat-popup">
                 <div className="p-1">
@@ -97,6 +110,9 @@ export default function Map({ data }: MapProps) {
         })
       )}
     </MapContainer>
+      {thermal && (
+        <ThermalOverlay minTemp={minTemp} maxTemp={maxTemp} zoneCount={data.length} />
+      )}
       <div className="absolute top-4 right-4 z-[9999] pointer-events-auto">
         <button
           onClick={() => setViewMode(prev => prev === 'heatmap' ? 'markers' : 'heatmap')}

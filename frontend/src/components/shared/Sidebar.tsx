@@ -12,6 +12,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { ThermalToggle } from './ThermalToggle';
 
 const nav = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -102,13 +103,14 @@ export function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className={`flex shrink-0 border-t border-subtle overflow-hidden ${collapsed ? 'flex-col items-center p-4 gap-3' : 'items-center justify-between p-4'}`}>
+      <div className={`flex shrink-0 border-t border-subtle overflow-hidden ${collapsed ? 'flex-col items-center p-4 gap-3' : 'items-center justify-between gap-1 p-4'}`}>
         <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-subtle">
           <span className="live-dot shrink-0" />
           {!collapsed && (
-            <span className="text-[11px] font-medium text-secondary whitespace-nowrap">System Live</span>
+            <span className="text-[11px] font-medium text-secondary whitespace-nowrap">Live</span>
           )}
         </div>
+        <ThermalToggle collapsed={collapsed} />
         <button
           type="button"
           onClick={() => setCollapsed(!collapsed)}
